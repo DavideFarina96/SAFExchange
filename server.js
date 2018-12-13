@@ -6,8 +6,9 @@ var morgan = require('morgan');             // log requests to the console (expr
 var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
 var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
 var schedule = require('node-schedule');    //scheduler
+var axios = require('axios');
 
-var globalValues = require('./public/globalValues');
+//var globalValues = require('./public/globalValues');
 
 // configuration =================
 
@@ -15,7 +16,7 @@ var globalValues = require('./public/globalValues');
 mongoose.connect('mongodb://localhost:27017/eaglewebplatform',
 	function(err) {
 		if(err)
-			console.log("error");
+			console.log("db error");
 		else
 			console.log("Connected to db");
 	});     // connect to mongoDB database
@@ -105,9 +106,18 @@ app.get('/user/USD', function(req, res) {
 });
 
 
-app.post('/price/BTC', function(req, res) {
-    // DO STUFF
-    res.send();
+app.get('/price/BTC', function(req, res) {
+    var priceObj = {price: 0};
+    axios.get('https://api.pro.coinbase.com/products/BTC-USD/ticker')
+      .then(response => {
+        console.log("price received");
+        priceObj.price = response.data.price;
+        res.send(priceObj);
+      })
+      .catch(error => {
+        console.log(error);
+        res.send(error);
+      });
 });
 
 app.get('/profile/', function(req, res) {

@@ -1,7 +1,7 @@
 {
-  "name": "node-todo",
+  "name": "SAFExchange",
   "version": "0.0.0",
-  "description": "Simple todo application.",
+  "description": "SAFExchange.",
   "main": "server.js",
   "author": "Davide Farina",
   "scripts": {
@@ -16,6 +16,7 @@
     "mongoose": "~4.7.3",
     "morgan": "~1.2.2",
     "node-schedule": "^1.2.5",
-    "nodemon": "^1.12.1"
+    "nodemon": "^1.12.1",
+	"axios": "^0.18.0"
   }
 }
