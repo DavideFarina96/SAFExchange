@@ -1,0 +1,19 @@
+{
+  "name": "database",
+  "version": "1.0.0",
+  "description": "server database",
+  "main": "server_database.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "heroku-ssl-redirect": "0.0.4",
+    "http": "0.0.0",
+    "https": "^1.0.0",
+    "request": "^2.83.0"
+  },
+  "author": "Francesco Bruschetti",
+  "license": "ISC"
+}
