@@ -1,0 +1,3 @@
+mongodump -d SAFExchangeDB
+
+mongorestore -d SAFExchangeDB "./dump/SAFExchangeDB"

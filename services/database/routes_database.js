@@ -2,14 +2,11 @@ var express = require('express');
 router = express.Router();
 
 var mongoose = require('mongoose');                     // mongoose for mongodb
-var db_schemas = require('./schemas.js');
-
-// VARIABLES
-var debugObjectArray = [] // used to store the data received from the server_price ws
+require('./schemas.js');								// create the models for the objs
 
 
 // MONGOOSE
-mongoose.connect('mongodb://localhost:27017/eaglewebplatform',
+mongoose.connect('mongodb://localhost:27017/SAFExchangeDB',
 	function (err) {
 		if (err)
 			console.log("db error");
@@ -18,56 +15,237 @@ mongoose.connect('mongodb://localhost:27017/eaglewebplatform',
 	});     // connect to mongoDB database
 
 // SCHEMAS
-var Users = mongoose.model('users');
-var Subreports = mongoose.model('subreports');
-var Reports = mongoose.model('reports');
-var Weeks = mongoose.model('weeks');
-var Tasks = mongoose.model('tasks');
-var Bugs = mongoose.model('bugs');
+var User = mongoose.model('users');
+var Price = mongoose.model('prices');
+var Transaction = mongoose.model('transactions');
+var PlannedAction = mongoose.model('plannedactions');
 
 
 // ROUTES
+var possible_routes =
+	"GET		/user" + "<br>" +
+	"/user/BTC" + "<br>" +
+	"/user/ETH" + "<br>" +
+	"/user/USD" + "<br>" +
+	"POST 		/user" + "<br>" +
+	"PUT 		/user/balance" + "<br>" +
 
+	"GET 		/price" + "<br>" +
+	"POST 		/price" + "<br>" +
+
+	"GET		/transaction" + "<br>" +
+	"POST 		/transaction" + "<br>" +
+
+	"GET		/plannedaction" + "<br>" +
+	"POST 		/plannedaction" + "<br>" +
+	"DELETE		/plannedaction/:id";
+
+router.get('/', function (req, res) {
+	res.send(possible_routes);
+});
+
+/*
+	GET		/user
+			/user/BTC
+			/user/ETH
+			/user/USD
+	POST 	/user
+	PUT 	/user/balance
+
+	GET 	/price
+	POST 	/price
+	
+	GET		/transaction
+	POST 	/transaction
+	
+	GET		/plannedaction
+	POST 	/plannedaction
+	DELETE	/plannedaction/:id
+*/
+
+/** USER ROUTES **/
+router.get('/user/:user_id', function (req, res) {
+	User.findById(req.params.user_id, function (err, user) {
+		if (err) res.send(err);
+		res.json(user);
+	});
+});
+router.get('/user/:user_id/:currency', function (req, res) {
+	User.findById(req.params.user_id, function (err, user) {
+		if (err) res.send(err);
+
+		var currency = req.params.currency;
+		switch (currency) {
+			case "USD":
+			case "usd": res.json(user.USD); break;
+
+			case "BTC":
+			case "btc": res.json(user.BTC); break;
+
+			case "ETH":
+			case "eth": res.json(user.ETH); break;
+		}
+	});
+});
+
+router.put('/user/:user_id/balance', function (req, res) {
+	var _user_id = req.params.user_id;
+	var _balance = {}
+
+	// Make sure only USD, BTC, and ETH field can be edited
+	if (req.body.hasOwnProperty('USD'))
+		_balance.USD = req.body.USD;
+	if (req.body.hasOwnProperty('BTC'))
+		_balance.BTC = req.body.BTC;
+	if (req.body.hasOwnProperty('ETH'))
+		_balance.ETH = req.body.ETH;
+
+	User.findByIdAndUpdate(_user_id, { $set: _balance }, { new: true }, function (err, user) {
+		if (err) res.send(err);
+
+		res.json(user);
+	});
+});
+
+router.post('/user', function (req, res) {
+	// Get user params
+	var _user = req.body;
+
+	User.create(_user, function (err, user) {
+		if (err) return res.send(err);
+
+		console.log("New user created");
+		res.json(user);
+	});
+});
+
+
+/** PRICE ROUTES **/
 // Defines the /price API, which is used from pricews for saving the new value of the currencies
-router.post('/price', function (req, res) {
-	// configuration for the response
-	res.statusCode = 200;
-	res.header('Content-type', 'application/json');
+router.get('/price', async function (req, res) {
+	var _price = {};
 
 	try {
-		//process
-		// req.body.param_name --> get the specified parameter sent through the request parameter
-		console.log("WS DATABASE");
-		var _receivedTime = (req.body.time); console.log("_receivedTime: " + _receivedTime);
-		var _receivedisBTCchanged = (req.body.isBTCchanged); console.log("_receivedisBTCchanged: " + _receivedisBTCchanged);
-		var _receivedisETHChanged = (req.body.isETHChanged); console.log("_receivedisETHChanged: " + _receivedisETHChanged);
-		var _receivedBTC = (req.body.BTC); console.log("_receivedBTC: " + _receivedBTC);
-		var _receivedETH = (req.body.ETH); console.log("_receivedETH: " + _receivedETH);
+		// Get the last prices for both BTC and ETH and send them
+		_price.BTCUSD = (await Price.findOne({ BTCUSD: { $exists: true } }, 'BTCUSD', { sort: { '_id': -1 } })).BTCUSD;
+		_price.ETHUSD = (await Price.findOne({ ETHUSD: { $exists: true } }, 'ETHUSD', { sort: { '_id': -1 } })).ETHUSD;
 
-
-
-		// store the element in the array 
-		debugObjectArray.push({
-			receivedTime: _receivedTime,
-			receivedisBTCchanged: _receivedisBTCchanged,
-			receivedisETHChanged: _receivedisETHChanged,
-			receivedBTC: _receivedBTC,
-			receivedETH: _receivedETH,
-		});
-
-		/////////////
-		/// do things..........
-		/////////////
-
-		res.send('{"status": "OK"}');
+		console.log("Last read price", "BTCUSD: ", _price.BTCUSD, "ETHUSD: " + _price.ETHUSD)
+		res.json(_price);
 	}
-	catch (error) {
-		res.statusCode = 400;
-		res.send('{"status": "' + error + '"}');
+	catch (err) {
+		console.log("Error")
+		res.send(err);
+	}
+});
+
+router.post('/price', function (req, res) {
+	var _price = req.body;
+
+	Price.create(_price, function (err, price) {
+		if (err) return res.send(err);
+
+		console.log("New price inserted");
+		res.json(price);
+	});
+});
+
+
+/** TRANSACTION ROUTES **/
+router.get('/transaction/:transaction_id', function (req, res) {
+	var _transaction_id = req.params.transaction_id;
+
+	Transaction.findById(_transaction_id, function (err, transaction) {
+		if (err) return res.send(err);
+
+		res.json(transaction);
+	});
+});
+
+router.get('/transaction/user/:user_id', function (req, res) {
+	var _user_id = req.params.user_id;
+
+	Transaction.find({ author: _user_id }, function (err, transactions) {
+		if (err) return res.send(err);
+
+		res.json(transactions);
+	});
+});
+
+router.post('/transaction', function (req, res) {
+	var _transaction = req.body;
+
+	var _has_BTC_field = _transaction.hasOwnProperty('BTC');
+	var _has_ETH_field = _transaction.hasOwnProperty('ETH');
+
+	// XOR operand
+	if ((_has_BTC_field && !_has_ETH_field) || (!_has_BTC_field && _has_ETH_field)) {
+		Transaction.create(_transaction, function (err, transaction) {
+			if (err) return res.send(err);
+
+			console.log("New transaction inserted");
+			res.json(transaction);
+		});
+	}
+	else {
+		console.log("Error! Wrong data");
+		res.send("Error! The body request should contain either the field BTC or ETH (exclusively)");
 	}
 });
 
 
+/** PLANNEDACTION ROUTES **/
+router.get('/plannedaction/:plannedaction_id', function (req, res) {
+	var _plannedaction_id = req.params.plannedaction_id;
+
+	PlannedAction.findById(_plannedaction_id, function (err, plannedaction) {
+		if (err) return res.send(err);
+
+		res.json(plannedaction);
+	});
+});
+
+router.get('/plannedaction/user/:user_id', function (req, res) {
+	var _user_id = req.params.user_id;
+
+	PlannedAction.find({ author: _user_id }, function (err, plannedactions) {
+		if (err) return res.send(err);
+
+		res.json(plannedactions);
+	});
+});
+
+router.post('/plannedaction', function (req, res) {
+	var _plannedaction = req.body;
+
+	var _has_BTC_field = _plannedaction.hasOwnProperty('BTC') && _plannedaction.hasOwnProperty('BTCUSD');
+	var _has_ETH_field = _plannedaction.hasOwnProperty('ETH') && _plannedaction.hasOwnProperty('ETHUSD');
+
+	// XOR operand
+	if ((_has_BTC_field && !_has_ETH_field) || (!_has_BTC_field && _has_ETH_field)) {
+		PlannedAction.create(_plannedaction, function (err, plannedaction) {
+			if (err) return res.send(err);
+
+			console.log("New plannedaction inserted");
+			res.json(plannedaction);
+		});
+	}
+	else {
+		console.log("Error! Wrong data");
+		res.send("Error! The body request should contain either the fields BTC and BTCUSD or ETH and ETHUSD (exclusively)");
+	}
+});
+
+router.delete('/plannedaction/:plannedaction_id', function (req, res) {
+	var _plannedaction_id = req.params.plannedaction_id;
+
+	PlannedAction.findByIdAndUpdate(_plannedaction_id, { $set: { state: 'CANCELED' } }, { new: true },
+		function (err, plannedaction) {
+			if (err) res.send(plannedaction);
+
+			res.json(plannedaction);
+		});
+});
 
 
 
