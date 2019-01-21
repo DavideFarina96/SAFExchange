@@ -83,17 +83,19 @@ app.get('/', function(req, res) {
 });
 
 app.post('/tokensignin', function(req, res) {
-    var token = req.body.idtoken;
-    var clientID = "533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com";
+    var token = req.body.tokenid;
+    console.log(token);
+    var clientId = "533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com";
 
-    /*verifier.verify(IdToken, clientId, function (err, tokenInfo) {
+    verifier.verify(token, clientId, function (err, tokenInfo) {
       if (!err) {
         res.json(tokenInfo);
       }
       else
         res.send("err");
-    });*/
-
+    });
+    
+    /*
     const client = new OAuth2Client("533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com");
 
     async function verify() {
@@ -105,7 +107,7 @@ app.post('/tokensignin', function(req, res) {
       const userid = payload['sub'];
       res.json(payload);
     }
-    verify().catch(console.error);
+    verify().catch(console.error);*/
 });
 
 // Include DATABASE routes
