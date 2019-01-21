@@ -96,12 +96,13 @@ app.post('/tokensignin', function(req, res) {
     });
 });
 
+
 // Include DATABASE routes
 var db_routes = require('./services/database/routes_database.js');
 app.use('/database', db_routes);
 
 // Include PLANNED ACTION routes
-var plannedaction_routes = require('./services/database/server_plannedaction.js');
+var plannedaction_routes = require('./services/plannedaction/server_plannedaction.js');
 app.use('/plannedaction', db_routes);
 
 // register main router
