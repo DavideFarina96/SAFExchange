@@ -86,26 +86,26 @@ app.post('/tokensignin', function(req, res) {
     var token = req.body.idtoken;
     var clientID = "533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com";
 
-    verifier.verify(IdToken, clientId, function (err, tokenInfo) {
+    /*verifier.verify(IdToken, clientId, function (err, tokenInfo) {
       if (!err) {
         res.json(tokenInfo);
       }
       else
         res.send("err");
-    });
+    });*/
 
-    //const client = new OAuth2Client("533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com");
+    const client = new OAuth2Client("533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com");
 
-    /*async function verify() {
+    async function verify() {
       const ticket = await client.verifyIdToken({
           idToken: token,
           audience: "5533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com",  // Specify the CLIENT_ID of the app that accesses the backend
       });
       const payload = ticket.getPayload();
       const userid = payload['sub'];
-      res.send(payload);
+      res.json(payload);
     }
-    verify().catch(console.error);*/
+    verify().catch(console.error);
 });
 
 // Include DATABASE routes
