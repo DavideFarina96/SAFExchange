@@ -12,6 +12,9 @@ var schedule = require('node-schedule');                // scheduler
 var axios = require('axios');                           // make HTTP requests
 //var globalValues = require('./public/globalValues');
 
+var {OAuth2Client} = require('google-auth-library');
+var verifier = require('google-id-token-verifier');
+
 
 // CONFIGURATION
 app.use(express.static(path.join(__dirname, 'public')));        // set the static files location /public/img will be /img for users
@@ -74,11 +77,32 @@ app.get('/profile/', function(req, res) {
     res.sendfile('./public/profile.html');
 }); */
 
+app.get('/', function(req, res) {
+    // DO STUFF
+    res.sendfile("./index.html");     
+});
+
+app.post('/tokensignin', function(req, res) {
+    var token = req.body.tokenid;
+    console.log(token);
+    var clientId = "533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com";
+
+    verifier.verify(token, clientId, function (err, tokenInfo) {
+      if (!err) {
+        res.json(tokenInfo);
+      }
+      else
+        res.json(req.body);
+    });
+});
 
 // Include DATABASE routes
 var db_routes = require('./services/database/routes_database.js');
 app.use('/database', db_routes);
 
+// Include PLANNED ACTION routes
+var plannedaction_routes = require('./services/database/server_plannedaction.js');
+app.use('/plannedaction', db_routes);
 
 // register main router
 app.use('/', router);

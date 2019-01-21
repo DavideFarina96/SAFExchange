@@ -17,7 +17,7 @@ const server_methods_ETHUSD = require('./server/server_methods_ETHUSD');
 var coinbaseObj, krakenObj, bitfinexObj, binanceObj; //logic variables
 var ourBTCValue = 0, ourETHValue = 0; // value BTC -> USD and ETH -> USD for buying and selling on SAFEx
 const rangeBTC = 0.1, rangeETH = 0.01; // the last computed value of BTC is different from the one saved on the db if it's outside the db value +- range
-const timerInterval = 10000; // milliseconds timer interval // 1500; --> error code 429 (To many requests)
+const timerInterval = 5000; // milliseconds timer interval // 1500; --> error code 429 (To many requests)
 
 // initially, the value for ourBTC and ourETH are set to zero by default. 
 // In order to use the "range" and check if the new value is different from the previous one, we need to correctly initialize it
@@ -41,6 +41,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 // needed to send file to the client (i.e. style file)
 app.use(express.static(path.join(__dirname, 'public')));
+// END of the SERVER CONFIGURATION 
+//////////////////////////////////////////////////////////////////////////////
 
 /** middleware route to support CORS and preflighted requests */
 app.use(function (req, res, next) {
@@ -58,11 +60,7 @@ app.use(function (req, res, next) {
 	}
 	next();
 });
-// END of the SERVER CONFIGURATION 
-//////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////
-// ROUTING SETUP
 /** function that respond to the request server_path/, in both GET and POST */
 router.all(['/index.js', '/style.css'], function (req, res) {
 	var resource = req.originalUrl == '/' ? '/index.html' : req.originalUrl;
@@ -73,16 +71,9 @@ router.all(['/index.js', '/style.css'], function (req, res) {
 });
 
 
-// ROUTES
-var possible_routes =
-	"GET		/BTCUSD" + "<br>" +
-				"/ETHUSD";
-
-router.get('/routes', function (req, res) {
-	res.send(possible_routes);
-});
-
-/** Defines default router used for get the client page */
+//////////////////////////////////////////////////////////////////////////////
+// ROUTING SETUP
+/** default router used for get the client page */
 router.get('/', function (req, res) {
 	// send a feedback to the client
 	res.sendFile(path.join(__dirname + '/client/index.html'));
@@ -140,6 +131,7 @@ router.get('/prices', function (req, res) { // automatically call both BTCUSD an
 
 	res.send(stringData);
 });
+
 
 /** Defines the /BTCUSD API.
  *  This function can be used from a client to get the value of the BTC as a json object
@@ -240,7 +232,7 @@ async function getPriceBTC() {
 			if(!((ourBTCValue - rangeBTC) < tmpBTCValue &&  (ourBTCValue + rangeBTC) > tmpBTCValue))
 			{	// true --> the computed value is different from the saved one
 				ourBTCValue = tmpBTCValue;
-				debugisBTCchanged = true;				
+				debugisBTCchanged = true;	
 			}
 		}
 		return debugisBTCchanged;
@@ -350,11 +342,11 @@ function organiseDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 		/** call the databasews in order to store the new value  */
 		// step 1: create the object with the data to send
 		var tmpObj =  querystring.stringify({
-			//time: formattedDate,			// time of the last update
-			//isBTCchanged: _isBTCChanged,	// to avoid adding duplicate values in the db
-			//isETHChanged: _isETHChanged,	// to avoid adding duplicate values in the db
-			BTCUSD: ourBTCValue,			// last stored value for BTC
-			ETHUSD: ourETHValue				// last stored value for ETH
+			time: formattedDate,			// time of the last update
+			isBTCchanged: _isBTCChanged,	// to avoid adding duplicate values in the db
+			isETHChanged: _isETHChanged,	// to avoid adding duplicate values in the db
+			BTC: ourBTCValue,				// last stored value for BTC
+			ETH: ourETHValue				// last stored value for ETH
 		});
 						
 		// step 2: create the header to send the data
@@ -364,7 +356,7 @@ function organiseDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 		}
 		
 		// step 3: call the function "sendDataToWS(...)" and send the updated prices to the WS that manage the database 
-		var sdtwsdb = sendDataToWS('localhost', 8080, '/database/price', 'POST',  _header, tmpObj); 
+		var sdtwsdb = sendDataToWS('localhost', 8085, '/price', 'POST',  _header, tmpObj); // original value: 27017
 		sdtwsdb.then(function(result) {
 			//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
 			console.log("[wsdb] "+result);

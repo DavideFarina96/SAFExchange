@@ -97,6 +97,11 @@ router.post('/checkTriggers', function (req, res) {
 	}
 });
 
+// show all planned actions for that user
+router.get('/' , function(req, res) {
+	
+});
+
 
 //////////////////////////////////////////////////////////////////////////////
 app.use('/', router); // set the initial path for the "router"

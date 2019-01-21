@@ -13,10 +13,14 @@
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "google-auth-library": "^3.0.1",
+    "google-id-token-verifier": "^0.2.3",
     "method-override": "~2.1.2",
     "mongoose": "~4.7.3",
     "morgan": "^1.9.1",
+    "node-datetime": "^2.1.2",
     "node-schedule": "^1.2.5",
-    "nodemon": "^1.18.9"
+    "nodemon": "^1.18.9",
+    "request": "^2.88.0"
   }
 }

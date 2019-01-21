@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<script src="https://apis.google.com/js/platform.js" async defer></script>
+		<meta name="google-signin-client_id" content="533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com">
+
+		<script type="text/javascript">
+			function onSignIn(googleUser) {
+				var profile = googleUser.getBasicProfile();
+				console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+				console.log('Name: ' + profile.getName());
+				console.log('Image URL: ' + profile.getImageUrl());
+				console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+				//alert("LUL ti ho hackerato, mister " + profile.getEmail());
+
+				//SEND TO BACKEND
+				var id_token = googleUser.getAuthResponse().id_token;
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', 'https:/safexchange.herokuapp.com/tokensignin');
+				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+				xhr.onload = function() {
+				  console.log('Signed in as: ' + xhr.responseText);
+				};
+				xhr.send('tokenid=' + id_token);
+
+			}
+		</script>
+	</head>
+
+	<body>
+		<div class="g-signin2" data-onsuccess="onSignIn"></div>
+	</body>
+</html>
+
+<!--
+Client ID: 533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com
+Client Secret: dpSGPjDB8jCQf7NBNGLq5aFt
+-->

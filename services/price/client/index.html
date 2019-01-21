@@ -15,20 +15,26 @@
 </head>
 
 <body class="row">
-    <dim class="col-xs-12">	
-		<h1><button onclick="getBTC()">GET BTC VALUES...</button></h1>
-		<h2 id="valueBTC"></h2>
+
+	<dim class="col-xs-12">	
+		<button onclick="getPrices()">AVAILABLE ROUTERS</button>
+		<p id="valuePrices"></p>
 	</dim>
 
     <dim class="col-xs-12">	
-		<h1><button onclick="getETH()">GET ETH VALUES...</button></h1>
-		<h2 id="valueETH"></h2>
+		<button onclick="getBTC()">GET BTC VALUES...</button>
+		<p id="valueBTC"></p>
+	</dim>
+
+    <dim class="col-xs-12">	
+		<button onclick="getETH()">GET ETH VALUES...</button>
+		<p id="valueETH"></p>
 	</dim>
 
 	<dim class="col-xs-12">	
-			<h1><button onclick="getPrices()">GET BTC and ETH VALUES...</button></h1>
-			<h2 id="valuePrices"></h2>
-		</dim>
+		<button onclick="getPrices()">GET BTC and ETH VALUES...</button>
+		<p id="valuePrices"></p>
+	</dim>
 
 
 	<script>

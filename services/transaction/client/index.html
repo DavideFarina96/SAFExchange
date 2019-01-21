@@ -1,0 +1,41 @@
+<!doctype html>
+
+<html>
+<head>
+    <!-- META -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>SAFExchange</title>   
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+
+<body class="row">
+    	<dim class="col-xs-12">	
+			<h1><button onclick="getTransactionHistory()">GET user TRANSACTION HISTORY...</button></h1>
+			<h2 id="transactions"></h2>
+		</dim>
+
+
+	<script>
+		var domain = "http://localhost:8082";
+		var ID_user = 1;
+		function getTransactionHistory()
+		{
+			$.ajax({
+				url: domain + '/transactions/' + ID_user,        // server path
+				type: 'GET',                  // http method to access the resource
+				success: function (jsondata) {
+					document.getElementById("transactions").innerText = JSON.stringify(jsondata);
+				},
+				error: function (jqXHR, exception) {
+					document.getElementById("transactions").innerText = "Error: " + jqXHR.responseText;
+				}
+			});
+		}
+
+	</script>
+</body>
+</html>	
