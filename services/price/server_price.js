@@ -317,7 +317,7 @@ function updateCurrency() {
 					console.error("BTC same: "+ ourBTCValue);
 			});
 
-		getPriceETH()
+		/* commentato tmp: getPriceETH()
 			.then((resIsETHChanged) => {
 				if(resIsETHChanged)
 				{
@@ -326,7 +326,7 @@ function updateCurrency() {
 				}
 				else
 					console.error("ETH same: " + ourETHValue);
-			});
+			});*/
 	}
 	catch(error)
 	{
@@ -358,18 +358,17 @@ function organiseDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 			'Content-Length': Buffer.byteLength(tmpObj)
 		}
 
+		console.log("HERE 1");
 		// step 3: call the function "sendDataToWS(...)" and send the updated prices to the WS that manage the database 
-		var res = sendDataToWS('localhost', 8085, '/price', 'POST',  _header, tmpObj);	
-
-		// step 4: call the function "sendDataToWS(...)" in order to notify the ws "plannedaction"
-		if(res)
-		{
-			sendDataToWS('localhost', 8083, '/checkTriggers', 'POST',  _header, tmpObj);
-		}
-		else
-		{	// saving the data in the db has generate an error ...
-			console.log("Unable to store data in the db");
-		}
+		sendDataToWS('localhost', 8085, '/price', 'POST',  _header, tmpObj).then((res) => {
+			console.log("RES:" + res);
+			if(res)
+			{
+				// sendDataToWS('localhost', 8083, '/checkTriggers', 'POST',  _header, tmpObj);
+			}
+			else
+				console.log("Unable to store data in the db");
+		});	
 	}
 	catch(error)
 	{
@@ -378,8 +377,9 @@ function organiseDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 }
 
 /** This function connects to the specified host and send the _data with the choosen crud method */
-function sendDataToWS(_host, _port, _path, _method, _header, _data)
-{
+// SBAGLIATA: ritorna true ancora prima di vedere cosa risponde il server e se il server è attivo
+async function sendDataToWS(_host, _port, _path, _method, _header, _data)
+{ // code from: https://stackoverflow.com/questions/19392744/calling-a-web-service-using-nodejs
 	try
 	{
 		var options = {
@@ -394,18 +394,27 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 		};
 		
 		var httpreq = http.request(options, function (response) {
+			var serverResponse;
+			
 			response.setEncoding('utf8');
 			response.on('data', function (chunk) {
-			console.log("--->"+ _port +": " + chunk);
+				serverResponse = chunk;
+				console.log("--->"+ _port +": " + chunk);
 			});
-			//response.on('end', function() {
-			//	console.log('---------->call ended');
-			//})
+			response.on('end', function() {
+				console.log('---------->call ended');
+				return true;
+			})
+		});
+		
+		
+		httpreq.on('error', function(err) {
+			// Handle error
+			console.error('httpreq: ' + err);
+			return false;
 		});
 		httpreq.write(_data);
 		httpreq.end();
-
-		return true;
 	}
 	catch(error)
 	{
