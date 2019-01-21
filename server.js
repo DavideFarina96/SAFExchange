@@ -84,12 +84,12 @@ app.get('/', function(req, res) {
 app.post('/tokensignin', function(req, res) {
     var token = req.body.idtoken;
 
-    const client = new OAuth2Client("533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61");
+    const client = new OAuth2Client("533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com");
 
     async function verify() {
       const ticket = await client.verifyIdToken({
           idToken: token,
-          audience: "533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61",  // Specify the CLIENT_ID of the app that accesses the backend
+          audience: "5533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com",  // Specify the CLIENT_ID of the app that accesses the backend
       });
       const payload = ticket.getPayload();
       const userid = payload['sub'];
