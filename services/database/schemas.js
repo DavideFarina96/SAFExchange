@@ -6,60 +6,37 @@ var UserSchema = new mongoose.Schema({
     password: String,
     surname: String,
     email: String,
-    workgroups: [String],
-    team: String,
-    roles: [{
-        role: String,
-        of: String
-    }]
+    oauth: String,
+    USD: Number,
+    BTC: Number,
+    ETH: Number
 });
 
-var SubreportSchema = new mongoose.Schema({
-    team: String,
-    text: String,
-    pro: String,
-    cons: String,
-    seen: Boolean
+var PriceSchema = new mongoose.Schema({
+    BTCUSD: Number,
+    ETHUSD: Number
 });
 
-var ReportSchema = new mongoose.Schema({
-    author: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
-    workgroup: String,
-    subreports: [{ type: mongoose.Schema.Types.ObjectId, ref: "subreports" }]
+var TransactionSchema = new mongoose.Schema({
+    author: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true },
+    action: { type: String, enum: ['buy', 'sell'], required: true },
+    USD: { type: Number, required: true },
+    BTC: Number,
+    ETH: Number
 });
 
-var WeekSchema = new mongoose.Schema({
-    weekdate: Date,
-    reports: [{ type: mongoose.Schema.Types.ObjectId, ref: "reports" }]
+var PlannedActionSchema = new mongoose.Schema({
+    author: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true },
+    action: { type: String, enum: ['buy', 'sell'], required: true },
+    state: { type: String, enum: ['IDLE', 'PROCESSING', 'COMPLETED', 'CANCELED'], required: true, default: 'IDLE' },
+    BTCUSD: Number,
+    ETHUSD: Number,
+    BTC: Number,
+    ETH: Number
 });
-
-var TaskSchema = new mongoose.Schema({
-    title: String,
-    description: String,
-    workgroup: String,
-    taskID: String,
-    creationDate: Date,
-    endingDate: Date,
-    assignedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
-    milestones: [{ name: String, date: Date }],
-    status: String
-});
-
-var BugSchema = new mongoose.Schema({
-    title: String,
-    bugID: String,
-    type: String,
-    description: String,
-    author: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
-    creationDate: Date,
-    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
-    status: String
-})
 
 
 mongoose.model('users', UserSchema);
-mongoose.model('subreports', SubreportSchema);
-mongoose.model('reports', ReportSchema);
-mongoose.model('weeks', WeekSchema);
-mongoose.model('tasks', TaskSchema);
-mongoose.model('bugs', BugSchema);
+mongoose.model('prices', PriceSchema);
+mongoose.model('transactions', TransactionSchema);
+mongoose.model('plannedactions', PlannedActionSchema);
