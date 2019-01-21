@@ -12,6 +12,8 @@ var schedule = require('node-schedule');                // scheduler
 var axios = require('axios');                           // make HTTP requests
 //var globalValues = require('./public/globalValues');
 
+var {OAuth2Client} = require('google-auth-library');
+
 
 // CONFIGURATION
 app.use(express.static(path.join(__dirname, 'public')));        // set the static files location /public/img will be /img for users
@@ -74,10 +76,26 @@ app.get('/profile/', function(req, res) {
     res.sendfile('./public/profile.html');
 }); */
 
-
 app.get('/', function(req, res) {
     // DO STUFF
     res.sendfile("./index.html");     
+});
+
+app.post('/tokensignin', function(req, res) {
+    var token = req.body.idtoken;
+
+    const client = new OAuth2Client("533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61");
+
+    async function verify() {
+      const ticket = await client.verifyIdToken({
+          idToken: token,
+          audience: "533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61",  // Specify the CLIENT_ID of the app that accesses the backend
+      });
+      const payload = ticket.getPayload();
+      const userid = payload['sub'];
+      console.log("Something happened");
+    }
+    verify().catch(console.error);
 });
 
 // Include DATABASE routes

@@ -13,6 +13,7 @@
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "google-auth-library": "^3.0.1",
     "method-override": "~2.1.2",
     "mongoose": "~4.7.3",
     "morgan": "^1.9.1",
