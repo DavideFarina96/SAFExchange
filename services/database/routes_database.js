@@ -4,12 +4,18 @@ router = express.Router();
 var mongoose = require('mongoose');                     // mongoose for mongodb
 require('./schemas.js');								// create the models for the objs
 
+var db_path = '';
+if (process.env.NODE && ~process.env.NODE.indexOf("heroku"))
+	db_path = 'mongodb:// path to DB'
+else
+	db_path = 'mongodb://administrator:admin_obv1@ds163164.mlab.com:63164/safexchangedb'
+
 
 // MONGOOSE
-mongoose.connect('mongodb://localhost:27017/SAFExchangeDB',
+mongoose.connect(db_path,
 	function (err) {
 		if (err)
-			console.log("db error");
+			console.log("DB error");
 		else
 			console.log("Connected to db");
 	});     // connect to mongoDB database
