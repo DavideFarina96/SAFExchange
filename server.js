@@ -75,6 +75,11 @@ app.get('/profile/', function(req, res) {
 }); */
 
 
+app.get('/', function(req, res) {
+    // DO STUFF
+    res.sendfile("./index.html");     
+});
+
 // Include DATABASE routes
 var db_routes = require('./services/database/routes_database.js');
 app.use('/database', db_routes);
