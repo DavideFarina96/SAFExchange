@@ -92,22 +92,8 @@ app.post('/tokensignin', function(req, res) {
         res.json(tokenInfo);
       }
       else
-        res.send("err");
+        res.json(req.body);
     });
-    
-    /*
-    const client = new OAuth2Client("533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com");
-
-    async function verify() {
-      const ticket = await client.verifyIdToken({
-          idToken: token,
-          audience: "5533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com",  // Specify the CLIENT_ID of the app that accesses the backend
-      });
-      const payload = ticket.getPayload();
-      const userid = payload['sub'];
-      res.json(payload);
-    }
-    verify().catch(console.error);*/
 });
 
 // Include DATABASE routes
