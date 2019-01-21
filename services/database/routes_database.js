@@ -145,7 +145,7 @@ router.post('/price', function (req, res) {
 	Price.create(_price, function (err, price) {
 		if (err) return res.send(err);
 
-		console.log("New price inserted");
+		console.log("New price inserted: " + price);
 		res.json(price);
 	});
 });

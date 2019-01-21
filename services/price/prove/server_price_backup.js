@@ -1,6 +1,5 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var request = require("request");
 var path = require('path');
 var http = require('http'); // used for calling external server
 var querystring = require('querystring');
@@ -17,7 +16,7 @@ const server_methods_ETHUSD = require('./server/server_methods_ETHUSD');
 var coinbaseObj, krakenObj, bitfinexObj, binanceObj; //logic variables
 var ourBTCValue = 0, ourETHValue = 0; // value BTC -> USD and ETH -> USD for buying and selling on SAFEx
 const rangeBTC = 0.1, rangeETH = 0.01; // the last computed value of BTC is different from the one saved on the db if it's outside the db value +- range
-const timerInterval = 10000; // milliseconds timer interval // 1500; --> error code 429 (To many requests)
+const timerInterval = 5000; // milliseconds timer interval // 1500; --> error code 429 (To many requests)
 
 // initially, the value for ourBTC and ourETH are set to zero by default. 
 // In order to use the "range" and check if the new value is different from the previous one, we need to correctly initialize it
@@ -41,6 +40,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 // needed to send file to the client (i.e. style file)
 app.use(express.static(path.join(__dirname, 'public')));
+// END of the SERVER CONFIGURATION 
+//////////////////////////////////////////////////////////////////////////////
 
 /** middleware route to support CORS and preflighted requests */
 app.use(function (req, res, next) {
@@ -58,11 +59,7 @@ app.use(function (req, res, next) {
 	}
 	next();
 });
-// END of the SERVER CONFIGURATION 
-//////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////
-// ROUTING SETUP
 /** function that respond to the request server_path/, in both GET and POST */
 router.all(['/index.js', '/style.css'], function (req, res) {
 	var resource = req.originalUrl == '/' ? '/index.html' : req.originalUrl;
@@ -73,16 +70,11 @@ router.all(['/index.js', '/style.css'], function (req, res) {
 });
 
 
-// ROUTES
-var possible_routes =
-	"GET		/BTCUSD" + "<br>" +
-				"/ETHUSD";
-
-router.get('/routes', function (req, res) {
-	res.send(possible_routes);
-});
-
-/** Defines default router used for get the client page */
+//////////////////////////////////////////////////////////////////////////////
+//
+// ROUTING SETUP
+//
+/** default route used for test*/
 router.get('/', function (req, res) {
 	// send a feedback to the client
 	res.sendFile(path.join(__dirname + '/client/index.html'));
@@ -140,6 +132,7 @@ router.get('/prices', function (req, res) { // automatically call both BTCUSD an
 
 	res.send(stringData);
 });
+
 
 /** Defines the /BTCUSD API.
  *  This function can be used from a client to get the value of the BTC as a json object
@@ -199,7 +192,9 @@ router.get('/ETHUSD', function (req, res) {
 });
 
 //////////////////////////////////////////////////////////////////////////////
+//
 // FUNCTIONS and METHODS
+//
 /** Get the BTC price using the APIs defined in "server_methods_BTCUSD.js".  
  *  .......
 */
@@ -240,7 +235,7 @@ async function getPriceBTC() {
 			if(!((ourBTCValue - rangeBTC) < tmpBTCValue &&  (ourBTCValue + rangeBTC) > tmpBTCValue))
 			{	// true --> the computed value is different from the saved one
 				ourBTCValue = tmpBTCValue;
-				debugisBTCchanged = true;				
+				debugisBTCchanged = true;	
 			}
 		}
 		return debugisBTCchanged;
@@ -322,6 +317,7 @@ function updateCurrency() {
 					console.error("BTC same: "+ ourBTCValue);
 			});
 
+		/* commentato tmp: 
 		getPriceETH()
 			.then((resIsETHChanged) => {
 				if(resIsETHChanged)
@@ -331,7 +327,7 @@ function updateCurrency() {
 				}
 				else
 					console.error("ETH same: " + ourETHValue);
-			});
+			});*/
 	}
 	catch(error)
 	{
@@ -350,11 +346,11 @@ function organiseDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 		/** call the databasews in order to store the new value  */
 		// step 1: create the object with the data to send
 		var tmpObj =  querystring.stringify({
-			//time: formattedDate,			// time of the last update
-			//isBTCchanged: _isBTCChanged,	// to avoid adding duplicate values in the db
-			//isETHChanged: _isETHChanged,	// to avoid adding duplicate values in the db
-			BTCUSD: ourBTCValue,			// last stored value for BTC
-			ETHUSD: ourETHValue				// last stored value for ETH
+			time: formattedDate,			// time of the last update
+			isBTCchanged: _isBTCChanged,	// to avoid adding duplicate values in the db
+			isETHChanged: _isETHChanged,	// to avoid adding duplicate values in the db
+			BTC: ourBTCValue,				// last stored value for BTC
+			ETH: ourETHValue				// last stored value for ETH
 		});
 						
 		// step 2: create the header to send the data
@@ -362,26 +358,18 @@ function organiseDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 			'Content-Type': 'application/x-www-form-urlencoded', // "x-www-form-urlencoded" no idea  what this is.....
 			'Content-Length': Buffer.byteLength(tmpObj)
 		}
-		
+
+		console.log("HERE 1");
 		// step 3: call the function "sendDataToWS(...)" and send the updated prices to the WS that manage the database 
-		var sdtwsdb = sendDataToWS('localhost', 8080, '/database/price', 'POST',  _header, tmpObj); 
-		sdtwsdb.then(function(result) {
-			//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
-			console.log("[wsdb] "+result);
-
-			// send date to the ws plannedaction with the updated value of the currencies
-			var sdtwspa = sendDataToWS('localhost', 8083, '/checkTriggers', 'POST',  _header, tmpObj);
-			sdtwspa.then(function(result) {
-				//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
-				console.log("[wspa] "+result);
-
-			}, function(err) { // enter here when Promise reject
-				console.log("[wspa] Unexpected error: " + err);
-			});
-
-		}, function(err) { // enter here when Promise reject
-			console.log("[wsdb] Unexpected error: " + err);
-		});
+		sendDataToWS('localhost', 27017, '/price', 'POST',  _header, tmpObj).then((res) => {
+			console.log("RES:" + res);
+			if(res)
+			{
+				// sendDataToWS('localhost', 8083, '/checkTriggers', 'POST',  _header, tmpObj);
+			}
+			else
+				console.log("Unable to store data in the db");
+		});	
 	}
 	catch(error)
 	{
@@ -390,42 +378,46 @@ function organiseDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 }
 
 /** This function connects to the specified host and send the _data with the choosen crud method */
-function sendDataToWS(_host, _port, _path, _method, _header, _data)
-{  // source code: https://medium.com/dev-bits/writing-neat-asynchronous-node-js-code-with-promises-32ed3a4fd098
-	
-	var options = {
-		host: _host, 		// es: 'localhost', 
-		port: _port, 		// es: 8085,
-		path: _path, 		// es: '/price',
-		method: _method, 	// es: 'POST',
-		headers: _header	
-	};
-		
-	// Return new promise 
-	return new Promise(function(resolve, reject) {
-		// Do async job
+async function sendDataToWS(_host, _port, _path, _method, _header, _data)
+{ // code from: https://stackoverflow.com/questions/19392744/calling-a-web-service-using-nodejs
+	try
+	{
+		var options = {
+			host: _host, 		// es: 'localhost', 
+			port: _port, 		// es: 8085,
+			path: _path, 		// es: '/price',
+			method: _method, 	// es: 'POST',
+			headers: _header	
+		};
 		
 		var httpreq = http.request(options, function (response) {
-				
+			//var serverResponse;
+			
 			response.setEncoding('utf8');
 			response.on('data', function (chunk) {
+				//serverResponse = chunk;
 				console.log("--->"+ _port +": " + chunk);
 			});
 			response.on('end', function() {
 				console.log('---------->call ended');
-				resolve("success");
+				return true;
 			})
 		});
-			
+		
 		httpreq.write(_data);
 		httpreq.end();
-	
+
 		httpreq.on('error', function(err) {
 			// Handle error
 			console.error('httpreq: ' + err);
-			reject(err);
+			return false;
 		});
-	});
+	}
+	catch(error)
+	{
+		console.error("sendDataToWS(): " + error);
+		return false;
+	}
 }
 
 
