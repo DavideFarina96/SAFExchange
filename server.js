@@ -93,7 +93,7 @@ app.post('/tokensignin', function(req, res) {
       });
       const payload = ticket.getPayload();
       const userid = payload['sub'];
-      console.log("Something happened");
+      res.send(payload);
     }
     verify().catch(console.error);
 });
