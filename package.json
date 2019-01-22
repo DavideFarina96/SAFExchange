@@ -15,6 +15,7 @@
     "express": "^4.16.4",
     "google-auth-library": "^3.0.1",
     "google-id-token-verifier": "^0.2.3",
+    "http": "0.0.0",
     "method-override": "~2.1.2",
     "mongoose": "~4.7.3",
     "morgan": "^1.9.1",

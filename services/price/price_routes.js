@@ -13,7 +13,7 @@ const server_methods_ETHUSD = require('./server/server_methods_ETHUSD');
 
 //////////////////////////////////////////////////////////////////////////////
 // VARIABLES DECLARATIONS:
-const host = "safexchange.heroku.com"
+const host = "safexchange.herokuapp.com"
 var coinbaseObj, krakenObj, bitfinexObj, binanceObj; //logic variables
 var ourBTCValue = 0, ourETHValue = 0; // value BTC -> USD and ETH -> USD for buying and selling on SAFEx
 const rangeBTC = 0.1, rangeETH = 0.01; // the last computed value of BTC is different from the one saved on the db if it's outside the db value +- range
