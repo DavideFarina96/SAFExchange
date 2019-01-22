@@ -13,7 +13,10 @@ const server_methods_ETHUSD = require('./server/server_methods_ETHUSD');
 
 //////////////////////////////////////////////////////////////////////////////
 // VARIABLES DECLARATIONS:
+<<<<<<< HEAD:services/price/price_routes.js
 const host = "safexchange.herokuapp.com"
+=======
+>>>>>>> parent of 05ddf1d... Added price routes:services/price/routes_price.js
 var coinbaseObj, krakenObj, bitfinexObj, binanceObj; //logic variables
 var ourBTCValue = 0, ourETHValue = 0; // value BTC -> USD and ETH -> USD for buying and selling on SAFEx
 const rangeBTC = 0.1, rangeETH = 0.01; // the last computed value of BTC is different from the one saved on the db if it's outside the db value +- range
@@ -333,12 +336,13 @@ function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 		}
 		
 		// step 3: call the function "sendDataToWS(...)" and send the updated prices to the WS that manage the database 
-		var sdtwsdb = sendDataToWS(host, 8080, '/database/price', 'POST',  _header, tmpObj); 
+		var sdtwsdb = sendDataToWS('localhost', 8080, '/database/price', 'POST',  _header, tmpObj); 
 		sdtwsdb.then(function(result) {
 			//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
 			console.log("[wsdb] "+ result);
 
 			// send date to the ws plannedaction with the updated value of the currencies
+<<<<<<< HEAD:services/price/price_routes.js
 			//var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST',  _header, tmpObj);
 			//sdtwspa.then(function(result) {
 			//	//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
@@ -347,6 +351,16 @@ function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 			//}, function(err) { // enter here when Promise reject
 			//	console.log("[wspa] Unexpected error: " + err);
 			//});
+=======
+			var sdtwspa = sendDataToWS('localhost', 8083, '/checkTriggers', 'POST',  _header, tmpObj);
+			sdtwspa.then(function(result) {
+				//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
+				console.log("[wspa] "+result);
+
+			}, function(err) { // enter here when Promise reject
+				console.log("[wspa] Unexpected error: " + err);
+			});
+>>>>>>> parent of 05ddf1d... Added price routes:services/price/routes_price.js
 
 		}, function(err) { // enter here when Promise reject
 			console.log("[wsdb] Unexpected error: " + err);
