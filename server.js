@@ -116,6 +116,9 @@ app.use('/user', user_routes);
 // Include PLANNED ACTION routes
 var plannedaction_routes = require('./services/plannedaction/server_plannedaction.js');
 app.use('/plannedaction', plannedaction_routes);
+// Include PLANNED ACTION routes
+var plannedaction_routes = require('./services/plannedaction/server_plannedaction.js');
+app.use('/plannedaction', db_routes);
 
 // register main router
 app.use('/', router);
