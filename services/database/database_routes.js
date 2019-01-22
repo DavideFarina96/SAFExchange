@@ -15,7 +15,7 @@ else
 mongoose.connect(db_path,
 	function (err) {
 		if (err)
-			console.log("DB error");
+			console.log("DB error: " + err);
 		else
 			console.log("Connected to db");
 	});     // connect to mongoDB database
