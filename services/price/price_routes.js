@@ -34,20 +34,14 @@ var seconds = 0;
 /** Defines default router used for get the client page */
 router.get('/client', function (req, res) {
 	// send a feedback to the client
-	res.sendFile(path.join(__dirname + '/client/index.html'));
-});
-
-router.get('/', function (req, res) {
-	// inizialize timer for update the currencies values
-	setInterval(updateCurrency, timerInterval);
-	console.log("Timer inizialized....");
+	res.sendFile(path.join(__dirname + './client/index.html'));
 });
 
 /* Provide the user the list of available operation on this server */
 var possible_routes =
 	"GET		/BTCUSD" + "<br>" +
 				"/ETHUSD";
-router.get('/routes', function (req, res) {
+router.get('/', function (req, res) {
 	res.send(possible_routes);
 });
 
@@ -394,7 +388,9 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 
 
 //////////////////////////////////////////////////////////////////////////////
-
+// inizialize timer for update the currencies values
+setInterval(updateCurrency, timerInterval);
+console.log("Timer inizialized....");
 
 // EXPORT router to be used in the main file
 module.exports = router;
