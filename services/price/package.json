@@ -9,8 +9,8 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
+	"heroku-ssl-redirect": "0.0.4",
     "http": "0.0.0",
-	  "heroku-ssl-redirect": "0.0.4",
     "querystring": "0.1.25",
     "node-datetime": "2.1.2"
   },
