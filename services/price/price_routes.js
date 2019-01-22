@@ -156,6 +156,16 @@ router.get('/ETHUSD', function (req, res) {
 	}
 });
 
+router.get('/TMP', function (req, res) {
+
+	res.statusCode = 200;
+	res.header('Content-type', 'application/json');
+
+	updateCurrency();
+
+	res.send("OK");
+});
+
 //////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS and METHODS
 /** Get the BTC price using the APIs defined in "server_methods_BTCUSD.js".  
@@ -325,7 +335,7 @@ function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 		var sdtwsdb = sendDataToWS(host, 8080, '/database/price', 'POST',  _header, tmpObj); 
 		sdtwsdb.then(function(result) {
 			//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
-			//console.log("[wsdb] "+result);
+			console.log("[wsdb] "+result);
 
 			// send date to the ws plannedaction with the updated value of the currencies
 			var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST',  _header, tmpObj);
@@ -370,7 +380,7 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 				//console.log("--->"+ _port +": " + chunk);
 			});
 			response.on('end', function() {
-				//console.log('---------->call ended');
+				console.log('---------->call ended');
 				resolve("success");
 			})
 		});
