@@ -65,29 +65,41 @@ router.get('/client', function (req, res) {
 	res.sendFile(path.join(__dirname + '/client/index.html'));
 });
 
+// ROUTES
+var possible_routes =
+	"GET		/transactions/:id_user" + "<br>" +
+	"POST 		/buy" + "<br>" + 
+	"	 		/sell";
+
+router.get('/routes', function (req, res) {
+	res.send(possible_routes);
+});
+
+
 /** Defines the / API,
  *  Given the ID of the user, return the list of all transactions that have been executed in the past
 */
-
-router.get('/transactions/:id_user', function (req, res) { 
+router.get('/transactions/:user_id', function (req, res) { 
 	try
 	{
 		// step 1: extract the ID of the user from the req
-		var ID_user = req.params.id_user;
+		var ID_user = req.params.user_id;
 		console.log("ID_user: " + ID_user); // DEBUG
 
 		// step 2: call the wb /database/.. in order to gather the user informations
 		// OSS: the data received from the /database ws should be already in the json format
-		if(organiseDataToBeSendAndSend(ID_user) == null) 
-		{	// an error has occurred
-				res.statusCode = 400; /*** 400 messo a caso */
-				res.send('{"status":"unexpected error has occurred."}');
-		}
-		else
-		{
+		var serverResponse = organiseDataToBeSendAndSend(ID_user);
+		var sdtwsdb = organiseDataToBeSendAndSend(ID_user); 
+		sdtwsdb.then(function(result) {
+			//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
 			res.statusCode = 200; 
 			res.send(result);
-		}
+
+		}, function(err) { // enter here when Promise reject
+			// an error has occurred
+			res.statusCode = 400; /*** 400 messo a caso */
+			res.send('{"status":"Unexpected error has occurred."}');
+		});
 	}
 	catch(error)
 	{
@@ -98,10 +110,12 @@ router.get('/transactions/:id_user', function (req, res) {
 });
 
 
+/////////////////////////////////////////
+///////////////// IDEA 1
 /** Defines the /buy API.
  *  This function receives the command from the client or from the plannedaction ws in order performe a "buy" action
   */
- router.post('/buy', function (req, res) { 
+ /*router.post('/buy', function (req, res) { 
 	res.statusCode = 200;
 	res.header('Content-type', 'application/json');
 
@@ -140,7 +154,98 @@ router.get('/transactions/:id_user', function (req, res) {
 	}
 	catch(error)
 	{
-		res.statusCode = 400; /*** 400 messo a caso */
+		res.statusCode = 400; /*** 400 messo a caso *
+		stringData = '{"status":"unexpected_error"}';
+	}
+
+	res.send(stringData);
+});*/
+
+router.post('/buy/:plannedaction_id', function (req, res) { 
+	res.statusCode = 200;
+	res.header('Content-type', 'application/json');
+
+	// Data send by the ws plannedaction:
+	// - ID_plannedaction
+	// - ID_user (contained in the details of the plannedaction)
+	// - buy ETH or BTC (contained in the details of the plannedaction)
+	// - price to buy (contained in the details of the plannedaction)
+	try
+	{	
+		var _ID_plannedaction = req.params.plannedaction_id;
+		var _ID_user = req.body.user_id;
+		var _currency = req.body.currency; // ETH or BTC
+		var _price = req.body.price;
+
+		// step 1: check the price of the currency
+		// create the object with the data to send
+		var tmpObj =  querystring.stringify({
+			ID_plannedaction: _ID_plannedaction,
+			ID_user: _ID_user,			// ID of the user that has requested the action
+			currency: _currency,
+			price: _price
+		});
+						
+		// step 2: create the header to send the data
+		var _header = {
+			'Content-Type': 'application/x-www-form-urlencoded', // "x-www-form-urlencoded" no idea  what this is.....
+			'Content-Length': Buffer.byteLength(tmpObj)
+		}
+
+		var serverPath = "";
+		if(_currency == "BTCUSD")
+			serverPath = "/price/BTCUSD";
+		if(_currency == "ETHUSD")
+			serverPath = "/price/ETHUSD";
+		
+		// Return new promise 
+		return new Promise(function(resolve, reject) {
+			// Do async job
+			
+			// step 3: call the function "sendDataToWS(...)" in order to get the transaction history of the specified user
+			var sdtwsdb = sendDataToWS('localhost', 8080, serverPath, 'GET',  _header, tmpObj); 
+			sdtwsdb.then(function(result) {
+				//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
+				console.log("[wsdb] " + result);
+				var resultOBJ = JSON.parse(result);
+				
+				// step 2: compare it with the value specified by the user or the plannedaction
+				var updatedValue = 0;
+				if(_currency == "BTCUSD")
+				{
+					updatedValue = parseFloat(resultOBJ.btcusd);
+				}
+				if(_currency == "ETHUSD")
+				{
+					updatedValue = parseFloat(resultOBJ.ethusd);
+				}
+				
+				// compare the updateValue with the one received from the ws plannedactions
+				if(parseFloat(price) == updatedValue)
+				{	
+
+					// step 3: if it was a plannedaction, ask to delete it (or mark as completed) by calling /plannedaction/....
+
+					// step 4: save the transaction in the db (call /database/.... )
+
+					// set 5: update user balance by calling /user/... with PUT method (simulate the action "buy")
+
+
+				}
+				else
+					console.log("Error: price values are inconsistent");
+
+
+			}, function(err) { // enter here when Promise reject
+				console.log("[wsdb] Unexpected error: " + err);
+			});
+		});
+
+
+	}
+	catch(error)
+	{
+		res.statusCode = 400; /*** 400 messo a caso *
 		stringData = '{"status":"unexpected_error"}';
 	}
 
@@ -200,7 +305,7 @@ router.get('/transactions/:id_user', function (req, res) {
 // FUNCTIONS and METHODS
 //////////////////////////////////////////////////////////////////////////////
 /** TO BE COMMENTED */
-function organiseDataToBeSendAndSend(_ID_user)
+async function organiseDataToBeSendAndSend(_ID_user)
 {
 	try
 	{
@@ -215,15 +320,29 @@ function organiseDataToBeSendAndSend(_ID_user)
 			'Content-Length': Buffer.byteLength(tmpObj)
 		}
 
-		// step 3: comunicate with the ws database in order to get the user transaction history
-		sendDataToWS('localhost', 8085, '/transaction', 'GET',  _header, tmpObj).then((result) => {
-			console.log("RESULT: " + result);
-			return result;
+		var serverPath = '/database/transaction/user/' + _ID_user;
+
+		// Return new promise 
+		return new Promise(function(resolve, reject) {
+			// Do async job
+			
+			// step 3: call the function "sendDataToWS(...)" in order to get the transaction history of the specified user
+			var sdtwsdb = sendDataToWS('localhost', 8080, serverPath, 'GET',  _header, tmpObj); 
+			sdtwsdb.then(function(result) {
+				//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
+				console.log("[wsdb] " + result);
+				
+				resolve(result);
+
+			}, function(err) { // enter here when Promise reject
+				console.log("[wsdb] Unexpected error: " + err);
+				reject(err);
+			});
 		});
 	}
 	catch(error)
 	{
-		console.log("Unexpected error: " + error);
+		console.log("CATCH Unexpected error: " + error);
 		return null;
 	}
 }
@@ -231,12 +350,6 @@ function organiseDataToBeSendAndSend(_ID_user)
 /** This function connects to the specified host and send the _data with the choosen crud method */
 async function sendDataToWS(_host, _port, _path, _method, _header, _data)
 {
-	/*****************************
-	 * https://stackoverflow.com/questions/4505809/how-to-post-to-a-request-using-node-js
-	 * https://www.npmjs.com/package/request
-	 */
-	try
-	{
 		var options = {
 			host: _host, 		// es: 'localhost', 
 			port: _port, 		// es: 8085,
@@ -248,38 +361,31 @@ async function sendDataToWS(_host, _port, _path, _method, _header, _data)
 								}*/
 		};
 		
-		/** ORIGINALE 
-		var httpreq = http.request(options, function (response) {
-			response.setEncoding('utf8');
-			response.on('data', function (chunk) {
-				console.log("--->data: " + chunk);
-				// return chunk;
+		// Return new promise 
+		return new Promise(function(resolve, reject) {
+			// Do async job
+			var serverResponse;
+			var httpreq = http.request(options, function (response) {
+					
+				response.setEncoding('utf8');
+				response.on('data', function (chunk) {
+					serverResponse = chunk;
+				});
+				response.on('end', function() {
+					console.log('---------->call ended');
+					resolve(serverResponse);
+				})
+			});
+			
+			httpreq.write(_data);
+			httpreq.end();
+		
+			httpreq.on('error', function(err) {
+				// Handle error
+				console.error('httpreq: ' + err);
+				reject(err);
 			});
 		});
-		httpreq.write(_data);
-		httpreq.end();
-		*****************/
-
-		/********** PROVA non va *************/
-		var url = _host + ":" + _port + "" + path;
-		https.get(url, res => {
-			res.setEncoding("utf8");
-			let body = "";
-			res.on("data", data => {
-			  body += data;
-			});
-			res.on("end", () => {
-			  body = JSON.parse(body);
-			  console.log(body);
-			});
-		  });
-		/***********************/
-	}
-	catch(error)
-	{
-		console.error("sendDataToWS(): " + error);
-		return null;
-	}
 }
 
 //////////////////////////////////////////////////////////////////////////////

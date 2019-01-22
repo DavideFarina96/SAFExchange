@@ -114,6 +114,10 @@ app.post('/tokensignin', function(req, res) {
 var db_routes = require('./services/database/routes_database.js');
 app.use('/database', db_routes);
 
+// Include PRICE routes
+//var price_routes = require('./services/price/routes_price.js');
+//app.use('/price', price_routes);
+
 
 // register main router
 app.use('/', router);
