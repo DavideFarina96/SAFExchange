@@ -364,7 +364,7 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 	var options = {
 		host: _host, 		// es: 'localhost', 
 		port: _port, 		// es: 8085,
-		path: _path, 		// es: '/price',
+		path: _host + "" + _path, 		// es: '/price',
 		method: _method, 	// es: 'POST',
 		headers: _header	
 	};
