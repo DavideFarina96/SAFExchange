@@ -97,6 +97,10 @@ app.use('/plannedaction', plannedaction_routes);
 var price_routes = require('./services/price/price_routes.js');
 app.use('/price', price_routes);
 
+// Include PRICE routes
+var transaction_routes = require('./services/transaction/transaction_routes.js');
+app.use('/transaction', transaction_routes);
+
 // register main router
 app.use('/', router);
 

@@ -1,7 +1,7 @@
 var express = require('express');
 //var bodyParser = require('body-parser');
 //var request = require("request");
-//var path = require('path');
+var path = require('path');
 var http = require('http'); // used for calling external server
 var querystring = require('querystring');
 var datetime = require('node-datetime');
@@ -34,7 +34,7 @@ var seconds = 0;
 /** Defines default router used for get the client page */
 router.get('/client', function (req, res) {
 	// send a feedback to the client
-	res.sendFile(path.join(__dirname + './client/index.html'));
+	res.sendFile(path.join(__dirname + '/client/index.html'));
 });
 
 /* Provide the user the list of available operation on this server */
@@ -161,9 +161,10 @@ router.get('/TMP', function (req, res) {
 	res.statusCode = 200;
 	res.header('Content-type', 'application/json');
 
-	updateCurrency();
+	updateCurrency().then((data) => {
+		res.send(data);
+	});
 
-	res.send("OK");
 });
 
 //////////////////////////////////////////////////////////////////////////////
@@ -283,14 +284,14 @@ function updateCurrency() {
 			.then((resIsBTCChanged) => {
 				if(resIsBTCChanged)
 				{
-					console.log("BTC changed: average: " + debugBTCHistory[debugBTCHistory.length - 1] + " final: " + ourBTCValue + "<---");
+					// debug: console.log("BTC changed: average: " + debugBTCHistory[debugBTCHistory.length - 1] + " final: " + ourBTCValue + "<---");
 					organizeDataToBeSendAndSend(true, false);
 				}
-				else
-					console.error("BTC same: "+ ourBTCValue);
+				//else
+				// debug: console.error("BTC same: "+ ourBTCValue);
 			});
 
-		/*getPriceETH()
+		getPriceETH()
 			.then((resIsETHChanged) => {
 				if(resIsETHChanged)
 				{
@@ -298,12 +299,12 @@ function updateCurrency() {
 					organizeDataToBeSendAndSend(false, true);
 				}
 				//else
-				//	console.error("ETH same: " + ourETHValue);
-			});*/
+				// debug: console.error("ETH same: " + ourETHValue);
+			});
 	}
 	catch(error)
 	{
-		console.log("[uc] Unexpected error: " + error);
+		console.log("[updateCurrency] " + error);
 	}
 }
 
@@ -336,26 +337,26 @@ function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 		var sdtwsdb = sendDataToWS('localhost', 8080, '/database/price', 'POST',  _header, tmpObj); 
 		sdtwsdb.then(function(result) {
 			//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
-			console.log("[wsdb] "+ result);
+			// debug: console.log("[wsdb] "+ result);
 
 			// send date to the ws plannedaction with the updated value of the currencies
-			//var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST',  _header, tmpObj);
-			//sdtwspa.then(function(result) {
-			//	//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
-			//	console.log("[wspa] "+result);
-			//
-			//}, function(err) { // enter here when Promise reject
-			//	console.log("[wspa] Unexpected error: " + err);
-			//});
+			var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST',  _header, tmpObj);
+			sdtwspa.then(function(result) {
+				//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
+				// debug: console.log("[wspa] "+result);
+			
+			}, function(err) { // enter here when Promise reject
+				console.log("[wsplannedaction] " + err);
+			});
 
 
 		}, function(err) { // enter here when Promise reject
-			console.log("[wsdb] Unexpected error: " + err);
+			console.log("[wsdatabase] " + err);
 		});
 	}
 	catch(error)
 	{
-		console.log("Unexpected error: " + error);
+		console.log("[organizeDataToBeSendAndSend] " + error);
 	}
 }
 
@@ -370,10 +371,6 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 		method: _method, 	// es: 'POST',
 		headers: _header	
 	};
-	console.log("QUA");
-	console.log(options);
-	console.log("--------------------");
-
 	// Return new promise 
 	return new Promise(function(resolve, reject) {
 		// Do async job
@@ -382,10 +379,10 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 				
 			response.setEncoding('utf8');
 			response.on('data', function (chunk) {
-				console.log("--->"+ _port +": " + chunk);
+				// debug: console.log("--->"+ _port +": " + chunk);
 			});
 			response.on('end', function() {
-				console.log('---------->call ended');
+				// debug: console.log('---------->call ended');
 				resolve("success");
 			})
 		});
@@ -394,8 +391,7 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 		httpreq.end();
 	
 		httpreq.on('error', function(err) {
-			// Handle error
-			console.error('-->httpreq: ' + err);
+			console.error(err);
 			reject(err);
 		});
 	});
@@ -405,7 +401,7 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 //////////////////////////////////////////////////////////////////////////////
 // inizialize timer for update the currencies values
 //setInterval(updateCurrency, timerInterval);
-//console.log("Timer inizialized....");
+//console.log("Timer \"price\" inizialized....");
 
 // EXPORT router to be used in the main file
 module.exports = router;
