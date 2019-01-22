@@ -101,7 +101,6 @@ app.post('/tokensignin', function(req, res) {
 var db_routes = require('./services/database/routes_database.js');
 app.use('/database', db_routes);
 
-<<<<<<< HEAD
 // Include PRICE routes
 var price_routes = require('./services/price/price_routes.js');
 app.use('/price', price_routes);
@@ -114,11 +113,9 @@ app.use('/interface', interface_routes);
 var user_routes = require('./services/user/user_routes.js');
 app.use('/user', user_routes);
 
-=======
->>>>>>> parent of d339ca2... reorganized project
 // Include PLANNED ACTION routes
 var plannedaction_routes = require('./services/plannedaction/server_plannedaction.js');
-app.use('/plannedaction', db_routes);
+app.use('/plannedaction', plannedaction_routes);
 
 // register main router
 app.use('/', router);
