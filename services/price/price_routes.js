@@ -13,6 +13,7 @@ const server_methods_ETHUSD = require('./server/server_methods_ETHUSD');
 
 //////////////////////////////////////////////////////////////////////////////
 // VARIABLES DECLARATIONS:
+const host = "safexchange.heroku.com"
 var coinbaseObj, krakenObj, bitfinexObj, binanceObj; //logic variables
 var ourBTCValue = 0, ourETHValue = 0; // value BTC -> USD and ETH -> USD for buying and selling on SAFEx
 const rangeBTC = 0.1, rangeETH = 0.01; // the last computed value of BTC is different from the one saved on the db if it's outside the db value +- range
@@ -327,13 +328,13 @@ function organiseDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 		}
 		
 		// step 3: call the function "sendDataToWS(...)" and send the updated prices to the WS that manage the database 
-		var sdtwsdb = sendDataToWS('localhost', 8080, '/database/price', 'POST',  _header, tmpObj); 
+		var sdtwsdb = sendDataToWS(host, 8080, '/database/price', 'POST',  _header, tmpObj); 
 		sdtwsdb.then(function(result) {
 			//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
 			console.log("[wsdb] "+result);
 
 			// send date to the ws plannedaction with the updated value of the currencies
-			var sdtwspa = sendDataToWS('localhost', 8083, '/checkTriggers', 'POST',  _header, tmpObj);
+			var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST',  _header, tmpObj);
 			sdtwspa.then(function(result) {
 				//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
 				console.log("[wspa] "+result);

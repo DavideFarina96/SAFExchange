@@ -82,8 +82,8 @@ var db_routes = require('./services/database/database_routes.js');
 app.use('/database', db_routes);
 
 // Include PRICE routes
-//var price_routes = require('./services/price/price_routes.js');
-//app.use('/price', price_routes);
+var price_routes = require('./services/price/price_routes.js');
+app.use('/price', price_routes);
 
 // Include INTERFACE routes
 var interface_routes = require('./services/interface/interface_routes.js');
