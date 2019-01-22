@@ -1,11 +1,46 @@
 var express = require('express');
+var bodyParser = require('body-parser');
 var path = require('path');
+var app = express();
 var router = express.Router();
 
 //////////////////////////////////////////////////////////////////////////////
 // VARIABLES DECLARATIONS:
 var debugObjectArray = [] // used to store the data received from the server_price ws
 //////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+// SERVER settings:
+// set the server listening port
+var port = process.env.PORT || 8083;
+
+/* Configure express app to use bodyParser()
+ * to parse body as URL encoded data
+ * (this is how browser POST form data)
+ */
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+// needed to send file to the client (i.e. style file)
+app.use(express.static(path.join(__dirname, 'public')));
+// END of the SERVER CONFIGURATION 
+//////////////////////////////////////////////////////////////////////////////
+
+/** middleware route to support CORS and preflighted requests */
+app.use(function (req, res, next) {
+
+	if (req.method === "OPTIONS") {
+		res.header("Access-Control-Allow-Origin", "*");
+		res.header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+		res.header("Access-Control-Allow-Credentials", false);
+		res.header("Access-Control-Max-Age", '86400'); // 24 hours
+		res.header("Access-Control-Allow-Headers", "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept");
+	}
+	else {
+		res.header("Access-Control-Allow-Origin", "*");
+		res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	}
+	next();
+});
 
 /** function that respond to the request server_path/, in both GET and POST */
 router.all(['/index.js', '/style.css'], function (req, res) {
@@ -27,7 +62,8 @@ router.post('/checkTriggers', function (req, res) {
 	res.statusCode = 200;
 	res.header('Content-type', 'application/json');
 
-	try {
+	try
+	{
 		//process
 		// req.body.param_name --> get the specified parameter sent through the request parameter
 		console.log("WS PLANNEDACTION");
@@ -37,7 +73,7 @@ router.post('/checkTriggers', function (req, res) {
 		var _receivedBTC = (req.body.BTC); console.log("_receivedBTC: " + _receivedBTC);
 		var _receivedETH = (req.body.ETH); console.log("_receivedETH: " + _receivedETH);
 
-
+		
 
 		// store the element in the array 
 		debugObjectArray.push({
@@ -54,13 +90,23 @@ router.post('/checkTriggers', function (req, res) {
 
 		res.send('{"status": "OK"}');
 	}
-	catch (error) {
+	catch(error)
+	{
 		res.statusCode = 400;
-		res.send('{"status": "' + error + '"}');
+		res.send('{"status": "'+error+'"}');
 	}
 });
 
+// show all planned actions for that user
+router.get('/' , function(req, res) {
+	
+});
 
 
-// EXPORT router to be used in the main file
-module.exports = router;
+//////////////////////////////////////////////////////////////////////////////
+app.use('/', router); // set the initial path for the "router"
+
+// listen in a specific port
+app.listen(port, function () {
+	console.log("WS planned action is listening on port " + port);
+});

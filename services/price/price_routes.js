@@ -283,14 +283,14 @@ function updateCurrency() {
 			.then((resIsBTCChanged) => {
 				if(resIsBTCChanged)
 				{
-					//console.log("BTC changed: average: " + debugBTCHistory[debugBTCHistory.length - 1] + " final: " + ourBTCValue + "<---");
+					console.log("BTC changed: average: " + debugBTCHistory[debugBTCHistory.length - 1] + " final: " + ourBTCValue + "<---");
 					organizeDataToBeSendAndSend(true, false);
 				}
-				//else
-				//	console.error("BTC same: "+ ourBTCValue);
+				else
+					console.error("BTC same: "+ ourBTCValue);
 			});
 
-		getPriceETH()
+		/*getPriceETH()
 			.then((resIsETHChanged) => {
 				if(resIsETHChanged)
 				{
@@ -299,7 +299,7 @@ function updateCurrency() {
 				}
 				//else
 				//	console.error("ETH same: " + ourETHValue);
-			});
+			});*/
 	}
 	catch(error)
 	{
@@ -327,6 +327,7 @@ function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 						
 		// step 2: create the header to send the data
 		var _header = {
+			'Host': host,
 			'Content-Type': 'application/x-www-form-urlencoded', // "x-www-form-urlencoded" no idea  what this is.....
 			'Content-Length': Buffer.byteLength(tmpObj)
 		}
@@ -335,17 +336,17 @@ function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 		var sdtwsdb = sendDataToWS(host, 8080, '/database/price', 'POST',  _header, tmpObj); 
 		sdtwsdb.then(function(result) {
 			//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
-			console.log("[wsdb] "+result);
+			console.log("[wsdb] "+ result);
 
 			// send date to the ws plannedaction with the updated value of the currencies
-			var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST',  _header, tmpObj);
-			sdtwspa.then(function(result) {
-				//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
-				//console.log("[wspa] "+result);
-
-			}, function(err) { // enter here when Promise reject
-				console.log("[wspa] Unexpected error: " + err);
-			});
+			//var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST',  _header, tmpObj);
+			//sdtwspa.then(function(result) {
+			//	//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
+			//	console.log("[wspa] "+result);
+			//
+			//}, function(err) { // enter here when Promise reject
+			//	console.log("[wspa] Unexpected error: " + err);
+			//});
 
 		}, function(err) { // enter here when Promise reject
 			console.log("[wsdb] Unexpected error: " + err);
@@ -364,11 +365,14 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 	var options = {
 		host: _host, 		// es: 'localhost', 
 		port: _port, 		// es: 8085,
-		path: _host + "" + _path, 		// es: '/price',
+		path: _path, 		// es: '/price',
 		method: _method, 	// es: 'POST',
 		headers: _header	
 	};
-		
+	console.log("QUA");
+	console.log(options);
+	console.log("--------------------");
+
 	// Return new promise 
 	return new Promise(function(resolve, reject) {
 		// Do async job
@@ -377,7 +381,7 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 				
 			response.setEncoding('utf8');
 			response.on('data', function (chunk) {
-				//console.log("--->"+ _port +": " + chunk);
+				console.log("--->"+ _port +": " + chunk);
 			});
 			response.on('end', function() {
 				console.log('---------->call ended');
@@ -390,7 +394,7 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 	
 		httpreq.on('error', function(err) {
 			// Handle error
-			console.error('httpreq: ' + err);
+			console.error('-->httpreq: ' + err);
 			reject(err);
 		});
 	});
@@ -399,8 +403,8 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 
 //////////////////////////////////////////////////////////////////////////////
 // inizialize timer for update the currencies values
-setInterval(updateCurrency, timerInterval);
-console.log("Timer inizialized....");
+//setInterval(updateCurrency, timerInterval);
+//console.log("Timer inizialized....");
 
 // EXPORT router to be used in the main file
 module.exports = router;

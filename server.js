@@ -12,6 +12,9 @@ var schedule = require('node-schedule');                // scheduler
 var axios = require('axios');                           // make HTTP requests
 //var globalValues = require('./public/globalValues');
 
+var {OAuth2Client} = require('google-auth-library');
+var verifier = require('google-id-token-verifier');
+
 
 // CONFIGURATION
 app.use(express.static(path.join(__dirname, 'public')));        // set the static files location /public/img will be /img for users
@@ -74,13 +77,31 @@ app.get('/profile/', function(req, res) {
     res.sendfile('./public/profile.html');
 }); */
 
+app.get('/', function(req, res) {
+    // DO STUFF
+    res.sendfile("./index.html");     
+});
 
+app.post('/tokensignin', function(req, res) {
+    var token = req.body.tokenid;
+    console.log(token);
+    var clientId = "533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com";
+
+    verifier.verify(token, clientId, function (err, tokenInfo) {
+      if (!err) {
+        res.json(tokenInfo);
+      }
+      else
+        res.json(req.body);
+    });
+});
 
 
 // Include DATABASE routes
-var db_routes = require('./services/database/database_routes.js');
+var db_routes = require('./services/database/routes_database.js');
 app.use('/database', db_routes);
 
+<<<<<<< HEAD
 // Include PRICE routes
 var price_routes = require('./services/price/price_routes.js');
 app.use('/price', price_routes);
@@ -93,10 +114,11 @@ app.use('/interface', interface_routes);
 var user_routes = require('./services/user/user_routes.js');
 app.use('/user', user_routes);
 
+=======
+>>>>>>> parent of d339ca2... reorganized project
 // Include PLANNED ACTION routes
-var plannedaction_routes = require('./services/plannedaction/plannedaction_routes.js');
-app.use('/plannedaction', plannedaction_routes);
-
+var plannedaction_routes = require('./services/plannedaction/server_plannedaction.js');
+app.use('/plannedaction', db_routes);
 
 // register main router
 app.use('/', router);
