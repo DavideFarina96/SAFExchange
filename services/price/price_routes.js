@@ -123,7 +123,7 @@ router.get('/BTCUSD', function (req, res) {
 	catch(error)
 	{
 		res.statusCode = 400;
-		res.send('{"btcusd":"unexpected_error"}');
+		res.send('{"btcusd":"'+ error +'"}');
 	}
 });
 
@@ -152,7 +152,7 @@ router.get('/ETHUSD', function (req, res) {
 	catch(error)
 	{
 		res.statusCode = 400;
-		res.send('{"ethusd":"unexpected_error"}');
+		res.send('{"ethusd":"'+ error +'"}');
 	}
 });
 
@@ -265,7 +265,7 @@ async function getPriceETH() {
 /** TO BE COMMENTED:  CORE FUNCTION */
 function updateCurrency() {
 	seconds++;
-	console.log(seconds + ' seconds');
+	//console.log(seconds + ' seconds');
 
 	try
 	{
@@ -273,32 +273,32 @@ function updateCurrency() {
 			.then((resIsBTCChanged) => {
 				if(resIsBTCChanged)
 				{
-					console.log("BTC changed: average: " + debugBTCHistory[debugBTCHistory.length - 1] + " final: " + ourBTCValue + "<---");
-					organiseDataToBeSendAndSend(true, false);
+					//console.log("BTC changed: average: " + debugBTCHistory[debugBTCHistory.length - 1] + " final: " + ourBTCValue + "<---");
+					organizeDataToBeSendAndSend(true, false);
 				}
-				else
-					console.error("BTC same: "+ ourBTCValue);
+				//else
+				//	console.error("BTC same: "+ ourBTCValue);
 			});
 
 		getPriceETH()
 			.then((resIsETHChanged) => {
 				if(resIsETHChanged)
 				{
-					console.log("ETH changed: average: " + debugETHHistory[debugETHHistory.length - 1] + " final: " + ourETHValue + "<---");
-					organiseDataToBeSendAndSend(false, true);
+					//console.log("ETH changed: average: " + debugETHHistory[debugETHHistory.length - 1] + " final: " + ourETHValue + "<---");
+					organizeDataToBeSendAndSend(false, true);
 				}
-				else
-					console.error("ETH same: " + ourETHValue);
+				//else
+				//	console.error("ETH same: " + ourETHValue);
 			});
 	}
 	catch(error)
 	{
-		console.log("Unexpected error: " + error);
+		console.log("[uc] Unexpected error: " + error);
 	}
 }
 
 /** TO BE COMMENTED */
-function organiseDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
+function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 {
 	try
 	{
@@ -325,13 +325,13 @@ function organiseDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 		var sdtwsdb = sendDataToWS(host, 8080, '/database/price', 'POST',  _header, tmpObj); 
 		sdtwsdb.then(function(result) {
 			//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
-			console.log("[wsdb] "+result);
+			//console.log("[wsdb] "+result);
 
 			// send date to the ws plannedaction with the updated value of the currencies
 			var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST',  _header, tmpObj);
 			sdtwspa.then(function(result) {
 				//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
-				console.log("[wspa] "+result);
+				//console.log("[wspa] "+result);
 
 			}, function(err) { // enter here when Promise reject
 				console.log("[wspa] Unexpected error: " + err);
@@ -367,10 +367,10 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 				
 			response.setEncoding('utf8');
 			response.on('data', function (chunk) {
-				console.log("--->"+ _port +": " + chunk);
+				//console.log("--->"+ _port +": " + chunk);
 			});
 			response.on('end', function() {
-				console.log('---------->call ended');
+				//console.log('---------->call ended');
 				resolve("success");
 			})
 		});

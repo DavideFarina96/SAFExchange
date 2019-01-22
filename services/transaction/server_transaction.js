@@ -88,8 +88,7 @@ router.get('/transactions/:user_id', function (req, res) {
 
 		// step 2: call the wb /database/.. in order to gather the user informations
 		// OSS: the data received from the /database ws should be already in the json format
-		var serverResponse = organiseDataToBeSendAndSend(ID_user);
-		var sdtwsdb = organiseDataToBeSendAndSend(ID_user); 
+		var sdtwsdb = organizeDataToBeSendAndSend(ID_user); 
 		sdtwsdb.then(function(result) {
 			//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
 			res.statusCode = 200; 
@@ -305,7 +304,7 @@ router.post('/buy/:plannedaction_id', function (req, res) {
 // FUNCTIONS and METHODS
 //////////////////////////////////////////////////////////////////////////////
 /** TO BE COMMENTED */
-async function organiseDataToBeSendAndSend(_ID_user)
+async function organizeDataToBeSendAndSend(_ID_user)
 {
 	try
 	{
