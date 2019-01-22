@@ -1,8 +1,8 @@
 var express = require('express');
-var bodyParser = require('body-parser');
+//var bodyParser = require('body-parser');
 //var request = require("request");
 //var path = require('path');
-//var http = require('http'); // used for calling external server
+var http = require('http'); // used for calling external server
 var querystring = require('querystring');
 var datetime = require('node-datetime');
 var router = express.Router();
