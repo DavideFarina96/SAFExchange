@@ -4,12 +4,12 @@ router = express.Router();
 var mongoose = require('mongoose');                     // mongoose for mongodb
 require('./schemas.js');								// create the models for the objs
 
-var db_path = '';
+//var db_path = '';
 //if (process.env.NODE && ~process.env.NODE.indexOf("heroku"))
 //	db_path = 'mongodb:// path to DB'
 //else
 
-db_path = 'mongodb://administrator:admin_obv1@ds163164.mlab.com:63164/safexchangedb';
+var db_path = 'mongodb://administrator:admin_obv1@ds163164.mlab.com:63164/safexchangedb';
 
 
 // MONGOOSE
