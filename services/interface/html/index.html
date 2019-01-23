@@ -45,9 +45,10 @@
 			if (response.status === 'connected') {
 				// Logged into your app and Facebook.
 				console.log("SEI LOGGATO");
+				getUserData();
 			} else {
 			  	// The person is not logged into your app or we are unable to tell.
-			  	console.log("LOGGATI");
+			  	
 			}
 	  	}
 
@@ -64,11 +65,34 @@
 			});
 		}
 
+		function login() {
+			FB.login(
+				function(response) {
+		            if (response.authResponse) {
+		               console.log('Welcome!  Fetching your information.... ');
+		               FB.api('/me', function(response) {
+		                   console.log('Good to see you, ' + response.email + ', ' + response.name + '.');
+		               });
+		            } 
+		            else {
+		                console.log('User cancelled login or did not fully authorize.');
+		            }
+	        	},
+	        	{scope:'email'}
+	        );
+		}
+
+		function getUserData() {
+			FB.api('/me?fields=name,email', function(response) {
+				console.log(response);  //response is the basic user object
+			});
+		}
+
 	</script>
 
 	<div class="g-signin2" data-onsuccess="onGoogleSignIn"></div>
 
-	<div class="fb-login-button" data-size="large" data-button-type="continue_with" data-auto-logout-link="false" data-use-continue-as="false" onlogin="checkLoginState();"></div>
+	<div class="fb-login-button" data-size="large" data-button-type="continue_with" data-auto-logout-link="false" data-use-continue-as="false" onlogin="login()"></div>
 
 	<p onclick="logout()">LOGOUT</p>
 
