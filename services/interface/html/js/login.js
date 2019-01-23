@@ -33,7 +33,7 @@ function execute_post(url, params) {
         .then(res => {
             if (res.logged = true) {
                 console.log('Signed in as: ' + res);
-                window.location.href = http_path;
+                window.location.href = "/interface";
             }
             else {
                 $('#error_msg').show();
