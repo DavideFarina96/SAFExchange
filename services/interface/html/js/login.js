@@ -1,5 +1,5 @@
-var url_google = '/googleSignIn'
-var url_mail = '/mailSignIn'
+var url_google = '/interface/googleSignIn'
+var url_mail = '/interface/mailSignIn'
 
 
 function onGoogleSignIn(googleUser) {
