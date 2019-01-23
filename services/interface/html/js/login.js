@@ -1,5 +1,5 @@
 //var http_path = 'https:/safexchange.herokuapp.com/interface'
-var http_path = 'http://localhost:8080/interface'
+var http_path = window.location.host + '/interface'
 var url_google = '/googleSignIn'
 var url_mail = '/mailSignIn'
 
