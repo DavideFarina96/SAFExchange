@@ -17,10 +17,9 @@
 				xfbml      : true,
 				version    : 'v3.2'
 			});
-		
+			checkLoginState();
 			FB.AppEvents.logPageView();
 			
-			checkLoginState();
 		};
 
 		(function(d, s, id){
@@ -58,12 +57,20 @@
 			});
 		}
 
+		function logout() {
+			FB.logout(function(response) {
+				checkLoginState();
+		   		// Person is now logged out
+			});
+		}
+
 	</script>
 
 	<div class="g-signin2" data-onsuccess="onGoogleSignIn"></div>
 
 	<div class="fb-login-button" data-size="large" data-button-type="continue_with" data-auto-logout-link="false" data-use-continue-as="false" onlogin="checkLoginState();"></div>
 
+	<p onclick="logout()">LOGOUT</p>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="./js/index.js"></script>
