@@ -23,6 +23,14 @@ router.get('/login', function (req, res) {
     res.render('login')
 })
 
+router.get('/privacy', function (req, res) {
+    res.render('privacy')
+})
+
+router.get('/tc', function (req, res) {
+    res.render('tc')
+})
+
 // LOGIN ROUTES
 // Handle Google Token
 router.post('/googleSignIn', async function (req, res) {
