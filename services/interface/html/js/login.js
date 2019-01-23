@@ -1,5 +1,3 @@
-//var http_path = 'https:/safexchange.herokuapp.com/interface'
-var http_path = window.location.host + '/interface'
 var url_google = '/googleSignIn'
 var url_mail = '/mailSignIn'
 
@@ -27,7 +25,7 @@ function onMailSignIn() {
 function execute_post(url, params) {
     // Send it to /interface
     $.ajax({
-        url: http_path + url,
+        url: url,
         data: params,
         type: 'POST',
         contentType: 'application/x-www-form-urlencoded'
