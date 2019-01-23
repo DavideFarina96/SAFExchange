@@ -8,16 +8,19 @@
 <body>
 
 	<script>
+		var FB;
+
 		window.fbAsyncInit = function() {
 			FB.init({
 				appId      : '2178730182445130',
 				cookie     : true,
 				xfbml      : true,
-				version    : '3.2'
+				version    : 'v3.2'
 			});
 		
-			FB.AppEvents.logPageView();   
-		
+			FB.AppEvents.logPageView();
+			
+			checkLoginState();
 		};
 
 		(function(d, s, id){
@@ -29,7 +32,7 @@
 		}(document, 'script', 'facebook-jssdk'));
 
 
-		checkLoginState();
+		//checkLoginState();
 
 
 		// FUNCTIONS
