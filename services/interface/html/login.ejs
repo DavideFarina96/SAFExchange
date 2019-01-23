@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <% include ./partials/head %>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com">
+</head>
+
+<body class="w3-dark-grey">
+
+    <% include ./partials/header %>
+
+    <div class="wrapper w3-row w3-padding-16">
+        <div class="w3-col" style="width:20%">&nbsp;</div>
+
+        <div class="w3-col w3-card-2" style="width:60%">
+            <div class="w3-container w3-indigo">
+                <h1>Log In</h1>
+            </div>
+            <div class="w3-container w3-margin-bottom">
+                <h4>Choose a method to perform the login / register</h4>
+
+                <div class="w3-auto" style="width:50%">
+                    <div class="w3-button w3-block g-signin2" data-onsuccess="onGoogleSignIn"></div>
+                    <div class="w3-button w3-block w3-indigo">Facebook</div>
+                    <div class="w3-button w3-block w3-green" onclick="onMailSignIn()">Mail</div>
+                </div>
+
+                <h4 id="error_msg" class="w3-red" style="display: none">Something went wrong. Please try again.</h4>
+            </div>
+        </div>
+
+        <div class="w3-col" style="width:20%">&nbsp;</div>
+    </div>
+
+
+    <% include ./partials/footer %>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/js/login.js"></script>
+</body>
+
+</html>

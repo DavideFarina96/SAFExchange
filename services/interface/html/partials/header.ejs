@@ -1,0 +1,14 @@
+<div class="header w3-container w3-teal">
+    <div class="w3-row">
+        <div class="w3-half">
+            <h4>SAFEx</h4>
+        </div>
+        <div class="w3-half w3-right-align">
+            <h5>
+                <% if (locals.user) { %>
+                <%= JSON.stringify(user) %>
+                <% } %>
+            </h5>
+        </div>
+    </div>
+</div>

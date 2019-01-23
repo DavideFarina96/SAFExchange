@@ -15,7 +15,7 @@ router.post('/tokensignin', function (req, res) {
             res.json(tokenInfo);
         }
         else
-            res.json(req.body);
+            res.json(err);
     });
 });
 
