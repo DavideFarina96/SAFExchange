@@ -44,7 +44,15 @@ function googleLogout() {
 // FACEBOOK
 var FB;
 
-var fbAsyncInit = async function () {
+var fbAsyncInit = async function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) { return; }
+    js = d.createElement(s); js.id = id;
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    (document, 'script', 'facebook-jssdk'));
+
     FB.init({
         appId: '2178730182445130',
         cookie: true,
@@ -54,13 +62,14 @@ var fbAsyncInit = async function () {
     FB.AppEvents.logPageView();
 };
 
+/*
 (function (d, s, id) {
     var js, fjs = d.getElementsByTagName(s)[0];
     if (d.getElementById(id)) { return; }
     js = d.createElement(s); js.id = id;
     js.src = "https://connect.facebook.net/en_US/sdk.js";
     fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));
+}(document, 'script', 'facebook-jssdk'));*/
 
 
 async function facebookLogout() {
