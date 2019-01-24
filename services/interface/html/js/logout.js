@@ -1,7 +1,7 @@
-function completeLogout(user) {
-    console.log(user)
+function completeLogout(logged_with) {
+    console.log(logged_with)
 
-    switch (user.logged_with) {
+    switch (logged_with) {
         case "GOOGLE":
             googleLogout(); break;
 
