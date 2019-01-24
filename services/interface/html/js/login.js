@@ -32,7 +32,7 @@ function execute_post(url, params) {
     })
         .then(res => {
             if (res.logged = true) {
-                console.log('Signed in as: ' + res);
+                console.log('Signed in as');
                 window.location.href = "/interface";
             }
             else {

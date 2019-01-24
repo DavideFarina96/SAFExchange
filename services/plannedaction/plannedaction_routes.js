@@ -7,15 +7,6 @@ var router = express.Router();
 var debugObjectArray = [] // used to store the data received from the server_price ws
 //////////////////////////////////////////////////////////////////////////////
 
-/** function that respond to the request server_path/, in both GET and POST */
-router.all(['/index.js', '/style.css'], function (req, res) {
-	var resource = req.originalUrl == '/' ? '/index.html' : req.originalUrl;
-	// get the index.html file in the client directory on the server
-	var file = path.join(__dirname + '/client' + resource);
-	// send the file to the client
-	res.sendFile(file);
-});
-
 
 //////////////////////////////////////////////////////////////////////////////
 //

@@ -129,7 +129,7 @@ router.post('/user', function (req, res) {
 
 /** PRICE ROUTES **/
 // Defines the /price API, which is used from pricews for saving the new value of the currencies
-router.get('/price', async function (req, res) {
+router.get('/price', async function (req, res) { // TODO HISTORY
 	var _price = {};
 
 	try {
