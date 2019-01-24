@@ -7,7 +7,7 @@ var querystring = require('querystring');
 var datetime = require('node-datetime');
 var router = express.Router();
 
- // here is where the methods for get the exchange value are implemented
+// here is where the methods for get the exchange value are implemented
 const server_methods_BTCUSD = require('./server/server_methods_BTCUSD');
 const server_methods_ETHUSD = require('./server/server_methods_ETHUSD');
 
@@ -21,11 +21,20 @@ const timerInterval = 10000; // milliseconds timer interval // 1500; --> error c
 
 // initially, the value for ourBTC and ourETH are set to zero by default. 
 // In order to use the "range" and check if the new value is different from the previous one, we need to correctly initialize it
-var hasBTCbeenInitialize = false; 
-var hasETHbeenInitialize = false; 
+var hasBTCbeenInitialize = false;
+var hasETHbeenInitialize = false;
 
 var debugBTCHistory = new Array(), debugETHHistory = new Array();
 //////////////////////////////////////////////////////////////////////////////
+
+
+
+// JOB SCHEDULER
+//var schedule = require('node-schedule');                // scheduler
+//var j = schedule.scheduleJob('0 0 1 * * 1', function () {
+//    AddNewWeek();
+//});
+
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -48,20 +57,17 @@ router.get('/prices', function (req, res) { // automatically call both BTCUSD an
 	res.statusCode = 200;
 	res.header('Content-type', 'application/json');
 
-	try
-	{
-		stringData += '"status":'+ res.statusCode;
+	try {
+		stringData += '"status":' + res.statusCode;
 
 		/** BTC section */
 		// let's first check if the BTC value has been initialized
-		if(hasBTCbeenInitialize)
-		{	// YES: return the latest saved one to the client
-			stringData += ', "btcusd":'+ ourBTCValue;
+		if (hasBTCbeenInitialize) {	// YES: return the latest saved one to the client
+			stringData += ', "btcusd":' + ourBTCValue;
 		}
-		else
-		{	// NO: inizialize the value and send it to the client
+		else {	// NO: inizialize the value and send it to the client
 			getPriceBTC().then(() => {
-				stringData += ', "btcusd":'+ ourBTCValue;
+				stringData += ', "btcusd":' + ourBTCValue;
 			});
 
 		}
@@ -69,24 +75,21 @@ router.get('/prices', function (req, res) { // automatically call both BTCUSD an
 
 		/** ETH section */
 		// let's first check if the ETH value has been initialized
-		if(hasETHbeenInitialize)
-		{	// YES: return the latest saved one to the client
-			stringData += ', "ethusd":'+ ourETHValue;
+		if (hasETHbeenInitialize) {	// YES: return the latest saved one to the client
+			stringData += ', "ethusd":' + ourETHValue;
 		}
-		else
-		{	// NO: inizialize the value and send it to the client
+		else {	// NO: inizialize the value and send it to the client
 			getPriceETH().then(() => {
-				stringData += ', "ethusd":'+ ourETHValue;
+				stringData += ', "ethusd":' + ourETHValue;
 			});
 		}
 		/****************/
 
 		stringData += "}";
 	}
-	catch(error)
-	{
+	catch (error) {
 		res.statusCode = 400; /*** 400 messo a caso */
-		stringData = '{"status":"'+ error +'"}';
+		stringData = '{"status":"' + error + '"}';
 	}
 
 	res.send(stringData);
@@ -99,24 +102,21 @@ router.get('/BTCUSD', function (req, res) {
 	res.statusCode = 200;
 	res.header('Content-type', 'application/json');
 
-	try
-	{
+	try {
 		// let's first check if the BTC value has been initialized
-		if(hasBTCbeenInitialize)
-		{	// YES: return the last saved one to the client
-			res.send('{"btcusd":"'+ ourBTCValue +'"}');
+		if (hasBTCbeenInitialize) {	// YES: return the last saved one to the client
+			res.send('{"btcusd":"' + ourBTCValue + '"}');
 		}
-		else
-		{	// NO: inizialize the value and send it to the client
+		else {	// NO: inizialize the value and send it to the client
 			getPriceBTC().then(() => {
-				res.send('{"btcusd":"'+ ourBTCValue +'"}');
+				//res.send('{"btcusd":"' + ourBTCValue + '"}');
+				res.json({ btcusd: ourBTCValue });
 			});
 		}
 	}
-	catch(error)
-	{
+	catch (error) {
 		res.statusCode = 400;
-		res.send('{"btcusd":"'+ error +'"}');
+		res.send('{"btcusd":"' + error + '"}');
 	}
 });
 
@@ -128,24 +128,20 @@ router.get('/ETHUSD', function (req, res) {
 	res.statusCode = 200;
 	res.header('Content-type', 'application/json');
 
-	try
-	{
+	try {
 		// let's first check if the ETH value has been initialized
-		if(hasETHbeenInitialize)
-		{	// YES: return the last saved one to the client
-			res.send('{"ethusd":"'+ ourETHValue +'"}');
+		if (hasETHbeenInitialize) {	// YES: return the last saved one to the client
+			res.send('{"ethusd":"' + ourETHValue + '"}');
 		}
-		else
-		{	// NO: inizialize the value and send it to the client
+		else {	// NO: inizialize the value and send it to the client
 			getPriceETH().then(() => {
-				res.send('{"ethusd":"'+ ourETHValue +'"}');
+				res.send('{"ethusd":"' + ourETHValue + '"}');
 			});
 		}
 	}
-	catch(error)
-	{
+	catch (error) {
 		res.statusCode = 400;
-		res.send('{"ethusd":"'+ error +'"}');
+		res.send('{"ethusd":"' + error + '"}');
 	}
 });
 
@@ -160,7 +156,7 @@ async function getPriceBTC() {
 	var tmpCurrencyVal = 0;
 	var tmpBTCValue = 0;
 	var numOfExchanges = 4.0;
-	
+
 	try {
 		debugisBTCchanged = false;
 		tmpCurrencyVal = 0;
@@ -168,7 +164,7 @@ async function getPriceBTC() {
 		coinbaseObj = (await server_methods_BTCUSD.HTTPCoinbaseRequestJSON()).data;
 		tmpCurrencyVal += parseFloat(coinbaseObj.price);
 
-		krakenObj = (await server_methods_BTCUSD.HTTPKrakenRequestJSON()).data; 
+		krakenObj = (await server_methods_BTCUSD.HTTPKrakenRequestJSON()).data;
 		tmpCurrencyVal += parseFloat(krakenObj.result.XXBTZUSD.a[0]);
 
 		bitfinexObj = (await server_methods_BTCUSD.HTTPBitfinexRequestJSON()).data;
@@ -180,18 +176,15 @@ async function getPriceBTC() {
 		tmpBTCValue = (tmpCurrencyVal / numOfExchanges); // compute the average value of the BTC among the N selected exchanges
 		debugBTCHistory.push(tmpBTCValue);
 
-		if(!hasBTCbeenInitialize)
-		{
+		if (!hasBTCbeenInitialize) {
 			hasBTCbeenInitialize = true;
 			ourBTCValue = tmpBTCValue; // first initialization of the variable on the server
 			debugisBTCchanged = true;
 		}
-		else
-		{
-			if(!((ourBTCValue - rangeBTC) < tmpBTCValue &&  (ourBTCValue + rangeBTC) > tmpBTCValue))
-			{	// true --> the computed value is different from the saved one
+		else {
+			if (!((ourBTCValue - rangeBTC) < tmpBTCValue && (ourBTCValue + rangeBTC) > tmpBTCValue)) {	// true --> the computed value is different from the saved one
 				ourBTCValue = tmpBTCValue;
-				debugisBTCchanged = true;				
+				debugisBTCchanged = true;
 			}
 		}
 		return debugisBTCchanged;
@@ -213,7 +206,7 @@ async function getPriceETH() {
 	var tmpCurrencyVal = 0;
 	var tmpETHValue = 0;
 	var numOfExchanges = 4.0;
-	
+
 	try {
 		debugisETHchanged = false;
 		tmpCurrencyVal = 0;
@@ -221,7 +214,7 @@ async function getPriceETH() {
 		coinbaseObj = (await server_methods_ETHUSD.HTTPCoinbaseRequestJSON()).data;
 		tmpCurrencyVal += parseFloat(coinbaseObj.price);
 
-		krakenObj = (await server_methods_ETHUSD.HTTPKrakenRequestJSON()).data; 
+		krakenObj = (await server_methods_ETHUSD.HTTPKrakenRequestJSON()).data;
 		tmpCurrencyVal += parseFloat(krakenObj.result.XETHZUSD.a[0]);
 
 		bitfinexObj = (await server_methods_ETHUSD.HTTPBitfinexRequestJSON()).data;
@@ -233,18 +226,15 @@ async function getPriceETH() {
 		tmpETHValue = (tmpCurrencyVal / numOfExchanges); // compute the average value of the BTC among the N selected exchanges
 		debugETHHistory.push(tmpETHValue);
 
-		if(!hasETHbeenInitialize)
-		{
+		if (!hasETHbeenInitialize) {
 			hasETHbeenInitialize = true;
 			ourETHValue = tmpETHValue; // first initialization of the variable on the server
 			debugisETHchanged = true;
 		}
-		else
-		{
-			if(!((ourETHValue - rangeETH) < tmpETHValue &&  (ourETHValue + rangeETH) > tmpETHValue))
-			{	// true --> the computed value is different from the saved one
+		else {
+			if (!((ourETHValue - rangeETH) < tmpETHValue && (ourETHValue + rangeETH) > tmpETHValue)) {	// true --> the computed value is different from the saved one
 				ourETHValue = tmpETHValue;
-				debugisETHchanged = true;	
+				debugisETHchanged = true;
 			}
 		}
 		return debugisETHchanged;
@@ -260,12 +250,10 @@ function updateCurrency() {
 	//seconds++;
 	//console.log(seconds + ' seconds');
 
-	try
-	{
+	try {
 		getPriceBTC()
 			.then((resIsBTCChanged) => {
-				if(resIsBTCChanged)
-				{
+				if (resIsBTCChanged) {
 					// debug: console.log("BTC changed: average: " + debugBTCHistory[debugBTCHistory.length - 1] + " final: " + ourBTCValue + "<---");
 					organizeDataToBeSendAndSend(true, false);
 				}
@@ -275,8 +263,7 @@ function updateCurrency() {
 
 		getPriceETH()
 			.then((resIsETHChanged) => {
-				if(resIsETHChanged)
-				{
+				if (resIsETHChanged) {
 					//console.log("ETH changed: average: " + debugETHHistory[debugETHHistory.length - 1] + " final: " + ourETHValue + "<---");
 					organizeDataToBeSendAndSend(false, true);
 				}
@@ -284,98 +271,93 @@ function updateCurrency() {
 				// debug: console.error("ETH same: " + ourETHValue);
 			});
 	}
-	catch(error)
-	{
+	catch (error) {
 		console.log("[updateCurrency] " + error);
 	}
 }
 
 /** TO BE COMMENTED */
-function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
-{
-	try
-	{
+function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
+	try {
 		var dt = datetime.create();
 		var formattedDate = dt.format('d/m/Y H:M:S:N');
 
 		/** call the databasews in order to store the new value  */
 		// step 1: create the object with the data to send
-		var tmpObj =  querystring.stringify({
+		var tmpObj = querystring.stringify({
 			//time: formattedDate,			// time of the last update
 			//isBTCchanged: _isBTCChanged,	// to avoid adding duplicate values in the db
 			//isETHChanged: _isETHChanged,	// to avoid adding duplicate values in the db
 			BTC: ourBTCValue,			// last stored value for BTC
 			ETH: ourETHValue				// last stored value for ETH
 		});
-						
+
 		// step 2: create the header to send the data
 		var _header = {
 			'Host': host,
 			'Content-Type': 'application/x-www-form-urlencoded', // "x-www-form-urlencoded" no idea  what this is.....
 			'Content-Length': Buffer.byteLength(tmpObj)
 		}
-		
+
 		// step 3: call the function "sendDataToWS(...)" and send the updated prices to the WS that manage the database 
-		var sdtwsdb = sendDataToWS('localhost', 8080, '/database/price', 'POST',  _header, tmpObj); 
-		sdtwsdb.then(function(result) {
+		var sdtwsdb = sendDataToWS('localhost', 8080, '/database/price', 'POST', _header, tmpObj);
+		sdtwsdb.then(function (result) {
 			//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
 			// debug: console.log("[wsdb] "+ result);
 
 			// send date to the ws plannedaction with the updated value of the currencies
-			var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST',  _header, tmpObj);
-			sdtwspa.then(function(result) {
+			var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST', _header, tmpObj);
+			sdtwspa.then(function (result) {
 				//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
 				// debug: 
-				console.log("[wspa] "+ result);
-			
-			}, function(err) { // enter here when Promise reject
+				console.log("[wspa] " + result);
+
+			}, function (err) { // enter here when Promise reject
 				console.log("[wsplannedaction] " + err);
 			});
 
 
-		}, function(err) { // enter here when Promise reject
+		}, function (err) { // enter here when Promise reject
 			console.log("[wsdatabase] " + err);
 		});
 	}
-	catch(error)
-	{
+	catch (error) {
 		console.log("[organizeDataToBeSendAndSend] " + error);
 	}
 }
 
 /** This function connects to the specified host and send the _data with the choosen crud method */
-function sendDataToWS(_host, _port, _path, _method, _header, _data)
-{  // source code: https://medium.com/dev-bits/writing-neat-asynchronous-node-js-code-with-promises-32ed3a4fd098
-	
+function sendDataToWS(_host, _port, _path, _method, _header, _data) {  // source code: https://medium.com/dev-bits/writing-neat-asynchronous-node-js-code-with-promises-32ed3a4fd098
+
 	var options = {
 		host: _host, 		// es: 'localhost', 
 		port: _port, 		// es: 8085,
 		path: _path, 		// es: '/price',
 		method: _method, 	// es: 'POST',
-		headers: _header	
+		headers: _header
 	};
 	// Return new promise 
-	return new Promise(function(resolve, reject) {
+	return new Promise(function (resolve, reject) {
 		// Do async job
-		
+
 		var httpreq = http.request(options, function (response) {
-				
+
 			response.setEncoding('utf8');
 			response.on('data', function (chunk) {
 				// debug: console.log("--->"+ _port +": " + chunk);
 			});
-			response.on('end', function() {
+			response.on('end', function () {
 				// debug: 
 				console.log('---------->call ended');
 
 				resolve("success");
 			})
 		});
-			
+
 		httpreq.write(_data);
 		httpreq.end();
-	
-		httpreq.on('error', function(err) {
+
+		httpreq.on('error', function (err) {
 			console.error(err);
 			reject(err);
 		});

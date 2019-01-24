@@ -39,16 +39,8 @@ router.post('/googleSignIn', async function (req, res) {
 
     try {
         // Forward to /user
-        var res = await axios.post(app_domain + 'user/tokensignin', { params });
-
-        if (res == "??valid??") {
-            res.render('index');
-        }
-        else {
-            res.render('login', {
-                error_message: "Something gone wrong. Please try again."
-            });
-        }
+        var data = await axios.post(app_domain + '/user/tokensignin', { params });
+        res.json(data)
     }
     catch (err) {
         res.json(err);

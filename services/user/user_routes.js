@@ -8,14 +8,17 @@ var verifier = require('google-id-token-verifier');
 router.post('/tokensignin', function (req, res) {
     var token = req.body.tokenid;
     console.log(token);
-    var clientId = "533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com";
+    var clientId = "533024552572-ltbl4ks1kib5qod9cgihc2ppjhcdem2l.apps.googleusercontent.com";
 
     verifier.verify(token, clientId, function (err, tokenInfo) {
         if (!err) {
+            tokenInfo.logged = true
             res.json(tokenInfo);
         }
-        else
-            res.json(err);
+        else {
+            console.log(err)
+            res.json({ logged: false });
+        }
     });
 });
 

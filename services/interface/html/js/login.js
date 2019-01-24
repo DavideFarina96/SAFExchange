@@ -46,7 +46,7 @@ function execute_post(url, params) {
 }
 
 
-// FB FROM HERE
+// FACEBOOK //////////////////////////////////////////////////////////////
 var FB;
 
 window.fbAsyncInit = function() {
@@ -126,6 +126,7 @@ function getUserData() {
         console.log(response);  //response is the basic user object
     });
 }
+//////////////////////////////////////////////////////////////////////////
 
 /* Make the page perform a POST request
 function execute_post(url, params) {

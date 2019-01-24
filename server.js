@@ -9,11 +9,11 @@ var path = require('path');
 var morgan = require('morgan');                         // log requests to the console (express4)
 //var methodOverride = require('method-override');      // simulate DELETE and PUT (express4)
 
-var schedule = require('node-schedule');                // scheduler
-var axios = require('axios');                           // make HTTP requests
+
+//var axios = require('axios');                           // make HTTP requests
 //var globalValues = require('./public/globalValues');
 
-global.app_domain = "https:/safexchange.herokuapp.com"
+global.app_domain = "https://safexchange.herokuapp.com"
 
 // CONFIGURATION
 app.use(session({ secret: 'ssshhhhh', resave: true, saveUninitialized: true }));
@@ -28,10 +28,6 @@ app.use(bodyParser.json());                                     // parse applica
 const PORT = process.env.PORT || 8080
 
 
-// JOB SCHEDULER
-//var j = schedule.scheduleJob('0 0 1 * * 1', function () {
-//    AddNewWeek();
-//});
 
 
 /** middleware route to support CORS and preflighted requests */
