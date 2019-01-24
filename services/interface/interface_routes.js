@@ -4,6 +4,10 @@ router = express.Router();
 const axios = require('axios')
 var path = require('path');
 
+
+var { OAuth2Client } = require('google-auth-library');
+var verifier = require('google-id-token-verifier');
+
 var interface_path = "/interface"
 
 
@@ -11,7 +15,7 @@ var interface_path = "/interface"
 router.get('/', function (req, res) {
     console.log('Request for home received')
     if (req.session.user != null) {
-        res.render('index', { user:  req.session.user })
+        res.render('index', { user: req.session.user })
     }
     else {
         res.redirect(interface_path + '/login');
@@ -29,7 +33,7 @@ router.get('/logout', function (req, res) {
     var logged_with = req.session.user.logged_with
     req.session.user = null;
 
-    res.render('logout', { logged_with:  logged_with })
+    res.render('logout', { logged_with: logged_with })
 })
 
 router.get('/privacy', function (req, res) {
@@ -42,22 +46,37 @@ router.get('/tc', function (req, res) {
 
 
 // LOGIN ROUTES
-// Handle Google Token
 router.post('/googleSignIn', async function (req, res) {
-    var token_id = req.body.token_id
+    // Get token from page
+    var token = req.body.tokenid;
+    console.log(token);
 
-    try {
-        // Forward to /user
-        var data = await axios.post(app_domain + '/user/tokensignin', { token_id: token_id });
+    var clientId = "533024552572-ltbl4ks1kib5qod9cgihc2ppjhcdem2l.apps.googleusercontent.com";
 
-        req.session.user = req.body.user
-        req.session.user.logged_with = "GOOGLE"
+    verifier.verify(token, clientId, function (err, tokenInfo) {
+        if (!err) {
+            // Token is valid
 
-        res.json(data)
-    }
-    catch (err) {
-        res.json(err);
-    }
+            tokenInfo.logged = true
+
+            // Get user data from Google
+            var _user = req.body.user
+
+            // Get user from /user -> Create if not exists
+            var user = await axios.put(app_domain + '/user/id_google', { user: _user });
+
+            // Set session variable
+            req.session.user = user
+            req.session.user.logged_with = "GOOGLE"
+
+            // Send data to page
+            res.json(tokenInfo);
+        }
+        else {
+            console.log(err)
+            res.json({ logged: false });
+        }
+    });
 });
 
 // Authenticate user with credentials

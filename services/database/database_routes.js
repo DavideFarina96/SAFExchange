@@ -71,6 +71,42 @@ router.get('/', function (req, res) {
 */
 
 /** USER ROUTES **/
+router.put('/user/id_google', async function (req, res) {
+	var _user = req.body.user
+
+	var user = await User.findOne({ id_google: _user.id_google });
+
+	if (user) {
+		res.json(user);
+	}
+	else {
+		User.create(_user, function (err, user) {
+			if (err) return res.send(err);
+
+			console.log("New user created");
+			res.json(user);
+		});
+	}
+});
+
+router.put('/user/id_facebook', function (req, res) {
+	var _user = req.body.user
+
+	var user = await User.findOne({ id_google: _user.id_facebook });
+
+	if (user) {
+		res.json(user);
+	}
+	else {
+		User.create(_user, function (err, user) {
+			if (err) return res.send(err);
+
+			console.log("New user created");
+			res.json(user);
+		});
+	}
+});
+
 router.get('/user/:user_id', function (req, res) {
 	User.findById(req.params.user_id, function (err, user) {
 		if (err) res.send(err);

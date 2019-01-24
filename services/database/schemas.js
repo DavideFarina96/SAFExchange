@@ -1,12 +1,12 @@
 var mongoose = require('mongoose');
 
 var UserSchema = new mongoose.Schema({
-    username: String,
     name: String,
-    password: String,
-    surname: String,
     email: String,
-    oauth: String,
+    password: String,
+    id_google: { type: String, unique : true },
+    id_facebook: { type: String, unique : true },
+    photo_url: String,
     USD: Number,
     BTC: Number,
     ETH: Number
