@@ -44,7 +44,7 @@ function googleLogout() {
 // FACEBOOK
 var FB;
 
-window.fbAsyncInit = function () {
+var fbAsyncInit = async function () {
     FB.init({
         appId: '2178730182445130',
         cookie: true,
@@ -52,9 +52,6 @@ window.fbAsyncInit = function () {
         version: 'v3.2'
     });
     FB.AppEvents.logPageView();
-
-    FB.logout(loggedOut);
-
 };
 
 (function (d, s, id) {
@@ -67,6 +64,7 @@ window.fbAsyncInit = function () {
 
 
 function facebookLogout() {
+    await fbAsyncInit();
     FB.logout(loggedOut);
 }
 
