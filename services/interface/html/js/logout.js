@@ -29,10 +29,10 @@ function errorLogginOut(){
 
 
 // GOOGLE
-async function googleLogout() {
+function googleLogout() {
     console.log('Logging out of Google')
 
-    gapi.load('auth2', function() {
+    gapi.load('auth2', async function() {
         setTimeout(function(){
             gapi.auth2.init();  
 
