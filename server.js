@@ -7,11 +7,6 @@ var session = require('express-session');
 var bodyParser = require('body-parser');                // pull information from HTML POST (express4)
 var path = require('path');
 var morgan = require('morgan');                         // log requests to the console (express4)
-//var methodOverride = require('method-override');      // simulate DELETE and PUT (express4)
-
-
-//var axios = require('axios');                           // make HTTP requests
-//var globalValues = require('./public/globalValues');
 
 global.app_domain = "https://safexchange.herokuapp.com"
 
@@ -26,9 +21,6 @@ app.use(bodyParser.json());                                     // parse applica
 
 // Choose what port to use. If deployed on heroku process.env.PORT will be set and therefore used
 const PORT = process.env.PORT || 8080
-
-
-
 
 /** middleware route to support CORS and preflighted requests */
 app.use(function (req, res, next) {
@@ -46,34 +38,6 @@ app.use(function (req, res, next) {
 
     next();
 });
-
-
-// THESE METHODS SHOULD GO IN THE APPROPRIATE FILE
-// ALSO USE router.get INSTEAD OF app.get 
-
-/*app.get('/user/USD', function(req, res) {
-	// DO STUFF
-    res.send();		
-});
-app.get('/price/BTC', function(req, res) {
-    var priceObj = {price: 0};
-    axios.get('https://api.pro.coinbase.com/products/BTC-USD/ticker')
-      .then(response => {
-        console.log("price received");
-        priceObj.price = response.data.price;
-        res.send(priceObj);
-      })
-      .catch(error => {
-        console.log(error);
-        res.send(error);
-      });
-});
-app.get('/profile/', function(req, res) {
-    var profileid = req.query.profileid;
-    res.sendfile('./public/profile.html');
-}); */
-
-
 
 
 // Include DATABASE routes

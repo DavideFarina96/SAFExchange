@@ -40,12 +40,8 @@ function googleLogout() {
     })
 }
 
-// MAIL
-function mailLogout() {
-    // LOG OUT
-}
 
-// FACEBOOK //////////////////////////////////////////////////////////////
+// FACEBOOK
 var FB;
 
 window.fbAsyncInit = function () {
@@ -72,3 +68,8 @@ function facebookLogout() {
     FB.logout(loggedOut);
 }
 
+
+// MAIL
+function mailLogout() {
+    // LOG OUT
+}

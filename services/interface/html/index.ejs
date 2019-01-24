@@ -12,8 +12,28 @@
     <div class="wrapper w3-container w3-padding-16">
         <div class="w3-row" style="height: 100%;">
 
-            <div class="w3-green w3-container w3-quarter" style="height: 100%;">
+            <div class="w3-container w3-quarter" style="height: 100%;">
                 <h2>Buy/Sell</h2>
+
+                <select id="currency-selector" class="w3-input">
+                    <option>BTCUSD</option>
+                    <option>ETHUSD</option>
+                </select>
+
+                <div id="buy-panel" class="w3-border-top w3-margin-top">
+                    <p>Buy</p>
+                    <input class="w3-input" type="number" placeholder="How many BTC to buy?">
+                    <p class="label-total-money">Total cost: <span id="buy-cost">10</span>$</p>
+                    <button class="w3-button w3-block w3-green">Buy</button>
+                </div>
+
+                <div id="sell-panel" class="w3-border-top w3-margin-top">
+                    <p>Sell</p>
+                    <input class="w3-input" type="number" placeholder="How many BTC to sell?">
+                    <p class="label-total-money">Total profit: <span id="sell-profit">10</span>$</p>
+                    <button class="w3-button w3-block w3-red">Sell</button>
+                </div>
+
             </div>
 
             <div class="w3-grey w3-threequarter" style="height: 100%;">
