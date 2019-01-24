@@ -11,13 +11,23 @@ function completeLogout(user) {
     }
 }
 
+function loggedOut(){
+    $('#logging_out_msg').hide()
+    $('#error_msg').hide()
+    $('#logged_out_msg').show()
+}
+
+function errorLogginOut(){
+    $('#logging_out_msg').hide()
+    $('#logged_out_msg').hide()
+    $('#error_msg').show()
+}
+
 
 // GOOGLE
 function googleLogout() {
     var auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
-        console.log('User signed out.');
-    });
+    auth2.signOut().then(loggedOut).catch(errorLogginOut);
 }
 
 // MAIL
@@ -50,9 +60,6 @@ window.fbAsyncInit = function () {
 
 
 function facebookLogout() {
-    FB.logout(function (response) {
-        checkLoginState();
-        // Person is now logged out
-    });
+    FB.logout(loggedOut);
 }
 
