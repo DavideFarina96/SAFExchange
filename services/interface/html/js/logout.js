@@ -29,20 +29,17 @@ function errorLogginOut(){
 
 
 // GOOGLE
-function googleLogout() {
+async function googleLogout() {
     console.log('Logging out of Google')
 
     gapi.load('auth2', function() {
         setTimeout(function(){
             gapi.auth2.init();  
 
-            var auth2 = gapi.auth2.getAuthInstance();
+            var auth2 = await gapi.auth2.getAuthInstance()
             auth2.signOut().then(loggedOut).catch(errorLogginOut);
         }, 500); 
-            
-
-
-      });
+          });
 }
 
 // MAIL
