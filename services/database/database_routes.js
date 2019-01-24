@@ -89,7 +89,7 @@ router.put('/user/id_google', async function (req, res) {
 	}
 });
 
-router.put('/user/id_facebook', function (req, res) {
+router.put('/user/id_facebook', async function (req, res) {
 	var _user = req.body.user
 
 	var user = await User.findOne({ id_google: _user.id_facebook });
