@@ -142,10 +142,12 @@ function login() {
 }
 
 function getUserData() {
+    var tmpRes;
     FB.api('/me?fields=name,email', function(response) {
         console.log(response);  //response is the basic user object
-        return response;
+        tmpRes = response;
     });
+    return tmpRes;
 }
 //////////////////////////////////////////////////////////////////////////
 
