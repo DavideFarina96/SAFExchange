@@ -84,6 +84,42 @@ router.post('/googleSignIn', function (req, res) {
     });
 });
 
+//facebook login
+router.post('/facebookSignIn', function (req, res) {
+    // Get token from page
+    var token = req.body.tokenid;
+    console.log(token);
+
+    //get app token
+    var app_token = (await axios.get("https://graph.facebook.com/oauth/access_token?client_id=2178730182445130&client_secret=ea1da7f5d63016176122012d80b2be4c&grant_type=client_credentials")).data.access_token;
+
+    //check token validity
+    var token_validity = (await axios.get("graph.facebook.com/debug_token?input_token=" + token + "&access_token=" + app_token)).data;
+    if(token_validity.data.is_valid == true)
+    {
+        var _user = req.body.user
+
+            try {
+                // Get user from /user -> Create if not exists
+                var user = (await axios.put(app_domain + '/user/id_facebook', _user)).data;
+            }
+            catch (err) {
+                console.log(err)
+            }
+
+            req.session.user = user;
+            req.session.user.logged_with = "FACEBOOK";
+
+            res.json(token_validity);
+    }
+    else
+    {
+        res.json({ logged: false });
+    }
+});
+
+
+
 // Authenticate user with credentials
 router.post('/mailSignIn', function (req, res) {
 

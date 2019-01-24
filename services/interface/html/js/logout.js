@@ -40,6 +40,10 @@ function googleLogout() {
     })
 }
 
+function facebookLogout() {
+    FB.logout(loggedOut);
+}
+
 // MAIL
 function mailLogout() {
     // LOG OUT

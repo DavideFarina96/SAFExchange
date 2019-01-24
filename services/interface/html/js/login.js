@@ -1,4 +1,5 @@
 var url_google = '/interface/googleSignIn'
+var url_facebook = '/interface/facebookSignIn'
 var url_mail = '/interface/mailSignIn'
 
 
@@ -22,6 +23,20 @@ function onGoogleSignIn(googleUser) {
     var id_token = googleUser.getAuthResponse().id_token;
 
     execute_post(url_google, { tokenid: id_token, user: user_obj });
+}
+
+function onFacebookSignIn(facebookData) {
+    var id_token = facebookData.authResponse.accessToken;
+    var userData = getUserData();
+
+    var user_obj = {
+        id_facebook: userData.id,
+        name: userData.name,
+        image_url: "",
+        email: userData.email
+    }    
+
+    execute_post(url_facebook, {tokenid: id_token, user: user_obj });
 }
 
 function onMailSignIn() {
@@ -90,6 +105,7 @@ function statusChangeCallback(response) {
     // for FB.getLoginStatus().
     if (response.status === 'connected') {
         // Logged into your app and Facebook.
+        onFacebookSignIn(response);
         console.log("SEI LOGGATO");
         getUserData();
     } else {
@@ -131,6 +147,7 @@ function login() {
 function getUserData() {
     FB.api('/me?fields=name,email', function(response) {
         console.log(response);  //response is the basic user object
+        return response;
     });
 }
 //////////////////////////////////////////////////////////////////////////
