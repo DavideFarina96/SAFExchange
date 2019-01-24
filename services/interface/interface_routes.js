@@ -26,9 +26,10 @@ router.get('/login', function (req, res) {
 router.get('/logout', function (req, res) {
     console.log('Request for logout received')
 
-    res.render('logout', { logged_with:  req.session.user.logged_with })
-
+    var logged_with = req.session.user.logged_with
     req.session.user = null;
+
+    res.render('logout', { logged_with:  logged_with })
 })
 
 router.get('/privacy', function (req, res) {
