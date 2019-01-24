@@ -62,8 +62,13 @@ router.post('/googleSignIn', function (req, res) {
             // Get user data from Google
             var _user = req.body.user
 
-            // Get user from /user -> Create if not exists
-            var user = await axios.put(app_domain + '/user/id_google', { user: _user });
+            try {
+                // Get user from /user -> Create if not exists
+                var user = await axios.put(app_domain + '/user/id_google', { user: _user });
+            }
+            catch (err) {
+                console.log(err)
+            }
 
             // Set session variable
             req.session.user = user
