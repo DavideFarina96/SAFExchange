@@ -2,9 +2,10 @@
 var express = require('express');
 var app = express();                                    // create our app w/ express
 var router = express.Router();
+var session = require('express-session');
 
 var bodyParser = require('body-parser');                // pull information from HTML POST (express4)
-var path = require('path');  
+var path = require('path');
 var morgan = require('morgan');                         // log requests to the console (express4)
 //var methodOverride = require('method-override');      // simulate DELETE and PUT (express4)
 
@@ -12,8 +13,10 @@ var schedule = require('node-schedule');                // scheduler
 var axios = require('axios');                           // make HTTP requests
 //var globalValues = require('./public/globalValues');
 
+global.app_domain = "https:/safexchange.herokuapp.com"
 
 // CONFIGURATION
+app.use(session({ secret: 'ssshhhhh', resave: true, saveUninitialized: true }));
 app.use(express.static(path.join(__dirname, 'public')));        // set the static files location /public/img will be /img for users
 app.use(morgan('dev'));                                         // log every request to the console
 app.use(bodyParser.urlencoded({ extended: true }));             // parse application/x-www-form-urlencoded
@@ -82,8 +85,9 @@ var db_routes = require('./services/database/database_routes.js');
 app.use('/database', db_routes);
 
 // Include INTERFACE routes
-var interface_routes = require('./services/interface/interface_routes.js');
-app.use('/interface', interface_routes);
+var interface_module = require('./services/interface/interface_routes.js');
+interface_module.setup_env(app);
+app.use('/interface', interface_module.router);
 
 // Include USER routes
 var user_routes = require('./services/user/user_routes.js');
