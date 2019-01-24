@@ -94,7 +94,9 @@ router.put('/user/id_google', async function (req, res) {
 });
 
 router.put('/user/id_facebook', async function (req, res) {
-	var _user = req.body.user
+	console.log("ID_FB")
+	console.log(req.body)
+	var _user = req.body
 
 	var user = await User.findOne({ id_facebook: _user.id_facebook });
 
