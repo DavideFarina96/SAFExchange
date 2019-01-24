@@ -51,7 +51,7 @@ var fbAsyncInit = async function (d, s, id) {
     js.src = "https://connect.facebook.net/en_US/sdk.js";
     fjs.parentNode.insertBefore(js, fjs);
 
-    (document, 'script', 'facebook-jssdk'));
+    (document, 'script', 'facebook-jssdk');
 
     FB.init({
         appId: '2178730182445130',
