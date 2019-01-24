@@ -85,7 +85,7 @@ router.post('/googleSignIn', function (req, res) {
 });
 
 //facebook login
-router.post('/facebookSignIn', function (req, res) {
+router.post('/facebookSignIn', async function (req, res) {
     // Get token from page
     var token = req.body.tokenid;
     console.log(token);
