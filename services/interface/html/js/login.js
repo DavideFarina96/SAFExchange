@@ -1,4 +1,5 @@
 var url_google = '/interface/googleSignIn'
+var url_facebook = '/interface/facebookSignIn'
 var url_mail = '/interface/mailSignIn'
 
 
@@ -22,6 +23,24 @@ function onGoogleSignIn(googleUser) {
     var id_token = googleUser.getAuthResponse().id_token;
 
     execute_post(url_google, { tokenid: id_token, user: user_obj });
+}
+
+function onFacebookSignIn(facebookData) {
+    var id_token = facebookData.authResponse.accessToken;
+
+    FB.api('/me?fields=name,email', function(response) {
+        console.log(response);  //response is the basic user object
+        var userData = response;
+
+        var user_obj = {
+            id_facebook: userData.id,
+            name: userData.name,
+            image_url: "",
+            email: userData.email
+        } 
+
+        execute_post(url_facebook, {tokenid: id_token, user: user_obj });
+    });    
 }
 
 function onMailSignIn() {
@@ -90,8 +109,8 @@ function statusChangeCallback(response) {
     // for FB.getLoginStatus().
     if (response.status === 'connected') {
         // Logged into your app and Facebook.
+        onFacebookSignIn(response);
         console.log("SEI LOGGATO");
-        getUserData();
     } else {
         // The person is not logged into your app or we are unable to tell.
         console.log("FAI IL LOGIN");
@@ -115,10 +134,7 @@ function login() {
     FB.login(
         function(response) {
             if (response.authResponse) {
-             console.log('Welcome!  Fetching your information.... ');
-             FB.api('/me?fields=id,name,email', function(response) {
-                 console.log(response);
-             });
+                onFacebookSignIn(response);
          } 
          else {
             console.log('User cancelled login or did not fully authorize.');
@@ -126,12 +142,6 @@ function login() {
     },
     {scope:'email'}
     );
-}
-
-function getUserData() {
-    FB.api('/me?fields=name,email', function(response) {
-        console.log(response);  //response is the basic user object
-    });
 }
 //////////////////////////////////////////////////////////////////////////
 
