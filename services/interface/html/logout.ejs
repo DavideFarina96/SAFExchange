@@ -3,7 +3,7 @@
 
 <head>
     <% include ./partials/head %>
-    <script src="https://apis.google.com/js/platform.js"></script>
+    <script src="https://apis.google.com/js/platform.js&callback=onGoogleReady"></script>
     <meta name="google-signin-client_id" content="533024552572-ltbl4ks1kib5qod9cgihc2ppjhcdem2l.apps.googleusercontent.com">
 </head>
 
@@ -36,10 +36,10 @@
     <script src="/js/logout.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function (event) {
-            console.log("DOM fully loaded and parsed");
+        function onGoogleReady(event) {
+            console.log("Google loaded");
             completeLogout('<%= logged_with %>')
-        });
+        }
 
     </script>
 </body>
