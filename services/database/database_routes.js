@@ -169,7 +169,7 @@ router.post('/user', function (req, res) {
 
 /** PRICE ROUTES **/
 // Defines the /price API, which is used from pricews for saving the new value of the currencies
-router.get('/price', async function (req, res) { // TODO HISTORY
+router.get('/price', async function (req, res) {
 	var _price = {};
 
 	try {
@@ -179,6 +179,44 @@ router.get('/price', async function (req, res) { // TODO HISTORY
 
 		console.log("Last read price", "BTCUSD: ", _price.BTCUSD, "ETHUSD: " + _price.ETHUSD)
 		res.json(_price);
+	}
+	catch (err) {
+		console.log("Error")
+		res.send(err);
+	}
+});
+
+router.get('/price/BTCUSD', async function (req, res) {
+	var _elem_number = parseInt(req.query.elem_number);
+
+	var _prices = [];
+
+	try {
+		// Get the last prices for both BTC and ETH and send them
+		_prices = (await Price.find({ BTCUSD: { $exists: true } }, 'BTCUSD',
+			{ sort: { '_id': -1 }, limit: _elem_number }));
+
+		console.log("Read last " + _elem_number + " BTCUSD prices")
+		res.json(_prices);
+	}
+	catch (err) {
+		console.log("Error")
+		res.send(err);
+	}
+});
+
+router.get('/price/ETHUSD', async function (req, res) {
+	var _elem_number = parseInt(req.query.elem_number);
+
+	var _prices = [];
+
+	try {
+		// Get the last prices for both BTC and ETH and send them
+		_prices = (await Price.find({ ETHUSD: { $exists: true } }, 'ETHUSD',
+			{ sort: { '_id': -1 }, limit: _elem_number }));
+
+		console.log("Read last " + _elem_number + " ETHUSD prices")
+		res.json(_prices);
 	}
 	catch (err) {
 		console.log("Error")
