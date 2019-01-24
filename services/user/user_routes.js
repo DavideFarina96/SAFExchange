@@ -9,7 +9,7 @@ router.put('/id_google', async function (req, res) {
     try {
         console.log("User", JSON.stringify(_user))
         var user = await axios.put(app_domain + '/database/user/id_google', _user);
-        console.log("User Received", JSON.stringify(user))
+        console.log("User Received", user)
     }
     catch (err) {
         console.log(err)
