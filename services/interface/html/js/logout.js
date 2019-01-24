@@ -37,7 +37,7 @@ function googleLogout() {
 
         var auth2 = await gapi.auth2.getAuthInstance()
         auth2.signOut().then(loggedOut).catch(errorLogginOut);
-    }
+    })
 }
 
 // MAIL
