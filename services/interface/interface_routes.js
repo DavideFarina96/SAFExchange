@@ -63,7 +63,6 @@ router.post('/googleSignIn', function (req, res) {
             var _user = req.body.user
 
             try {
-                console.log("Interface ", JSON.stringify(_user))
                 // Get user from /user -> Create if not exists
                 var user = (await axios.put(app_domain + '/user/id_google', _user)).data;
             }
