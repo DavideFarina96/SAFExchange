@@ -28,7 +28,7 @@ function onGoogleSignIn(googleUser) {
 function onFacebookSignIn(facebookData) {
     var id_token = facebookData.authResponse.accessToken;
 
-    FB.api('/me?fields=name,email', function(response) {
+    FB.api('/me?fields=name,email', function (response) {
         console.log(response);  //response is the basic user object
         var userData = response;
 
@@ -37,10 +37,10 @@ function onFacebookSignIn(facebookData) {
             name: userData.name,
             image_url: "",
             email: userData.email
-        } 
+        }
 
-        execute_post(url_facebook, {tokenid: id_token, user: user_obj });
-    });    
+        execute_post(url_facebook, { tokenid: id_token, user: user_obj });
+    });
 }
 
 function onMailSignIn() {
@@ -75,28 +75,28 @@ function execute_post(url, params) {
 // FACEBOOK //////////////////////////////////////////////////////////////
 var FB;
 
-window.fbAsyncInit = function() {
+window.fbAsyncInit = function () {
     FB.init({
-        appId      : '2178730182445130',
-        cookie     : true,
-        xfbml      : true,
-        version    : 'v3.2'
+        appId: '2178730182445130',
+        cookie: true,
+        xfbml: true,
+        version: 'v3.2'
     });
     checkLoginState();
     FB.AppEvents.logPageView();
-    
+
 };
 
-(function(d, s, id){
+(function (d, s, id) {
     var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) {return;}
+    if (d.getElementById(id)) { return; }
     js = d.createElement(s); js.id = id;
     js.src = "https://connect.facebook.net/en_US/sdk.js";
     fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
 
 
-        //checkLoginState();
+//checkLoginState();
 
 
 // FUNCTIONS
@@ -118,13 +118,13 @@ function statusChangeCallback(response) {
 }
 
 function checkLoginState() {
-    FB.getLoginStatus(function(response) {
+    FB.getLoginStatus(function (response) {
         statusChangeCallback(response);
     });
 }
 
 function logout() {
-    FB.logout(function(response) {
+    FB.logout(function (response) {
         checkLoginState();
         // Person is now logged out
     });
@@ -132,38 +132,14 @@ function logout() {
 
 function login() {
     FB.login(
-        function(response) {
+        function (response) {
             if (response.authResponse) {
                 onFacebookSignIn(response);
-         } 
-         else {
-            console.log('User cancelled login or did not fully authorize.');
-        }
-    },
-    {scope:'email'}
+            }
+            else {
+                console.log('User cancelled login or did not fully authorize.');
+            }
+        },
+        { scope: 'email' }
     );
 }
-//////////////////////////////////////////////////////////////////////////
-
-/* Make the page perform a POST request
-function execute_post(url, params) {
-    // The rest of this code assumes you are not using a library.
-    // It can be made less wordy if you use one.
-    var form = document.createElement("form");
-    form.setAttribute("method", "post");
-    form.setAttribute("action", http_path + url);
-
-    for(var key in params) {
-        if(params.hasOwnProperty(key)) {
-            var hiddenField = document.createElement("input");
-            hiddenField.setAttribute("type", "hidden");
-            hiddenField.setAttribute("name", key);
-            hiddenField.setAttribute("value", params[key]);
-
-            form.appendChild(hiddenField);
-        }
-    }
-
-    document.body.appendChild(form);
-    form.submit();
-}*/
