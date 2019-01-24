@@ -8,8 +8,7 @@ router.put('/id_google', async function (req, res) {
 
     try {
         console.log("User", JSON.stringify(_user))
-        var user = await axios.put(app_domain + '/database/user/id_google', _user);
-        console.log("User Received", user)
+        var user = (await axios.put(app_domain + '/database/user/id_google', _user)).data;
     }
     catch (err) {
         console.log(err)
@@ -17,7 +16,7 @@ router.put('/id_google', async function (req, res) {
 
     console.log("User received", JSON.stringify(user))
 
-    res.json("{res: 'ok'}")
+    res.json(user)
 })
 
 
