@@ -98,7 +98,15 @@ router.put('/user/id_facebook', async function (req, res) {
 	console.log(req.body)
 	var _user = req.body
 
-	var user = await User.findOne({ id_facebook: _user.id_facebook });
+	try {
+		var user = await User.findOne({ id_facebook: _user.id_facebook });
+	}
+	catch (err) {
+		console.log(err)
+	}
+	
+	console.log("RESULTS")
+	console.log(user)
 
 	if (user) {
 		res.json(user);
