@@ -2,10 +2,10 @@ var express = require('express');
 router = express.Router();
 
 const axios = require('axios')
-//const qs = require('qs')
 var path = require('path');
 
 var interface_path = "/interface"
+
 
 // PAGE ROUTES
 router.get('/', function (req, res) {
@@ -23,6 +23,15 @@ router.get('/login', function (req, res) {
     res.render('login')
 })
 
+router.get('/logout', function (req, res) {
+    console.log('Request for logout received')
+
+    var logged_with = req.session.user.logged_with
+    req.session.user = null;
+
+    res.render('logout', { logged_with:  logged_with })
+})
+
 router.get('/privacy', function (req, res) {
     res.render('privacy')
 })
@@ -30,6 +39,7 @@ router.get('/privacy', function (req, res) {
 router.get('/tc', function (req, res) {
     res.render('tc')
 })
+
 
 // LOGIN ROUTES
 // Handle Google Token
@@ -41,6 +51,7 @@ router.post('/googleSignIn', async function (req, res) {
         var data = await axios.post(app_domain + '/user/tokensignin', { token_id: token_id });
 
         req.session.user = req.body.user
+        req.session.user.logged_with = "GOOGLE"
 
         res.json(data)
     }
@@ -53,6 +64,7 @@ router.post('/googleSignIn', async function (req, res) {
 router.post('/mailSignIn', function (req, res) {
 
     req.session.user = { name: "test" }
+    req.session.user.logged_with = "MAIL"
 
     // Return index.html
     res.json({ logged: true });
