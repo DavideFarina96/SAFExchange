@@ -6,7 +6,7 @@ function completeLogout(logged_with) {
             googleLogout(); break;
 
         case "FACEBOOK":
-            setInterval(facebookLogout(), 500);
+            setInterval(facebookLogout, 500);
             break;
 
         case "MAIL":
@@ -45,7 +45,7 @@ function googleLogout() {
 // FACEBOOK
 var FB;
 
-var fbAsyncInit = async function () {
+window.fbAsyncInit = function() {
     FB.init({
         appId: '2178730182445130',
         cookie: true,
@@ -65,7 +65,6 @@ var fbAsyncInit = async function () {
 
 
 async function facebookLogout() {
-    await fbAsyncInit();
     FB.logout(loggedOut);
 }
 
