@@ -9,12 +9,19 @@ function onGoogleSignIn(googleUser) {
     console.log('Image URL: ' + profile.getImageUrl());
     console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
 
+    var user_obj = {
+        id: profile.getId(),
+        name: profile.getName(),
+        image_url: profile.getImageUrl(),
+        email: profile.getEmail()
+    }
+
     //console.log(profile.getEmail());
 
     //SEND TOKEN TO BACKEND
     var id_token = googleUser.getAuthResponse().id_token;
 
-    execute_post(url_google, { tokenid: id_token });
+    execute_post(url_google, { tokenid: id_token, user: user_obj });
 }
 
 function onMailSignIn() {

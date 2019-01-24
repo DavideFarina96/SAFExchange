@@ -34,12 +34,14 @@ router.get('/tc', function (req, res) {
 // LOGIN ROUTES
 // Handle Google Token
 router.post('/googleSignIn', async function (req, res) {
-    var params = {}
-    params.token_id = req.body.token_id
+    var token_id = req.body.token_id
 
     try {
         // Forward to /user
-        var data = await axios.post(app_domain + '/user/tokensignin', { params });
+        var data = await axios.post(app_domain + '/user/tokensignin', { token_id: token_id });
+
+        req.session.user = req.body.user
+
         res.json(data)
     }
     catch (err) {
