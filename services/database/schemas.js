@@ -6,7 +6,7 @@ var UserSchema = new mongoose.Schema({
     password: String,
     id_google: { type: String, unique : true },
     id_facebook: { type: String, unique : true },
-    photo_url: String,
+    image_url: String,
     USD: Number,
     BTC: Number,
     ETH: Number

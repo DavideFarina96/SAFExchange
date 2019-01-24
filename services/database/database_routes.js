@@ -73,6 +73,7 @@ router.get('/', function (req, res) {
 /** USER ROUTES **/
 router.put('/user/id_google', async function (req, res) {
 	var _user = req.body.user
+	console.log("Database ", JSON.stringify(_user))
 
 	try {
 		var user = await User.findOne({ id_google: _user.id_google });
