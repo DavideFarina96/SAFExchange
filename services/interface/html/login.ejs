@@ -4,7 +4,7 @@
 <head>
     <% include ./partials/head %>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <meta name="google-signin-client_id" content="533024552572-ueqgth3dnht0ntpqdfbcmhofu20o8i61.apps.googleusercontent.com">
+    <meta name="google-signin-client_id" content="533024552572-ltbl4ks1kib5qod9cgihc2ppjhcdem2l.apps.googleusercontent.com">
 </head>
 
 <body class="w3-dark-grey">
@@ -23,7 +23,8 @@
 
                 <div class="w3-auto" style="width:50%">
                     <div class="w3-button w3-block g-signin2" data-onsuccess="onGoogleSignIn"></div>
-                    <div class="w3-button w3-block w3-indigo">Facebook</div>
+                    <div class="fb-login-button" data-size="large" data-button-type="continue_with" data-auto-logout-link="false" data-use-continue-as="false" onlogin="login()"></div>
+                    <div class="w3-button w3-block w3-blue" onclick="logout()">LOGOUT FB</div>
                     <div class="w3-button w3-block w3-green" onclick="onMailSignIn()">Mail</div>
                 </div>
 
