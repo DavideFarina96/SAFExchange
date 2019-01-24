@@ -26,8 +26,8 @@ router.get('/login', function (req, res) {
 router.get('/logout', function (req, res) {
     console.log('Request for logout received')
 
-    res.render('logout', { user:  req.session.user })
-    
+    res.render('logout', { logged_with:  req.session.user.logged_with })
+
     delete req.session.user;
 })
 
