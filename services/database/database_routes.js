@@ -72,7 +72,7 @@ router.get('/', function (req, res) {
 
 /** USER ROUTES **/
 router.put('/user/id_google', async function (req, res) {
-	var _user = req.body.user
+	var _user = req.body
 	console.log("Database ", JSON.stringify(_user))
 
 	try {
