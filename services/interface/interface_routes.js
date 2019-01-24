@@ -101,6 +101,7 @@ router.post('/facebookSignIn', async function (req, res) {
     {
         console.log("TOKEN IS VALID");
         var _user = req.body.user
+        console.log(_user);
 
             try {
                 // Get user from /user -> Create if not exists
