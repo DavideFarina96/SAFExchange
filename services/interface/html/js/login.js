@@ -25,18 +25,22 @@ function onGoogleSignIn(googleUser) {
     execute_post(url_google, { tokenid: id_token, user: user_obj });
 }
 
-async function onFacebookSignIn(facebookData) {
+function onFacebookSignIn(facebookData) {
     var id_token = facebookData.authResponse.accessToken;
-    var userData = await getUserData();
 
-    var user_obj = {
-        id_facebook: userData.id,
-        name: userData.name,
-        image_url: "",
-        email: userData.email
-    }    
+    FB.api('/me?fields=name,email', function(response) {
+        console.log(response);  //response is the basic user object
+        var userData = response;
 
-    execute_post(url_facebook, {tokenid: id_token, user: user_obj });
+        var user_obj = {
+            id_facebook: userData.id,
+            name: userData.name,
+            image_url: "",
+            email: userData.email
+        } 
+
+        execute_post(url_facebook, {tokenid: id_token, user: user_obj });
+    });    
 }
 
 function onMailSignIn() {
@@ -107,7 +111,6 @@ function statusChangeCallback(response) {
         // Logged into your app and Facebook.
         onFacebookSignIn(response);
         console.log("SEI LOGGATO");
-        getUserData();
     } else {
         // The person is not logged into your app or we are unable to tell.
         console.log("FAI IL LOGIN");
@@ -139,12 +142,6 @@ function login() {
     },
     {scope:'email'}
     );
-}
-
-async function getUserData() {
-    var response = await FB.api('/me?fields=name,email');
-    console.log(response);
-    return response;
 }
 //////////////////////////////////////////////////////////////////////////
 
