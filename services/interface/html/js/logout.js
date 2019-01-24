@@ -6,7 +6,7 @@ function completeLogout(logged_with) {
             googleLogout(); break;
 
         case "FACEBOOK":
-            setInterval(facebookLogout, 500);
+            setTimeout(facebookLogout, 500);
             break;
 
         case "MAIL":
