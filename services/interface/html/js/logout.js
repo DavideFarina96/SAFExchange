@@ -13,14 +13,14 @@ function completeLogout(logged_with) {
     }
 }
 
-function loggedOut(){
+function loggedOut() {
     console.log('Logged out')
     $('#logging_out_msg').hide()
     $('#error_msg').hide()
     $('#logged_out_msg').show()
 }
 
-function errorLogginOut(){
+function errorLogginOut() {
     console.log('Error logging out')
     $('#logging_out_msg').hide()
     $('#logged_out_msg').hide()
@@ -32,14 +32,12 @@ function errorLogginOut(){
 function googleLogout() {
     console.log('Logging out of Google')
 
-    gapi.load('auth2', function() {
-        setTimeout(async function(){
-            gapi.auth2.init();  
+    gapi.load('auth2', async function () {
+        gapi.auth2.init();
 
-            var auth2 = await gapi.auth2.getAuthInstance()
-            auth2.signOut().then(loggedOut).catch(errorLogginOut);
-        }, 500); 
-          });
+        var auth2 = await gapi.auth2.getAuthInstance()
+        auth2.signOut().then(loggedOut).catch(errorLogginOut);
+    }, 500);
 }
 
 // MAIL
