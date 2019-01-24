@@ -1,4 +1,6 @@
 function completeLogout(user) {
+    console.log(user)
+
     switch (user.logged_with) {
         case "GOOGLE":
             googleLogout(); break;
@@ -45,7 +47,6 @@ window.fbAsyncInit = function () {
         xfbml: true,
         version: 'v3.2'
     });
-    checkLoginState();
     FB.AppEvents.logPageView();
 
 };
