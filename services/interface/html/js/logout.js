@@ -65,7 +65,21 @@ window.fbAsyncInit = function() {
 
 
 async function facebookLogout() {
-    FB.logout(loggedOut);
+    FB.getLoginStatus(function (response) {
+        statusChangeCallback(response);
+    });
+
+    
+}
+
+function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    if (response.status === 'connected') {
+        FB.logout(loggedOut);
+    } else {
+        console.log("Error");
+    }
 }
 
 
