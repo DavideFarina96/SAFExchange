@@ -13,7 +13,7 @@ const server_methods_ETHUSD = require('./server/server_methods_ETHUSD');
 
 //////////////////////////////////////////////////////////////////////////////
 // VARIABLES DECLARATIONS:
-const host = "safexchange.herokuapp.com"
+const host = "localhost"; // "safexchange.herokuapp.com"
 var coinbaseObj, krakenObj, bitfinexObj, binanceObj; //logic variables
 var ourBTCValue = 0, ourETHValue = 0; // value BTC -> USD and ETH -> USD for buying and selling on SAFEx
 const rangeBTC = 0.1, rangeETH = 0.01; // the last computed value of BTC is different from the one saved on the db if it's outside the db value +- range
@@ -25,22 +25,15 @@ var hasBTCbeenInitialize = false;
 var hasETHbeenInitialize = false; 
 
 var debugBTCHistory = new Array(), debugETHHistory = new Array();
-var seconds = 0;
 //////////////////////////////////////////////////////////////////////////////
 
 
 //////////////////////////////////////////////////////////////////////////////
 // ROUTES SETUP
-/** Defines default router used for get the client page */
-router.get('/client', function (req, res) {
-	// send a feedback to the client
-	res.sendFile(path.join(__dirname + '/client/index.html'));
-});
-
 /* Provide the user the list of available operation on this server */
 var possible_routes =
-	"GET		/BTCUSD" + "<br>" +
-				"/ETHUSD";
+	"GET\t	/BTCUSD" + "<br>" +
+	"\t		/ETHUSD";
 router.get('/', function (req, res) {
 	res.send(possible_routes);
 });
@@ -93,7 +86,7 @@ router.get('/prices', function (req, res) { // automatically call both BTCUSD an
 	catch(error)
 	{
 		res.statusCode = 400; /*** 400 messo a caso */
-		stringData = '{"status":"unexpected_error"}';
+		stringData = '{"status":"'+ error +'"}';
 	}
 
 	res.send(stringData);
@@ -154,17 +147,6 @@ router.get('/ETHUSD', function (req, res) {
 		res.statusCode = 400;
 		res.send('{"ethusd":"'+ error +'"}');
 	}
-});
-
-router.get('/TMP', function (req, res) {
-
-	res.statusCode = 200;
-	res.header('Content-type', 'application/json');
-
-	updateCurrency().then((data) => {
-		res.send(data);
-	});
-
 });
 
 //////////////////////////////////////////////////////////////////////////////
@@ -275,7 +257,7 @@ async function getPriceETH() {
 
 /** TO BE COMMENTED:  CORE FUNCTION */
 function updateCurrency() {
-	seconds++;
+	//seconds++;
 	//console.log(seconds + ' seconds');
 
 	try
@@ -322,8 +304,8 @@ function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 			//time: formattedDate,			// time of the last update
 			//isBTCchanged: _isBTCChanged,	// to avoid adding duplicate values in the db
 			//isETHChanged: _isETHChanged,	// to avoid adding duplicate values in the db
-			BTCUSD: ourBTCValue,			// last stored value for BTC
-			ETHUSD: ourETHValue				// last stored value for ETH
+			BTC: ourBTCValue,			// last stored value for BTC
+			ETH: ourETHValue				// last stored value for ETH
 		});
 						
 		// step 2: create the header to send the data
@@ -343,7 +325,8 @@ function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged)
 			var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST',  _header, tmpObj);
 			sdtwspa.then(function(result) {
 				//	enter here when Promise response. Result is the value return by the promise -> resolve("success");
-				// debug: console.log("[wspa] "+result);
+				// debug: 
+				console.log("[wspa] "+ result);
 			
 			}, function(err) { // enter here when Promise reject
 				console.log("[wsplannedaction] " + err);
@@ -382,7 +365,9 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data)
 				// debug: console.log("--->"+ _port +": " + chunk);
 			});
 			response.on('end', function() {
-				// debug: console.log('---------->call ended');
+				// debug: 
+				console.log('---------->call ended');
+
 				resolve("success");
 			})
 		});
