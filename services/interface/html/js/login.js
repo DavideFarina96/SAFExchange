@@ -131,10 +131,7 @@ function login() {
     FB.login(
         function(response) {
             if (response.authResponse) {
-             console.log('Welcome!  Fetching your information.... ');
-             FB.api('/me?fields=id,name,email', function(response) {
-                 console.log(response);
-             });
+                onFacebookSignIn(response);
          } 
          else {
             console.log('User cancelled login or did not fully authorize.');
