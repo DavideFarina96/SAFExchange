@@ -3,6 +3,17 @@ router = express.Router();
 
 const axios = require('axios')
 
+router.get('/:user_id', async function(req, res) { //user_id is the mondoDB user ID
+    try {
+        var user = (await axios.get(app_domain + '/database/user/' + req.params.user_id)).data;
+    }
+    catch (err) {
+        console.log(err)
+    }
+    
+    res.json(user);
+})
+
 router.put('/id_google', async function (req, res) {
     var _user = req.body
 
