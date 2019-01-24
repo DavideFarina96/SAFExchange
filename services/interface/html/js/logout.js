@@ -14,12 +14,14 @@ function completeLogout(logged_with) {
 }
 
 function loggedOut(){
+    console.log('Logged out')
     $('#logging_out_msg').hide()
     $('#error_msg').hide()
     $('#logged_out_msg').show()
 }
 
 function errorLogginOut(){
+    console.log('Error logging out')
     $('#logging_out_msg').hide()
     $('#logged_out_msg').hide()
     $('#error_msg').show()
@@ -34,8 +36,6 @@ function googleLogout() {
         gapi.auth2.init();
         var auth2 = gapi.auth2.getAuthInstance();
         auth2.signOut().then(loggedOut).catch(errorLogginOut);
-
-        console.log('Logged out of Google')
       });
 }
 

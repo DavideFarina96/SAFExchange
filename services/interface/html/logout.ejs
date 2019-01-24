@@ -36,7 +36,11 @@
     <script src="/js/logout.js"></script>
 
     <script>
-        completeLogout( '<%= logged_with %>' )
+        document.addEventListener("DOMContentLoaded", function (event) {
+            console.log("DOM fully loaded and parsed");
+            completeLogout('<%= logged_with %>')
+        });
+
     </script>
 </body>
 
