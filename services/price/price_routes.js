@@ -5,6 +5,7 @@ var path = require('path');
 var http = require('http'); // used for calling external server
 var querystring = require('querystring');
 var datetime = require('node-datetime');
+var schedule = require('node-schedule');                // scheduler
 var router = express.Router();
 
 // here is where the methods for get the exchange value are implemented
@@ -29,14 +30,6 @@ var debugBTCHistory = new Array(), debugETHHistory = new Array();
 
 
 
-// JOB SCHEDULER
-//var schedule = require('node-schedule');                // scheduler
-//var j = schedule.scheduleJob('0 0 1 * * 1', function () {
-//    AddNewWeek();
-//});
-
-
-
 //////////////////////////////////////////////////////////////////////////////
 // ROUTES SETUP
 /* Provide the user the list of available operation on this server */
@@ -52,98 +45,91 @@ router.get('/', function (req, res) {
  *  This function allows the client to retrive both the value of BTC and ETH as a JSON object
 */
 router.get('/prices', function (req, res) { // automatically call both BTCUSD and ETHUSD in order to update the respective prices
-	var stringData = "{";
-
-	res.statusCode = 200;
 	res.header('Content-type', 'application/json');
 
-	try {
-		stringData += '"status":' + res.statusCode;
+	try
+	{
+		var lastestNvalues = 1;
+		var gsdfws = getPricesFromWS(lastestNvalues);
+		gsdfws.then(function (result) {
+			console.log(result);
+			res.json({btc: result});
 
-		/** BTC section */
-		// let's first check if the BTC value has been initialized
-		if (hasBTCbeenInitialize) {	// YES: return the latest saved one to the client
-			stringData += ', "btcusd":' + ourBTCValue;
-		}
-		else {	// NO: inizialize the value and send it to the client
-			getPriceBTC().then(() => {
-				stringData += ', "btcusd":' + ourBTCValue;
-			});
-
-		}
-		/****************/
-
-		/** ETH section */
-		// let's first check if the ETH value has been initialized
-		if (hasETHbeenInitialize) {	// YES: return the latest saved one to the client
-			stringData += ', "ethusd":' + ourETHValue;
-		}
-		else {	// NO: inizialize the value and send it to the client
-			getPriceETH().then(() => {
-				stringData += ', "ethusd":' + ourETHValue;
-			});
-		}
-		/****************/
-
-		stringData += "}";
+		}, function (err) { // enter here when Promise reject
+			console.log("[wsdatabase] " + err);
+			res.json({error: err});
+		});
 	}
-	catch (error) {
-		res.statusCode = 400; /*** 400 messo a caso */
-		stringData = '{"status":"' + error + '"}';
+	catch(error)
+	{
+		res.json({error: error});
 	}
-
-	res.send(stringData);
 });
 
 /** Defines the /BTCUSD API.
- *  This function can be used from a client to get the value of the BTC as a json object
+ *  This function can be used by the client to get the value of the BTC from the database, as a json object.
   */
-router.get('/BTCUSD', function (req, res) {
-	res.statusCode = 200;
+router.get('/BTCUSD', function (req, res) { 
 	res.header('Content-type', 'application/json');
 
-	try {
-		// let's first check if the BTC value has been initialized
-		if (hasBTCbeenInitialize) {	// YES: return the last saved one to the client
-			res.send('{"btcusd":"' + ourBTCValue + '"}');
+	try
+	{
+		// step 1: check if the user send the param "num"
+		var lastestNvalues = req.body.num;
+		if(lastestNvalues == undefined || lastestNvalues == null)
+		{	// user is asking for the lastest value
+			lastestNvalues = 1;
 		}
-		else {	// NO: inizialize the value and send it to the client
-			getPriceBTC().then(() => {
-				//res.send('{"btcusd":"' + ourBTCValue + '"}');
-				res.json({ btcusd: ourBTCValue });
-			});
-		}
+		
+		var gsdfws = getSpecifiedDataFromWS(lastestNvalues, 'BTC');
+		gsdfws.then(function (result) {
+			console.log("BTC: " + result);
+			res.json({btc: result});
+
+		}, function (err) { // enter here when Promise reject
+			console.log("[wsdatabase] " + err);
+			res.json({error: err});
+		});
 	}
-	catch (error) {
-		res.statusCode = 400;
-		res.send('{"btcusd":"' + error + '"}');
+	catch(error)
+	{
+		res.json({error: error});
 	}
 });
 
 /** Defines the /ETHUSD API.
- *  This function can be used from a client to get the value of the ETH as a json object
-  */
-router.get('/ETHUSD', function (req, res) {
-
-	res.statusCode = 200;
+ *  This function can be used by the client to get the value of the BTC from the database, as a json object.
+ */
+router.get('/ETH', function (req, res) { 
 	res.header('Content-type', 'application/json');
 
-	try {
-		// let's first check if the ETH value has been initialized
-		if (hasETHbeenInitialize) {	// YES: return the last saved one to the client
-			res.send('{"ethusd":"' + ourETHValue + '"}');
+	try
+	{
+		// step 1: check if the user send the param "num"
+		var lastestNvalues = req.body.num;
+		console.log(lastestNvalues);
+		if(lastestNvalues == undefined || lastestNvalues == null)
+		{	// user is asking for the lastest value
+			lastestNvalues = 1;
 		}
-		else {	// NO: inizialize the value and send it to the client
-			getPriceETH().then(() => {
-				res.send('{"ethusd":"' + ourETHValue + '"}');
-			});
-		}
+
+		console.log(lastestNvalues);
+		var gsdfws = getSpecifiedDataFromWS(lastestNvalues, 'ETH');
+		gsdfws.then(function (result) {
+			console.log("ETH: " + result);
+			res.json(result);
+
+		}, function (err) { // enter here when Promise reject
+			console.log("[wsdatabase] " + err);
+			res.json({eth: err});
+		});
 	}
-	catch (error) {
-		res.statusCode = 400;
-		res.send('{"ethusd":"' + error + '"}');
+	catch(error)
+	{
+		res.json({eth: error});
 	}
 });
+
 
 //////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS and METHODS
@@ -247,8 +233,6 @@ async function getPriceETH() {
 
 /** TO BE COMMENTED:  CORE FUNCTION */
 function updateCurrency() {
-	//seconds++;
-	//console.log(seconds + ' seconds');
 
 	try {
 		getPriceBTC()
@@ -279,8 +263,8 @@ function updateCurrency() {
 /** TO BE COMMENTED */
 function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
 	try {
-		var dt = datetime.create();
-		var formattedDate = dt.format('d/m/Y H:M:S:N');
+		//var dt = datetime.create();
+		//var formattedDate = dt.format('d/m/Y H:M:S:N');
 
 		/** call the databasews in order to store the new value  */
 		// step 1: create the object with the data to send
@@ -326,6 +310,73 @@ function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
 	}
 }
 
+function getSpecifiedDataFromWS(_num, _currency,) {
+	try {
+		// step 1: create the object with the data to send
+		var tmpObj = querystring.stringify({
+			currency: _currency,
+			num: _num
+		});
+
+		// step 2: create the header to send the data
+		var _header = {
+			'Host': host,
+			'Content-Type': 'application/x-www-form-urlencoded', // "x-www-form-urlencoded" no idea  what this is.....
+			'Content-Length': Buffer.byteLength(tmpObj)
+		}
+
+		// Return new promise 
+		return new Promise(function (resolve, reject) {
+			// step 3: call the function "sendDataToWS(...)" and send the updated prices to the WS that manage the database 
+			var sdtwsdb = sendDataToWS('localhost', 8080, '/database/price/', 'GET', _header, tmpObj);
+			sdtwsdb.then(function (result) {
+				console.log(result);
+				resolve(result);
+			}, function (err) { // enter here when Promise reject
+				console.log("[wsdatabase] " + err);
+				reject(err);
+			});
+		});
+	}
+	catch (error) {
+		console.log("[getSpecifiedDataFromWS] " + error);
+	}
+	
+}
+
+function getPricesFromWS(_num) {
+	try {
+		// step 1: create the object with the data to send
+		var tmpObj = querystring.stringify({
+			num: _num
+		});
+
+		// step 2: create the header to send the data
+		var _header = {
+			'Host': host,
+			'Content-Type': 'application/x-www-form-urlencoded', // "x-www-form-urlencoded" no idea  what this is.....
+			'Content-Length': Buffer.byteLength(tmpObj)
+		}
+
+		// Return new promise 
+		return new Promise(function (resolve, reject) {
+			// step 3: call the function "sendDataToWS(...)" and send the updated prices to the WS that manage the database 
+			var sdtwsdb = sendDataToWS('localhost', 8080, '/database/price/', 'GET', _header, tmpObj);
+			sdtwsdb.then(function (result) {
+				console.log(result);
+				resolve(result);
+			}, function (err) { // enter here when Promise reject
+				console.log("[wsdatabase] " + err);
+				reject(err);
+			});
+		});
+	}
+	catch (error) {
+		console.log("[getPricesFromWS] " + error);
+	}
+	
+}
+
 /** This function connects to the specified host and send the _data with the choosen crud method */
 function sendDataToWS(_host, _port, _path, _method, _header, _data) {  // source code: https://medium.com/dev-bits/writing-neat-asynchronous-node-js-code-with-promises-32ed3a4fd098
 
@@ -344,7 +395,8 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data) {  // source
 
 			response.setEncoding('utf8');
 			response.on('data', function (chunk) {
-				// debug: console.log("--->"+ _port +": " + chunk);
+				// debug: 
+				console.log("--->"+ _port +": " + chunk);
 			});
 			response.on('end', function () {
 				// debug: 
@@ -366,9 +418,11 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data) {  // source
 
 
 //////////////////////////////////////////////////////////////////////////////
-// inizialize timer for update the currencies values
-//setInterval(updateCurrency, timerInterval);
-//console.log("Timer \"price\" inizialized....");
+// inizialize JOB SCHEDULER that updates the currencies values
+//var j = schedule.scheduleJob('*/10 * * * * *', function () { // execute the function every 5sec
+//    updateCurrency();
+//});
+console.log("Timer \"price\" inizialized....");
 
 // EXPORT router to be used in the main file
 module.exports = router;
