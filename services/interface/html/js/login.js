@@ -25,9 +25,9 @@ function onGoogleSignIn(googleUser) {
     execute_post(url_google, { tokenid: id_token, user: user_obj });
 }
 
-function onFacebookSignIn(facebookData) {
+async function onFacebookSignIn(facebookData) {
     var id_token = facebookData.authResponse.accessToken;
-    var userData = getUserData();
+    var userData = await getUserData();
 
     var user_obj = {
         id_facebook: userData.id,
@@ -141,13 +141,10 @@ function login() {
     );
 }
 
-function getUserData() {
-    var tmpRes;
-    FB.api('/me?fields=name,email', function(response) {
-        console.log(response);  //response is the basic user object
-        tmpRes = response;
-    });
-    return tmpRes;
+async function getUserData() {
+    var response = await FB.api('/me?fields=name,email');
+    console.log(response);
+    return response;
 }
 //////////////////////////////////////////////////////////////////////////
 
