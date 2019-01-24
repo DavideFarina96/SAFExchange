@@ -92,11 +92,14 @@ router.post('/facebookSignIn', async function (req, res) {
 
     //get app token
     var app_token = (await axios.get("https://graph.facebook.com/oauth/access_token?client_id=2178730182445130&client_secret=ea1da7f5d63016176122012d80b2be4c&grant_type=client_credentials")).data.access_token;
+    console.log("GOT APP TOKEN");
 
     //check token validity
     var token_validity = (await axios.get("graph.facebook.com/debug_token?input_token=" + token + "&access_token=" + app_token)).data;
+
     if(token_validity.data.is_valid == true)
     {
+        console.log("TOKEN IS VALID");
         var _user = req.body.user
 
             try {
