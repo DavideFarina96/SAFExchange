@@ -28,7 +28,7 @@ router.get('/logout', function (req, res) {
 
     res.render('logout', { logged_with:  req.session.user.logged_with })
 
-    delete req.session.user;
+    req.session.user = null;
 })
 
 router.get('/privacy', function (req, res) {
