@@ -14,6 +14,7 @@ router.put('/id_google', async function (req, res) {
         console.log(err)
     }
 
+    console.log("User received", JSON.stringify(user))
 
     res.json(user)
 })
