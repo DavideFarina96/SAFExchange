@@ -36,7 +36,7 @@
     <script src="/js/logout.js"></script>
 
     <script>
-        completeLogout( <%= user %> )
+        completeLogout( <%= JSON.stringify(user) %> )
     </script>
 </body>
 
