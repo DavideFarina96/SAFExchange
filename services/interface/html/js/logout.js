@@ -63,7 +63,7 @@ var fbAsyncInit = async function () {
 }(document, 'script', 'facebook-jssdk'));
 
 
-function facebookLogout() {
+async function facebookLogout() {
     await fbAsyncInit();
     FB.logout(loggedOut);
 }
