@@ -46,14 +46,14 @@ router.get('/tc', function (req, res) {
 
 
 // LOGIN ROUTES
-router.post('/googleSignIn', async function (req, res) {
+router.post('/googleSignIn', function (req, res) {
     // Get token from page
     var token = req.body.tokenid;
     console.log(token);
 
     var clientId = "533024552572-ltbl4ks1kib5qod9cgihc2ppjhcdem2l.apps.googleusercontent.com";
 
-    verifier.verify(token, clientId, function (err, tokenInfo) {
+    verifier.verify(token, clientId, async function (err, tokenInfo) {
         if (!err) {
             // Token is valid
 
