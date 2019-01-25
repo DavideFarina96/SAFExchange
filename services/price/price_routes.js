@@ -5,6 +5,7 @@ var querystring = require('querystring');
 var date = require('date-and-time');
 var schedule = require('node-schedule');   // scheduler used for automatically call a specific function every N secs
 var router = express.Router();
+const axios = require('axios');
 
 // here is where the methods for get the exchange value are implemented
 const server_methods_BTCUSD = require('./server/server_methods_BTCUSD');
@@ -12,10 +13,9 @@ const server_methods_ETHUSD = require('./server/server_methods_ETHUSD');
 
 //////////////////////////////////////////////////////////////////////////////
 // VARIABLES DECLARATIONS:
-const host = global.app_domain; 
 var coinbaseObj, krakenObj, bitfinexObj, binanceObj; //logic variables
 var ourBTCValue = 0, ourETHValue = 0; // value BTC -> USD and ETH -> USD for buying and selling on SAFEx
-const rangeBTC = 0.1, rangeETH = 0.01; // the last computed value of BTC is different from the one saved on the db if it's outside the db value +- range
+const rangeBTC = 0.1, rangeETH = 0.009; // the last computed value of BTC is different from the one saved on the db if it's outside the db value +- range
 
 // initially, the value for ourBTC and ourETH are set to zero by default. 
 // In order to use the "range" and check if the new value is different from the previous one, we need to correctly initialize it
@@ -41,25 +41,14 @@ router.get('/', function (req, res) {
 /** Defines the /prices API,
  *  This function allows the client to retrive both the value of BTC and ETH as a JSON object
 */
-router.get('/prices', function (req, res) { 
+router.get('/prices', async function (req, res) { 
 	res.header('Content-type', 'application/json');
 
 	try
 	{
-		// step 1: create the header to send the data
-		var _header = {
-			'Host': host
-		}
-
-		var sDSG = sendDataSimpleGET(host, 8080, '/database/price/', 'GET', _header);
-		sDSG.then(function (result) {
-			// debug: console.log(result);
-			res.json(result);
-
-		}, function (err) { // enter here when Promise reject
-			console.log("[GET /prices] " + err);
-			res.json({error: err});
-		});
+		var result = (await axios.get(app_domain + '/database/price/', null)).data;
+		console.log(result);
+		res.json(result);
 	}
 	catch(error)
 	{
@@ -71,7 +60,7 @@ router.get('/prices', function (req, res) {
 /** Defines the /BTCUSD API.
  *  This function can be used by the client to get the value of the BTC from the database, as a json object.
   */
-router.get('/BTCUSD', function (req, res) {   
+router.get('/BTCUSD', async function (req, res) {   
 	res.header('Content-type', 'application/json');
 
 	try
@@ -83,7 +72,10 @@ router.get('/BTCUSD', function (req, res) {
 			lastestNvalues = 1;
 		}
 		
-		// step 2: create the header to send the data
+
+		var result = (await axios.get(app_domain + '/database/price/BTCUSD?elem_number=' + lastestNvalues)).data;
+		res.json(result);
+		/*// step 2: create the header to send the data
 		var _header = {
 			'Host': host
 		}
@@ -98,11 +90,11 @@ router.get('/BTCUSD', function (req, res) {
 		}, function (err) { // enter here when Promise reject
 			console.log("[GET /BTCUSD] " + err);
 			res.json({error: err});
-		});
+		});*/
 	}
 	catch(error)
 	{
-		console.log(error);
+		console.log("[GET /BTCUSD] " + error);
 		res.json({error: error});
 	}
 });
@@ -110,7 +102,7 @@ router.get('/BTCUSD', function (req, res) {
 /** Defines the /ETHUSD API.
  *  This function can be used by the client to get the value of the BTC from the database, as a json object.
  */
-router.get('/ETHUSD', function (req, res) {   
+router.get('/ETHUSD', async function (req, res) {   
 	res.header('Content-type', 'application/json');
 
 	try
@@ -122,8 +114,11 @@ router.get('/ETHUSD', function (req, res) {
 			lastestNvalues = 1;
 		}
 		
+		var result = (await axios.get(app_domain + '/database/price/ETHUSD?elem_number=' + lastestNvalues)).data;
+		res.json(result);
+
 		// step 2: create the header to send the data
-		var _header = {
+		/*var _header = {
 			'Host': host
 		}
 
@@ -137,10 +132,11 @@ router.get('/ETHUSD', function (req, res) {
 		}, function (err) { // enter here when Promise reject
 			console.log("[GET /ETHUSD] " + err);
 			res.json({error: err});
-		});
+		});*/
 	}
 	catch(error)
 	{
+		console.log("[GET /ETHUSD] " + error);
 		res.json({error: error});
 	}
 });
@@ -267,43 +263,43 @@ function updateCurrency() {
 }
 
 /** TO BE COMMENTED */ 
-function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
+async function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
 	try {
 		var tmpObj = "";
-		if(_isBTCChanged == true && _isETHChanged == true) 
+		console.log("_isBTCChanged: " + _isBTCChanged + " _isETHChanged: " + _isETHChanged);
+		if(_isBTCChanged == true) 
 		{
 			// step 1: create the object with the data to send
 			tmpObj = querystring.stringify({
-				BTCUSD: ourBTCValue,			// last stored value for BTC
-				ETHUSD: ourETHValue			// last stored value for ETH
+				BTCUSD: ourBTCValue			// last stored value for BTC
 			});
 		}
 		else
 		{
-			if(_isBTCChanged == true) 
+			if(_isETHChanged == true) 
 			{
 				// step 1: create the object with the data to send
 				tmpObj = querystring.stringify({
-					BTCUSD: ourBTCValue			// last stored value for BTC
+					ETHUSD: ourETHValue			// last stored value for ETH
 				});
 			}
-			else
-			{
-				if(_isETHChanged == true) 
-				{
-					// step 1: create the object with the data to send
-					tmpObj = querystring.stringify({
-						ETHUSD: ourETHValue			// last stored value for ETH
-					});
-				}
-			}
-
 		}
 
 		if(tmpObj != "")
 		{
+
+			var resultOBJ = (await axios.post(app_domain + '/database/price', tmpObj));
+			if(resultOBJ.data.BTCUSD == undefined && resultOBJ.data.ETHUSD == undefined)
+				console.log("[organizeDataToBeSendAndSend] No data received from the database.");
+			else {
+				console.log(resultOBJ.data);
+
+				var result_paws = (await axios.post(app_domain + '/plannedaction/checkTriggers', tmpObj));
+				console.log("[organizeDataToBeSendAndSend] " + result_paws.data.status);
+			}
+
 			// step 2: create the header to send the data
-			var _header = {
+			/*var _header = {
 				'Host': host,
 				'Content-Type': 'application/x-www-form-urlencoded', // "x-www-form-urlencoded" no idea  what this is.....
 				'Content-Length': Buffer.byteLength(tmpObj)
@@ -314,20 +310,20 @@ function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
 			sdtwsdb.then(function (result) {
 				console.log("PRICE UPDATED: " + result);
 
-				/******  COMMENTATO perché manca il ws 
-				// send date to the ws plannedaction with the updated value of the currencies
-				var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST', _header, tmpObj);
-				sdtwspa.then(function (result) {
-					// debug: console.log("[wspa] " + result);
+				//  COMMENTATO perché manca il ws 
+				//// send date to the ws plannedaction with the updated value of the currencies
+				//var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST', _header, tmpObj);
+				//sdtwspa.then(function (result) {
+				//	// debug: console.log("[wspa] " + result);
 
-				}, function (err) { // enter here when Promise reject
-					console.log("[wsplannedaction] " + err);
-				});*/
+				//}, function (err) { // enter here when Promise reject
+				//	console.log("[wsplannedaction] " + err);
+				//});
 
 
 			}, function (err) { // enter here when Promise reject
 				console.log("[wsdatabase] " + err);
-			});
+			});*/
 		}
 		else
 		console.log("[organizeDataToBeSendAndSend] ETH and BTC haven't changed.");
@@ -337,70 +333,8 @@ function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
 	}
 }
 
-/* function getSpecifiedDataFromWS(_num, _currency) {
-	try {
-		// step 2: create the header to send the data
-		var _header = {
-			'Host': host
-		}
-
-		// Return new promise 
-		return new Promise(function (resolve, reject) {
-
-			// http://localhost:8080/database/price/ETHUSD?elem_number=10
-			var serverPath = "";
-			if(_currency.toUpperCase() == "BTCUSD")
-				serverPath = '/database/price/BTCUSD?elem_number='+ _num;
-			if(_currency.toUpperCase() == "ETHUSD")
-				serverPath = '/database/price/ETHUSD?elem_number='+ _num;
-			
-				console.log(serverPath);
-
-			// step 3: get the N latest values of the specified currency from the database 
-			var sdtwsdb = sendDataToWSAsync(host, 8080, serverPath, 'GET', _header, '{}');
-			sdtwsdb.then(function (result) {
-				console.log(result);
-				resolve(result);
-			}, function (err) { // enter here when Promise reject
-				console.log("[wsdatabase] " + err);
-				reject(err);
-			});
-		});
-	}
-	catch (error) {
-		console.log("[getSpecifiedDataFromWS] " + error);
-	}
-	
-}*/
-
-/*async function getPricesFromWS() {
-	try {
-		// step 1: create the header to send the data
-		var _header = {
-			'Host': host
-		}
-
-		// Return new promise 
-		return new Promise(async function (resolve, reject) {
-			// step 2: get the latest N values, for both ETH and BTC from the database
-			var sdtwsdb = (await sendDataToWSAsync(host, 8080, '/database/price/', 'GET', _header,  '{}'));
-			sdtwsdb.then(function (result) {
-				console.log(result);
-				resolve(result);
-			}, function (err) { // enter here when Promise reject
-				console.log("[wsdatabase] " + err);
-				reject(err);
-			});
-		});
-	}
-	catch (error) {
-		console.log("[getPricesFromWS] " + error);
-	}
-	
-}*/
-
 /** This function connects to the specified host and send the _data with the choosen crud method */
-function sendDataToWS(_host, _port, _path, _method, _header, _data) {  // source code: https://medium.com/dev-bits/writing-neat-asynchronous-node-js-code-with-promises-32ed3a4fd098
+/*function sendDataToWS(_host, _port, _path, _method, _header, _data) {  // source code: https://medium.com/dev-bits/writing-neat-asynchronous-node-js-code-with-promises-32ed3a4fd098
 
 	var options = {
 		host: _host, 		// es: 'localhost', 
@@ -434,7 +368,7 @@ function sendDataToWS(_host, _port, _path, _method, _header, _data) {  // source
 								*		'Content-Length': Buffer.byteLength(object_name)
 								*	}
 								*	If I don't specify the Content and I send the data, the request will generate an error .... 
-								*/
+								*
 		httpreq.end();
 
 		httpreq.on('error', function (err) {
@@ -476,13 +410,14 @@ function sendDataSimpleGET(_host, _port, _path, _method, _header) {  // source c
 			reject(err);
 		});
 	});
-}
+}*/
 
 //////////////////////////////////////////////////////////////////////////////
 // inizialize JOB SCHEDULER that updates the currencies values
 var j = schedule.scheduleJob('*/10 * * * * *', function () { // execute the function every 5sec
   updateCurrency();
-  // debug: console.log(date.format(new Date(), 'HH:mm:ss'));
+  // debug: 
+  console.log(date.format(new Date(), 'HH:mm:ss'));
 });
 console.log("Timer \"price\" inizialized....");
 
