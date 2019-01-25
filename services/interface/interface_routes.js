@@ -136,7 +136,34 @@ router.post('/mailSignIn', function (req, res) {
 });
 
 
+
+
 // REDIRECTS ROUTES
+
+router.get('/transaction/user/:user_id', async function (req, res) {
+    var _user_id = req.params.user_id;
+
+    console.log("Received request for transaction list", _user_id)
+    
+    // TODO CHANGE TO /transaction
+    var transaction_list = (await axios.get(app_domain + '/database/transaction/user/' + _user_id)).data;
+
+    // Return index.html
+    res.json(transaction_list);
+});
+
+router.get('/plannedaction/user/:user_id', async function (req, res) {
+    var _user_id = req.params.user_id;
+
+    console.log("Received request for plannedaction list", _user_id)
+
+    var plannedaction_list = (await axios.get(app_domain + '/plannedaction/user/' + _user_id)).data;
+
+    // Return index.html
+    res.json(plannedaction_list);
+});
+
+
 
 
 

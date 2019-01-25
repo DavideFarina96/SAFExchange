@@ -47,7 +47,7 @@ router.get('/prices', async function (req, res) {
 	try
 	{
 		var result = (await axios.get(app_domain + '/database/price/', null)).data;
-		console.log(result);
+		//console.log(result);
 		res.json(result);
 	}
 	catch(error)
@@ -266,7 +266,7 @@ function updateCurrency() {
 async function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
 	try {
 		var tmpObj = "";
-		console.log("_isBTCChanged: " + _isBTCChanged + " _isETHChanged: " + _isETHChanged);
+		//console.log("_isBTCChanged: " + _isBTCChanged + " _isETHChanged: " + _isETHChanged);
 		if(_isBTCChanged == true) 
 		{
 			// step 1: create the object with the data to send
