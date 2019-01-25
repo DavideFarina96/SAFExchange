@@ -91,17 +91,19 @@ $('#user-stats').click((event) => {
     $('#logout-container').toggle();
 })
 
-$('#currency-selector').change((event) => {
+$('#currency-selector').on('change', function (e) {
+    console.log('Selected', this.value)
+
     if (this.value == 'BTCUSD')
         currency = 'BTC'
     else if (this.value == 'ETHUSD')
         currency = 'ETH'
-
-    // Update GUI
-    updateTransactionList()
-    updatePlannedactionList()
 })
 
 
 // Trigger change / update on startup
-$('#currency-selector').trigger('change');
+//$('#currency-selector').trigger('change');
+
+// Update GUI
+updateTransactionList()
+updatePlannedactionList()
