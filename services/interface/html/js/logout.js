@@ -6,7 +6,8 @@ function completeLogout(logged_with) {
             googleLogout(); break;
 
         case "FACEBOOK":
-            facebookLogout(); break;
+            setTimeout(facebookLogout, 500);
+            break;
 
         case "MAIL":
             mailLogout(); break;
@@ -40,15 +41,11 @@ function googleLogout() {
     })
 }
 
-// MAIL
-function mailLogout() {
-    // LOG OUT
-}
 
-// FACEBOOK //////////////////////////////////////////////////////////////
+// FACEBOOK
 var FB;
 
-window.fbAsyncInit = function () {
+window.fbAsyncInit = function() {
     FB.init({
         appId: '2178730182445130',
         cookie: true,
@@ -56,7 +53,6 @@ window.fbAsyncInit = function () {
         version: 'v3.2'
     });
     FB.AppEvents.logPageView();
-
 };
 
 (function (d, s, id) {
@@ -68,7 +64,26 @@ window.fbAsyncInit = function () {
 }(document, 'script', 'facebook-jssdk'));
 
 
-function facebookLogout() {
-    FB.logout(loggedOut);
+async function facebookLogout() {
+    FB.getLoginStatus(function (response) {
+        statusChangeCallback(response);
+    });
+
+    
 }
 
+function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    if (response.status === 'connected') {
+        FB.logout(loggedOut);
+    } else {
+        console.log("Error");
+    }
+}
+
+
+// MAIL
+function mailLogout() {
+    // LOG OUT
+}

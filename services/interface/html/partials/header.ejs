@@ -1,14 +1,27 @@
 <div class="header w3-container w3-teal">
     <div class="w3-row">
-        <div class="w3-half">
+        <div class="w3-half header-elem">
             <h4>SAFEx</h4>
         </div>
-        <div class="w3-half w3-right-align">
-            <h5>
-                <% if (locals.user) { %>
-                <%= user.name %>
-                <% } %>
-            </h5>
+        <div class="w3-half w3-right-align header-elem">
+            <% if (locals.user) { %>
+
+            <div id="user-stats" class="helper">
+                <div class="user-name">
+                    <%= user.name %>
+                </div>
+                <div class="user-profile">
+                    <span class="helper"></span>
+                    <img class="user-icon" src="https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/AKxrwcbyUKmrEqQeD1zHORu3o7zpRdBmPA/s96-c/photo.jpg"></img>
+                    <!--src="<%= user.image_url %>">-->
+                </div>
+            </div>
+
+            <div id="logout-container" class="hover-logout w3-teal">
+                <a href="/interface/logout">logout</a>
+            </div>
+
+            <% } %>
         </div>
     </div>
 </div>
