@@ -302,6 +302,7 @@ router.get('/plannedaction/:plannedaction_id', function (req, res) {
 
 router.get('/plannedaction/user/:user_id', function (req, res) {
 	var _user_id = req.params.user_id;
+	console.log("oK");
 
 	PlannedAction.find({ author: _user_id }, function (err, plannedactions) {
 		if (err) return res.send(err);
