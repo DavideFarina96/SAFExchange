@@ -1,9 +1,24 @@
 <div class="header w3-container w3-teal">
     <div class="w3-row">
-        <div class="w3-half header-elem">
-            <h4>SAFEx</h4>
+        <div class="w3-quarter header-elem">
+            <h4><a href="/interface">SAFEx</a></h4>
         </div>
-        <div class="w3-half w3-right-align header-elem">
+
+        <div class="w3-half w3-center header-elem">
+            <% if (locals.user) { %>
+            <h5 class="w3-third">USD:
+                <%= (user.USD) ? user.USD : 0 %>
+            </h5>
+            <h5 class="w3-third">BTC:
+                <%= (user.BTC) ? user.BTC : 0 %>
+            </h5>
+            <h5 class="w3-third">ETH:
+                <%= (user.ETH) ? user.ETH : 0 %>
+            </h5>
+            <% } %>
+        </div>
+
+        <div class="w3-quarter w3-right-align header-elem">
             <% if (locals.user) { %>
 
             <div id="user-stats" class="helper">
@@ -18,7 +33,7 @@
             </div>
 
             <div id="logout-container" class="hover-logout w3-teal">
-                <a class="return-link" href="/interface/logout">logout</a>
+                <a href="/interface/logout">logout</a>
             </div>
 
             <% } %>
