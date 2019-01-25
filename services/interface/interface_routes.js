@@ -50,7 +50,7 @@ router.get('/tc', function (req, res) {
 router.post('/googleSignIn', function (req, res) {
     // Get token from page
     var token = req.body.tokenid;
-    console.log(token);
+    //console.log(token);
 
     var clientId = "533024552572-ltbl4ks1kib5qod9cgihc2ppjhcdem2l.apps.googleusercontent.com";
 
@@ -89,7 +89,7 @@ router.post('/googleSignIn', function (req, res) {
 router.post('/facebookSignIn', async function (req, res) {
     // Get token from page
     var token = req.body.tokenid;
-    console.log(token);
+    //console.log(token);
 
     //get app token
     var app_token = (await axios.get("https://graph.facebook.com/oauth/access_token?client_id=2178730182445130&client_secret=ea1da7f5d63016176122012d80b2be4c&grant_type=client_credentials")).data.access_token;
