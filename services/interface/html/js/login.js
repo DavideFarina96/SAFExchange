@@ -123,13 +123,6 @@ function checkLoginState() {
     });
 }
 
-function logout() {
-    FB.logout(function (response) {
-        checkLoginState();
-        // Person is now logged out
-    });
-}
-
 function login() {
     FB.login(
         function (response) {
