@@ -15,6 +15,7 @@ var interface_path = "/interface"
 router.get('/', function (req, res) {
     console.log('Request for home received')
     if (req.session.user != null) {
+        console.log('User', JSON.stringify(req.session.user))
         res.render('index', { user: req.session.user })
     }
     else {
