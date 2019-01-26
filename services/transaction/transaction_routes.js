@@ -8,6 +8,7 @@ const axios = require('axios');
 
 ////////////////////////////////////////////////////
 // VARIABLES DECLARATION
+var range = 1; // used to check if the price of the "plannedaction" and the "user action" is close enough to the price on the ws
 
 
 //////////////////////////////////////////////////////////////////////////////
