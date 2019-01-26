@@ -8,7 +8,6 @@ const axios = require('axios');
 
 ////////////////////////////////////////////////////
 // VARIABLES DECLARATION
-var range = 1;
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -31,11 +30,11 @@ router.get('/user/:user_id', async function (req, res) {
 	{
 		// step 1: extract the ID of the user from the req
 		var user_id = req.params.user_id;
-		console.log(user_id);
+		// debug: console.log(user_id);
 		if(user_id != undefined)
 		{
 			var result = (await axios.get(app_domain + '/database/transaction/user/' + user_id)).data;
-			console.log(result);
+			// debug: console.log(result);
 			res.json(result);
 		}
 		else
@@ -61,7 +60,7 @@ router.post('/plannedaction/', async function (req, res) {
 	try
 	{	
 		var resp = (await transaction_plannedaction(req));
-		console.log(resp);
+		// debug: console.log(resp);
 		res.json(resp);
 	}
 	catch(error)
@@ -80,7 +79,7 @@ router.post('/user/', async function (req, res) {
 	try
 	{	
 		var resp = (await transaction_user(req));
-		console.log(resp);
+		// debug: console.log(resp);
 		res.json(resp);
 	}
 	catch(error)
@@ -146,7 +145,7 @@ async function transaction_user(req)
 			if(tmpDBOBJ != undefined)
 			{
 				var resultDBTransaction = (await axios.post(app_domain + '/database/transaction/', tmpDBOBJ)).data;
-				console.log(resultDBTransaction);
+				// debug: console.log(resultDBTransaction);
 
 				// step 5: it there is the value "_id" in the ws response, then proceed
 				if(resultDBTransaction._id != undefined)
@@ -243,11 +242,12 @@ async function transaction_plannedaction(req)
 			// step 4: the prices are equal, ask the to remove the planned action (or mark as completed) from the user's scheduled actions
 			var pathDeletePlannedAction = "/plannedaction/" + _ID_plannedaction;
 			var deletePlannedAction = (await axios.delete(app_domain + pathDeletePlannedAction)).data;
-			
+
 			// let's check that the "delete" has worked correctly
-			if(deletePlannedAction != null)
+			try	
 			{
-				if(deletePlannedAction.state.toUpperCase() == "CANCELED")
+				var state = deletePlannedAction.state;
+				if(state.toUpperCase() == "CANCELED")
 				{
 					// step 5: save the transaction in the db (call /database/.... )
 					var tmpDBOBJ = undefined;
@@ -328,10 +328,10 @@ async function transaction_plannedaction(req)
 					return ({ error: "Error: can't perform the operation 'DELETE' on the specific planned action."});
 				}
 			}
-			else
+			catch(error)
 			{
 				console.log("Unexpected error while performing the 'DELETE' of the planned action.");
-				return ({ error: "Unexpected error while performing the 'DELETE' of the planned action."});
+				return ({ error: error});
 			}
 		}
 		else
@@ -345,82 +345,6 @@ async function transaction_plannedaction(req)
 		console.log(error);
 		return ({ error: error});
 	}
-	
-	
-	
-	
-	
-	
-	
-	/*// step 2: create the header to send the data
-		var _header = {
-			'Host': host,
-			'Content-Type': 'application/x-www-form-urlencoded', // "x-www-form-urlencoded" no idea  what this is.....
-			'Content-Length': Buffer.byteLength(dataObj)
-		}
-
-		var serverPath = "";
-		if(_currency.toUpperCase() == "BTC")
-			serverPath = "/price/BTCUSD";
-		if(_currency.toUpperCase() == "ETH")
-			serverPath = "/price/ETHUSD";
-
-		// step 3: get the actual value of the specified currency
-		var sdtwsdb = sendDataToWS(host, 8080, serverPath, 'GET',  _header, tmpObj); 
-		sdtwsdb.then(function(result) {
-			var resultOBJ = JSON.parse(result);
-				
-			// step 2: compare it with the value of _price specified by the the plannedaction
-			var updatedValue = -1;
-			if(_currency.toUpperCase() == "BTC")
-				updatedValue = parseFloat(resultOBJ.btcusd);
-			if(_currency.toUpperCase() == "ETH")
-				updatedValue = parseFloat(resultOBJ.ethusd);
-				
-			// compare the up to date value with the one received from the ws plannedaction
-			if(parseFloat(price) == updatedValue)
-			{	
-				// step 3: ask to delete it (or mark as completed) by calling /plannedaction/....
-				var path = "/plannedaction/deleteaction/" + _ID_plannedaction;
-					
-				// ***** commentato perché il ws che fa questa parte non c'è ancora ****
-				//var sdtwspa = sendDataToWS(host, 8080, path, 'DELETE',  _header, '{}'); 
-				//sdtwspa.then(function(result) {
-					// step 4: save the transaction in the db (call /database/.... )
-					var path = "/database/transaction/";	
-					var sdtwsdb = sendDataToWS(host, 8080, path, 'POST',  _header, dataObj);
-					sdtwsdb.then(function(result) {
-
-						// set 5: update user balance by calling /user/... with PUT method (simulate the action "buy")
-						var path = "/user/balance/buy/";	
-						var sdtwsuser = sendDataToWS(host, 8080, path, 'PUT',  _header, dataObj);
-						sdtwsuser.then(function(result) {
-							// ....
-							return result;
-
-						}, function(err) { // enter here when Promise reject
-							console.log("[wsuser] " + err);
-							return err;
-						});
-					}, function(err) { // enter here when Promise reject
-						console.log("[wspa] " + err);
-						return err;
-					});
-
-				//}, function(err) { // enter here when Promise reject
-				//	console.log("[wspa] " + err);
-				//  return err;
-				//});
-
-			}
-			else
-				console.log("Error: price values are inconsistent.");
-
-
-		}, function(err) { // enter here when Promise reject
-			console.log("[wsdb] " + err);
-		});
-	*/
 }
 
 //////////////////////////////////////////////////////////////////////////////

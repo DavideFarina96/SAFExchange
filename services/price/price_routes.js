@@ -67,30 +67,14 @@ router.get('/BTCUSD', async function (req, res) {
 	{
 		// step 1: check if the user send the param "num"
 		var lastestNvalues = req.query.elem_number;
-		if(lastestNvalues == undefined || lastestNvalues == null)
+		if(lastestNvalues == undefined || lastestNvalues == null || isNaN(parseFloat(lastestNvalues)) || parseFloat(lastestNvalues) < 1)
 		{	// user is asking for the lastest value
 			lastestNvalues = 1;
 		}
 		
-
 		var result = (await axios.get(app_domain + '/database/price/BTCUSD?elem_number=' + lastestNvalues)).data;
 		res.json(result);
-		/*// step 2: create the header to send the data
-		var _header = {
-			'Host': host
-		}
-
-		// step 3: specify the server path on the database ws
-		var serverPath = '/database/price/BTCUSD?elem_number=' + lastestNvalues;
-		var sDSG = sendDataSimpleGET(host, 8080, serverPath, 'GET', _header);
-		sDSG.then(function (result) {
-			// debug: console.log(result);
-			res.json(result);
-
-		}, function (err) { // enter here when Promise reject
-			console.log("[GET /BTCUSD] " + err);
-			res.json({error: err});
-		});*/
+		
 	}
 	catch(error)
 	{
@@ -109,7 +93,7 @@ router.get('/ETHUSD', async function (req, res) {
 	{
 		// step 1: check if the user send the param "num"
 		var lastestNvalues = req.query.elem_number;
-		if(lastestNvalues == undefined || lastestNvalues == null)
+		if(lastestNvalues == undefined || lastestNvalues == null || isNaN(parseFloat(lastestNvalues)) || parseFloat(lastestNvalues) < 1)
 		{	// user is asking for the lastest value
 			lastestNvalues = 1;
 		}
@@ -117,22 +101,6 @@ router.get('/ETHUSD', async function (req, res) {
 		var result = (await axios.get(app_domain + '/database/price/ETHUSD?elem_number=' + lastestNvalues)).data;
 		res.json(result);
 
-		// step 2: create the header to send the data
-		/*var _header = {
-			'Host': host
-		}
-
-		// step 3: specify the server path on the database ws
-		var serverPath = '/database/price/ETHUSD?elem_number=' + lastestNvalues;
-		var sDSG = sendDataSimpleGET(host, 8080, serverPath, 'GET', _header);
-		sDSG.then(function (result) {
-			// debug: console.log(result);
-			res.json(result);
-
-		}, function (err) { // enter here when Promise reject
-			console.log("[GET /ETHUSD] " + err);
-			res.json({error: err});
-		});*/
 	}
 	catch(error)
 	{
@@ -292,38 +260,12 @@ async function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
 			if(resultOBJ.data.BTCUSD == undefined && resultOBJ.data.ETHUSD == undefined)
 				console.log("[organizeDataToBeSendAndSend] No data received from the database.");
 			else {
-				console.log(resultOBJ.data);
+				// debug: console.log(resultOBJ.data);
 
 				var result_paws = (await axios.post(app_domain + '/plannedaction/checkTriggers', tmpObj));
 				console.log("[organizeDataToBeSendAndSend] " + result_paws.data.status);
 			}
 
-			// step 2: create the header to send the data
-			/*var _header = {
-				'Host': host,
-				'Content-Type': 'application/x-www-form-urlencoded', // "x-www-form-urlencoded" no idea  what this is.....
-				'Content-Length': Buffer.byteLength(tmpObj)
-			}
-
-			// step 3: call the function "sendDataToWS(...)" and send the updated prices to the WS that manage the database 
-			var sdtwsdb = sendDataToWS(host, 8080, '/database/price', 'POST', _header, tmpObj);
-			sdtwsdb.then(function (result) {
-				console.log("PRICE UPDATED: " + result);
-
-				//  COMMENTATO perché manca il ws 
-				//// send date to the ws plannedaction with the updated value of the currencies
-				//var sdtwspa = sendDataToWS(host, 8080, '/plannedaction/checkTriggers', 'POST', _header, tmpObj);
-				//sdtwspa.then(function (result) {
-				//	// debug: console.log("[wspa] " + result);
-
-				//}, function (err) { // enter here when Promise reject
-				//	console.log("[wsplannedaction] " + err);
-				//});
-
-
-			}, function (err) { // enter here when Promise reject
-				console.log("[wsdatabase] " + err);
-			});*/
 		}
 		else
 		console.log("[organizeDataToBeSendAndSend] ETH and BTC haven't changed.");
@@ -333,91 +275,11 @@ async function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
 	}
 }
 
-/** This function connects to the specified host and send the _data with the choosen crud method */
-/*function sendDataToWS(_host, _port, _path, _method, _header, _data) {  // source code: https://medium.com/dev-bits/writing-neat-asynchronous-node-js-code-with-promises-32ed3a4fd098
-
-	var options = {
-		host: _host, 		// es: 'localhost', 
-		port: _port, 		// es: 8085,
-		path: _path, 		// es: '/price',
-		method: _method, 	// es: 'POST',
-		headers: _header
-	};
-	// Return new promise 
-	return new Promise(function (resolve, reject) {
-
-		var returnData;
-		var httpreq = http.request(options, function (response) {
-
-			response.setEncoding('utf8');
-			response.on('data', function (chunk) {
-				// debug: console.log("--->"+ _port +": " + chunk);
-				returnData = chunk;
-			});
-			response.on('end', function () {
-				// debug:  console.log('---------->call ended');
-				resolve(returnData);
-			})
-		});
-
-		httpreq.write(_data);	/* !!!! IMPORTANT: whether _data is an empty object or has parameters,
-								*	 I always need to generate the _header as following
-								*	var _header = {
-								*		'Host': host,
-								*		'Content-Type': 'application/x-www-form-urlencoded', // "x-www-form-urlencoded" no idea  what this is.....
-								*		'Content-Length': Buffer.byteLength(object_name)
-								*	}
-								*	If I don't specify the Content and I send the data, the request will generate an error .... 
-								*
-		httpreq.end();
-
-		httpreq.on('error', function (err) {
-			console.error("ERR:::: " + err);
-			reject(err);
-		});
-	});
-}
-
-function sendDataSimpleGET(_host, _port, _path, _method, _header) {  // source code: https://medium.com/dev-bits/writing-neat-asynchronous-node-js-code-with-promises-32ed3a4fd098
-
-	var options = {
-		host: _host, 		// es: 'localhost', 
-		port: _port, 		// es: 8085,
-		path: _path, 		// es: '/price',
-		method: _method, 	// es: 'POST',
-		headers: _header
-	};
-	// Return new promise 
-	return new Promise(function (resolve, reject) {
-
-		var returnData;
-		var httpreq = http.request(options, function (response) {
-
-			response.setEncoding('utf8');
-			response.on('data', function (chunk) {
-				// debug:  console.log("--->"+ _port +": " + chunk);
-				returnData = chunk;
-			});
-			response.on('end', function () {
-				// debug: console.log('---------->call ended');
-				resolve(returnData);
-			})
-		});
-		httpreq.end();
-
-		httpreq.on('error', function (err) {
-			console.error("ERR: " + err);
-			reject(err);
-		});
-	});
-}*/
-
 //////////////////////////////////////////////////////////////////////////////
 // inizialize JOB SCHEDULER that updates the currencies values
 var j = schedule.scheduleJob('*/10 * * * * *', function () { // execute the function every 5sec
   updateCurrency();
-  // debug: 
-  console.log(date.format(new Date(), 'HH:mm:ss'));
+  // debug: console.log(date.format(new Date(), 'HH:mm:ss'));
 });
 console.log("Timer \"price\" inizialized....");
 
