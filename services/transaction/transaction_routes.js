@@ -245,7 +245,7 @@ async function transaction_plannedaction(req)
 			var deletePlannedAction = (await axios.delete(app_domain + pathDeletePlannedAction)).data;
 			
 			// let's check that the "delete" has worked correctly
-			if(deletePlannedAction.state != undefined)
+			if(deletePlannedAction != null)
 			{
 				if(deletePlannedAction.state.toUpperCase() == "CANCELED")
 				{
