@@ -145,8 +145,7 @@ router.get('/transaction/user/:user_id', async function (req, res) {
 
     console.log("Received request for transaction list", _user_id)
     
-    // TODO CHANGE TO /transaction
-    var transaction_list = (await axios.get(app_domain + '/database/transaction/user/' + _user_id)).data;
+    var transaction_list = (await axios.get(app_domain + '/transaction/user/' + _user_id)).data;
 
     // Return index.html
     res.json(transaction_list);
