@@ -51,7 +51,7 @@ function updateUserInfo() { // TODO
         });
 }
 
-// Update every 5 seconds
+// Update every 10 seconds
 updatePrices()
-setInterval(updatePrices, 5000);
+setInterval(updatePrices, 10000);
 

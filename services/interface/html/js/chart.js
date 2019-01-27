@@ -1,5 +1,16 @@
 Chart.defaults.global.defaultFontColor = 'white';
 
+var config = {
+    datasets: [{
+        backgroundColor: 'rgba(128,203,196, 0.4)',
+        borderColor: '#009688',
+        fill: 'start'
+    }]
+}
+
+var lastPoint = null
+
+
 function displayChart(data) {
 
     var config = {
@@ -51,14 +62,6 @@ function displayChart(data) {
 }
 
 function parseAndDisplayData(res) {
-    var data = {
-        datasets: [{
-            backgroundColor: 'rgba(128,203,196, 0.4)',
-            borderColor: '#009688',
-            fill: 'start'
-        }]
-    }
-
     var labels = []
     var values = []
 
@@ -72,10 +75,13 @@ function parseAndDisplayData(res) {
             values.push(price.ETHUSD)
     });
 
-    data.labels = labels
-    data.datasets[0].data = values
+    config.labels = labels
+    config.datasets[0].data = values
 
-    displayChart(data)
+    displayChart(config)
+
+    // Set last point
+    lastPoint = res[res.length - 1]
 }
 
 function parseTimestampToDateString(timestamp) {
@@ -90,13 +96,24 @@ function parseTimestampToDateString(timestamp) {
     return hours + ':' + minutes.substr(-2);
 }
 
-var lastPoint
 function newChartPoint(newPoint) {
-    
-    if (lastPoint._id != newPoint) {
-        // Add new point
+    if (lastPoint != null && lastPoint._id != newPoint._id) {
+        lastPoint = newPoint
 
+        // Add new point and remove oldest one
         console.log('New point to be added in chart')
+
+        config.labels.push(parseTimestampToDateString(newPoint._id));
+        config.labels.shift()
+
+        if (currency == 'BTC')
+            var value = newPoint.BTCUSD
+        else if (currency == 'ETH')
+            var value = newPoint.ETHUSD
+
+        config.datasets[0].data.push(value)
+        config.datasets[0].data.shift()
+
+        window.myLine.update();
     }
-    
 }
