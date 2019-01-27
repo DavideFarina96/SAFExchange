@@ -1,45 +1,48 @@
 var express = require('express');
-var path = require('path');
-var http = require('http'); // used for calling external server
-var querystring = require('querystring');
-var app = express();
 var router = express.Router();
 const axios = require('axios');
+//var path = require('path');
+//var querystring = require('querystring');
+//var app = express();
 
-////////////////////////////////////////////////////
-// VARIABLES DECLARATION
-var range = 1; // used to check if the price of the "plannedaction" and the "user action" is close enough to the price on the ws
-
-
-//////////////////////////////////////////////////////////////////////////////
-// ROUTING SETUP
+var range = 1; // used to check if the price of the "plannedaction" and the "user action" is close enough to the price received from the ws transaction.
 var possible_routes =
 	"GET \t		 /user/:id_user" + "<br>" +
-	"POST \t 	 /plannedaction" + "<br>" + 
-	"POST \t 	 /user";
+	"POST \t 	 /plannedaction -> this path can be used from the ws 'plannedaction', either for selling or buying both BTC and ETH " + "<br>" + 
+	"POST \t 	 /user -> this path can be used from the ws 'user', either for selling or buying both BTC and ETH";
 
+/////////////////////////////////////////
+// ROUTING SETUP
+/////////////////////////////////////////
+/* 
+ * DEFAULT ROUTER: return the list of available actions for this specific ws.
+ */
 router.get('/', function (req, res) {
 	res.send(possible_routes);
 });
 
-/* WORKS
+/* 
+ *	This router takes the ID of the user and returns the entire history of transactions performed by the user.
  */
 router.get('/user/:user_id', async function (req, res) { 
 	res.header('Content-type', 'application/json');
 	
 	try
 	{
-		// step 1: extract the ID of the user from the req
+		// step 1: extract the ID of the user from the request.
 		var user_id = req.params.user_id;
-		// debug: console.log(user_id);
+
 		if(user_id != undefined)
-		{
+		{	
+			// step 2: once we got the ID, let's call the ws "database" in order to retrieve user's transactions history.
 			var result = (await axios.get(app_domain + '/database/transaction/user/' + user_id)).data;
-			// debug: console.log(result);
+			
+			// step 3: return the data obtained from the ws "database", to the caller.
 			res.json(result);
 		}
 		else
 		{
+			// the user_id has not been specified, send the error to the caller.
 			console.log("User_id not specified.");
 			res.json({ error: "User_id not specified." });
 		}
@@ -47,83 +50,94 @@ router.get('/user/:user_id', async function (req, res) {
 	}
 	catch(error)
 	{
+		// an unexpected error occours during the process, notify the caller.
 		console.log("[GET /user/:user_id] " + error);
-		res.json({ error: err });
+		res.json({ error: error });
 	}
 });
 
-/** Defines the /buy/plannedaction API.
- *  This function receives the command from the plannedaction ws in order performe a "buy" or a "sell" action
+/* 
+ *	This router receives the command from the ws "plannedaction" and performs a "buy" or a "sell" action, depending on what is specified in the "action" parameter of the request.
  */
 router.post('/plannedaction/', async function (req, res) { 
 	res.header('Content-type', 'application/json');
 
 	try
 	{	
+		// called the transaction_plannedaction function in order to perform the "buy/sell" operation.
 		var resp = (await transaction_plannedaction(req));
-		// debug: console.log(resp);
+		// return a feedback to the caller.
 		res.json(resp);
 	}
 	catch(error)
 	{
-		console.log(error);
+		// an unexpected error occours during the process, notify the caller.
+		console.log("[POST /plannedaction] " + error);
 		res.json({ error: error});
 	}
 });
 
-/** Defines the /user API.
- *  This function receives the command from the user in order performe a "buy" or a "sell" action
+/* 
+ *	This router receives the command from the ws "user" and performs a "buy" or a "sell" action, depending on what is specified in the "action" parameter of the request.
  */
 router.post('/user/', async function (req, res) { 
 	res.header('Content-type', 'application/json');
 
 	try
 	{	
+		// called the transaction_plannedaction function in order to perform the "buy/sell" operation.
 		var resp = (await transaction_user(req));
-		// debug: console.log(resp);
+		// return a feedback to the caller.
 		res.json(resp);
 	}
 	catch(error)
 	{
-		console.log(error);
+		// an unexpected error occours during the process, notify the caller.
+		console.log("[POST /user] " + error);
 		res.json({ error: error});
 	}
 	
 });
 
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////
 // FUNCTIONS and METHODS
+/////////////////////////////////////////
+/*
+ * This function take the parameters received from the ws "user" and perfoms a transaction.
+ */
 async function transaction_user(req)
 {
 	try
 	{
+		// Extract the data sent from the ws "user".
 		var _author = req.body.author; 
 		var _action =  req.body.action; 
 		var _currency = req.body.currency;
 		var _price = req.body.price;
 		var _priceUSD = req.body.priceUSD;
 
-		// step 1: check the price of the currency
+		// step 1: check which currency the user is going to "buy/sell".
 		var serverPath = "";
 		if(_currency.toUpperCase() == "BTC")
 			serverPath = "/price/BTCUSD";
 		if(_currency.toUpperCase() == "ETH")
 			serverPath = "/price/ETHUSD";
 
-		// step 2: get the actual value of the specified currency
+		// step 2: get the up-to-date value of the specified currency, from the ws "price".
 		var resultPrice = (await axios.get(app_domain + serverPath)).data;
 
-		// step 3: compare it with the value of _price specified by the the plannedaction
+		// step 3: compare the value with the one specified by the ws "user" in the parameter _price.
 		var updatedValue = -1;
 		if(_currency.toUpperCase() == "BTC")
 			updatedValue = parseFloat(resultPrice[0].BTCUSD);
 		if(_currency.toUpperCase() == "ETH")
 			updatedValue = parseFloat(resultPrice[0].ETHUSD);
 			
-		// compare the up to date value with the one received from the ws plannedaction
-		if((parseFloat(_price) > updatedValue - range) && (parseFloat(_price) < updatedValue + range)) // original: if(parseFloat(_price) == updatedValue)
-		{	
-			// step 4: save the transaction in the db (call /database/.... )
+		// if the up-to-date value is closed enough to the _price...
+		if((parseFloat(_price) > updatedValue - range) && (parseFloat(_price) < updatedValue + range)) 
+		{	// ... then we consider the _price valid.
+
+			// create an object with the correct parameters, in order to be sent in the ws "database".
 			var tmpDBOBJ = undefined;
 			if(_currency.toUpperCase() == "BTC")
 			{
@@ -145,13 +159,15 @@ async function transaction_user(req)
 			}
 			if(tmpDBOBJ != undefined)
 			{
+				// step 4: save the transaction in the ws "database" by calling the specific API.
 				var resultDBTransaction = (await axios.post(app_domain + '/database/transaction/', tmpDBOBJ)).data;
 				// debug: console.log(resultDBTransaction);
 
-				// step 5: it there is the value "_id" in the ws response, then proceed
+				// step 5: check whether if there is the value "_id" in the ws response
 				if(resultDBTransaction._id != undefined)
-				{
-					// set 6: update user balance by calling /user/:user_id/balance with PUT method (simulate the specified action)
+				{	// ... parameter found, the operation has been successful.
+
+					// create an object with the correct parameters, in order to be sent in the ws "user".
 					var tmpBalanceOBJ = undefined;
 					if(_currency.toUpperCase() == "BTC")
 					{
@@ -172,36 +188,40 @@ async function transaction_user(req)
 
 					if(tmpBalanceOBJ != undefined)
 					{
+						// set 6: update user's balance by calling the ws "user". This step needs to simulate the specified "buy/sell" action.
 						var pathBalance = "/user/"+ _author +"/balance";
 						var resultUser = (await axios.put(app_domain + pathBalance, tmpBalanceOBJ)).data;
 						return resultUser;
 					}
 					else
 					{
-						console.log("tmpBalanceOBJ is undefined");
-						return ({ error: "tmpBalanceOBJ is undefined"});
+						// the creation of the object has generated an error.
+						console.log("Unexpected error while creating the object for the ws 'user'.");
+						return ({ error: "Unexpected error while creating the object for the ws 'user'."});
 					}
 				}
 				else
-				{	// otherwise, an error occurred
+				{	// ... parameter not found, an error occurred.
 					console.log("The call to /database/transaction/ has generated the following error: " + resultDBTransaction.errors);
 					return ({ error: resultDBTransaction.errors});
 				}
 			}
 			else
 			{
-				console.log("Unexpected error while creating the object for the ws database.");
-				return ({ error: "Unexpected error while creating the object for the ws database."});
+				// the creation of the object has generated an error.
+				console.log("Unexpected error while creating the object for the ws 'database'.");
+				return ({ error: "Unexpected error while creating the object for the ws 'database'."});
 			}
 		}
 		else
-		{
+		{	// ... otherwise, the values are considered different and thus we notify the caller.
 			console.log("Prices don't match.");
 			return ({ error: "Prices don't match."});
 		}
 	}
 	catch(error)
 	{
+		// an unexpected error occours during the process, notify the caller.
 		console.log(error);
 		return ({ error: error});
 	}
@@ -211,6 +231,7 @@ async function transaction_plannedaction(req)
 {
 	try
 	{
+		// Extract the data sent from the ws "user".
 		var _ID_plannedaction = req.body.plannedaction_id; 
 		var _author = req.body.author;
 		var _action =  req.body.action;  
@@ -219,7 +240,7 @@ async function transaction_plannedaction(req)
 		var _priceUSD = req.body.priceUSD;
 						
 
-			// step 1: check the type of the currency
+		// step 1: check which currency the user is going to "buy/sell".
 		var serverPath = "";
 		if(_currency.toUpperCase() == "BTC")
 			serverPath = "/price/BTCUSD";
@@ -227,30 +248,31 @@ async function transaction_plannedaction(req)
 			serverPath = "/price/ETHUSD";
 	
 
-		// step 2: get the actual value of the specified currency from the ws /price
+		// step 2: get the up-to-date value of the specified currency, from the ws "price".
 		var resultPrice = (await axios.get(app_domain + serverPath)).data; 
 
-		// step 3: compare it with the value of _price specified by the the plannedaction
+		// step 3: compare the value with the one specified by the ws "user" in the parameter _price.
 		var updatedValue = -1;
 		if(_currency.toUpperCase() == "BTC")
 			updatedValue = parseFloat(resultPrice[0].BTCUSD);
 		if(_currency.toUpperCase() == "ETH")
 			updatedValue = parseFloat(resultPrice[0].ETHUSD);
 		
-		// compare the up to date value with the one received from the ws plannedaction
-		if((parseFloat(_price) > updatedValue - range) && (parseFloat(_price) < updatedValue + range)) // original: if(parseFloat(_price) == updatedValue)
+		// if the up-to-date value is closed enough to the _price...
+		if((parseFloat(_price) > updatedValue - range) && (parseFloat(_price) < updatedValue + range)) 
 		{	
-			// step 4: the prices are equal, ask the to remove the planned action (or mark as completed) from the user's scheduled actions
+			// step 4: the prices are equal, ask the to remove the planned action (in other words, mark it as completed) from the user's scheduled actions.
 			var pathDeletePlannedAction = "/plannedaction/" + _ID_plannedaction;
 			var deletePlannedAction = (await axios.delete(app_domain + pathDeletePlannedAction)).data;
 
-			// let's check that the "delete" has worked correctly
 			try	
 			{
+				// let's check if the "delete" has worked correctly ...
 				var state = deletePlannedAction.state;
 				if(state.toUpperCase() == "CANCELED")
-				{
-					// step 5: save the transaction in the db (call /database/.... )
+				{	// ... the planned action has been correctly marked as completed.
+
+					// create an object with the correct parameters, in order to be sent in the ws "database".
 					var tmpDBOBJ = undefined;
 					if(_currency.toUpperCase() == "BTC")
 					{
@@ -272,15 +294,15 @@ async function transaction_plannedaction(req)
 					}
 					if(tmpDBOBJ != undefined)
 					{
+						// step 5: save the transaction in the ws "database" by calling the specific API.
 						var resultDBTransaction = (await axios.post(app_domain + '/database/transaction/', tmpDBOBJ)).data;
 						
-						// step 6: it there is the value "_id" in the ws response, then proceed
+						// step 6:  check whether if there is the value "_id" in the ws response
 						if(resultDBTransaction._id != undefined)
-						{
+						{	// ... parameter found, the operation has been successful.
 
-							// set 6: update user balance by calling /user/:user_id/balance with PUT method (simulate the specified action)
+							//  create an object with the correct parameters, in order to be sent in the ws "user".
 							var tmpBalanceOBJ = undefined;
-							
 							if(_currency.toUpperCase() == "BTC")
 							{
 								tmpBalanceOBJ =  {
@@ -300,27 +322,31 @@ async function transaction_plannedaction(req)
 
 							if(tmpBalanceOBJ != undefined)
 							{
+								// step 7: update user's balance by calling the ws "user". This step needs to simulate the specified "buy/sell" action.
 								var pathBalance = "/user/"+ _author +"/balance";
 								var resultUser = (await axios.put(app_domain + pathBalance, tmpDBOBJ)).data;
 								return resultUser;
 							}
 							else
 							{
-								console.log("tmpBalanceOBJ is undefined");
-								return ({ error: "tmpBalanceOBJ is undefined"});
+								// the creation of the object has generated an error.
+								console.log("Unexpected error while creating the object for the ws 'user'.");
+								return ({ error: "Unexpected error while creating the object for the ws 'user'."});
 							}
 						}
 						else
 						{	// otherwise, an error occurred
-							console.log("The call to /database/transaction/ has generated the following error: " + resultDBTransaction);
-							return ({ error: "The call to /database/transaction/ has generated the following error: " + resultDBTransaction});
+							// ... parameter not found, an error occurred.
+							console.log("The call to /database/transaction/ has generated the following error: " + resultDBTransaction.errors);
+							return ({ error: resultDBTransaction.errors});
 						}
 
 					}
 					else
 					{
-						console.log("Unexpected error while creating the object for the ws database.");
-						return ({ error: "Unexpected error while creating the object for the ws database."});
+						// the creation of the object has generated an error.
+						console.log("Unexpected error while creating the object for the ws 'database'.");
+						return ({ error: "Unexpected error while creating the object for the ws 'database'."});
 					}
 				}
 				else
@@ -337,12 +363,14 @@ async function transaction_plannedaction(req)
 		}
 		else
 		{
+			// ... otherwise, the values are considered different and thus we notify the caller.
 			console.log("Prices don't match.");
 			return ({ error: "Prices don't match."});
 		}
 	}
 	catch(error)
 	{
+		// an unexpected error occours during the process, notify the caller.
 		console.log(error);
 		return ({ error: error});
 	}
