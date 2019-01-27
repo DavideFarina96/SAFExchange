@@ -80,7 +80,22 @@ router.post('/plannedaction/', async function (req, res) {
 /* 
  *	This router receives the command from the ws "user" and performs a "buy" or a "sell" action, depending on what is specified in the "action" parameter of the request.
  */
-router.post('/user/', async function (req, res) { 
+router.post('/', async function (req, res) { 
+
+	var _transaction = req.body
+
+    try {
+        var transaction = (await axios.post(app_domain + '/database/transaction', _transaction)).data;
+    }
+    catch (err) {
+        console.log(err)
+    }
+    
+    res.json(transaction);
+	
+});
+
+/* router.post('/user/', async function (req, res) { 
 	res.header('Content-type', 'application/json');
 
 	try
@@ -97,7 +112,7 @@ router.post('/user/', async function (req, res) {
 		res.json({ error: error});
 	}
 	
-});
+}); */
 
 /////////////////////////////////////////
 // FUNCTIONS and METHODS

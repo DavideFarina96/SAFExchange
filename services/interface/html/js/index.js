@@ -10,15 +10,19 @@ var transactions_post_path = '/interface/transaction/'
 var plannedactions_get_path = '/interface/plannedaction/user/'
 var plannedactions_post_path = '/interface/plannedaction/'
 
+var nElemHistory = 50;
+
 var currency = 'BTC'
 
 // BUY / SELL PANEL //////////////////////////////////////////////////////
 function buy() {
     var _amount = $('#buy-amount').val();
 
+    clearBuySellPanel()
+
     $.ajax({
-        url: buy_post_path + currency,
-        data: { amount: _amount },
+        url: buy_post_path,
+        data: { currency: currency, amount: _amount },
         type: 'POST'
     })
         .then(res => {
@@ -39,11 +43,41 @@ function buy() {
 }
 
 function sell() {
+    var _amount = $('#sell-amount').val();
 
+    clearBuySellPanel()
+
+    $.ajax({
+        url: sell_post_path,
+        data: { currency: currency, amount: _amount },
+        type: 'POST'
+    })
+        .then(res => {
+            if (res.successful) {
+                alert(res.message)
+
+                updateTransactionList()
+                updateUserInfo()
+            }
+            else {
+                alert(res.message)
+            }
+        })
+        .catch(err => {
+            // If the promise resolves with an error, log it in console
+            console.log(err);
+        });
 }
 
+function clearBuySellPanel() {
+    $('#buy-amount').val('');
+    $('#buy-cost').html('0');
+    $('#sell-amount').val('');
+    $('#sell-profit').html('0')
+}
+
+
 // CHART PANEL ///////////////////////////////////////////////////////////
-var nElemHistory = 50;
 function getPriceHistory() {
     $.ajax({
         url: price_history_get_path + currency + 'USD',
@@ -108,35 +142,42 @@ function createHTMLlist(list, type) {
         html = '<tr><td colspan=4>Nothing to show</td></tr>'
     }
     else {
-        list.forEach(t => {
-            html += '<tr>'
+        rows = ''
+        row = ''
 
-            if (t.action == 'sell')
-                html += '<td class="w3-red">SELL</td>'
-            else
-                html += '<td class="w3-green">BUY</td>'
+        list.forEach(t => {
+            row = '<tr>'
+
+            if (t.action == 'SELL')
+                row += '<td class="w3-red">SELL</td>'
+            else if (t.action == 'BUY')
+                row += '<td class="w3-green">BUY</td>'
 
             if (t.hasOwnProperty('BTC')) {
-                html += '<td>BTC</td>'
-                html += '<td>' + t.BTC + '</td>'
+                row += '<td>BTC</td>'
+                row += '<td>' + t.BTC.toFixed(2) + '</td>'
 
                 if (type == 'transaction')
-                    html += '<td>' + t.USD + '</td>'
+                    row += '<td>' + t.USD.toFixed(2) + '</td>'
                 else if (type == 'plannedaction')
-                    html += '<td>' + t.BTCUSD + '</td>'
+                    row += '<td>' + t.BTCUSD.toFixed(2) + '</td>'
             }
             else if (t.hasOwnProperty('ETH')) {
-                html += '<td>ETH</td>'
-                html += '<td>' + t.ETH + '</td>'
+                row += '<td>ETH</td>'
+                row += '<td>' + t.ETH.toFixed(2) + '</td>'
 
                 if (type == 'transaction')
-                    html += '<td>' + t.USD + '</td>'
+                    row += '<td>' + t.USD.toFixed(2) + '</td>'
                 else if (type == 'plannedaction')
-                    html += '<td>' + t.ETHUSD + '</td>'
+                    row += '<td>' + t.ETHUSD.toFixed(2) + '</td>'
             }
 
-            html += '</tr>'
+            row += '</tr>'
+
+            rows = row + rows
         });
+
+        html += rows
     }
     return html;
 }
@@ -153,10 +194,7 @@ $('#currency-selector').on('change', function (e) {
 
 
     // Reset Buy/sell panel
-    $('#buy-amount').val('');
-    $('#buy-cost').html('0');
-    $('#sell-amount').val('');
-    $('#sell-profit').html('0')
+    clearBuySellPanel()
 
     // Get data for the chart and update it
     getPriceHistory()
@@ -164,16 +202,16 @@ $('#currency-selector').on('change', function (e) {
 
 $('#buy-amount').on('input', function (e) {
     if (currency == 'BTC')
-        $('#buy-cost').html(this.value * current_BTCUSD)
+        $('#buy-cost').html((this.value * current_BTCUSD).toFixed(2))
     else if (currency == 'ETH')
-        $('#buy-cost').html(this.value * current_ETHUSD)
+        $('#buy-cost').html((this.value * current_ETHUSD).toFixed(2))
 })
 
 $('#sell-amount').on('input', function (e) {
     if (currency == 'BTC')
-        $('#sell-profit').html(this.value * current_BTCUSD)
+        $('#sell-profit').html((this.value * current_BTCUSD).toFixed(2))
     else if (currency == 'ETH')
-        $('#sell-profit').html(this.value * current_ETHUSD)
+        $('#sell-profit').html((this.value * current_ETHUSD).toFixed(2))
 })
 
 $('#btn-buy').click(buy)

@@ -125,7 +125,10 @@ router.post('/facebookSignIn', async function (req, res) {
 // Mail login
 router.post('/mailSignIn', function (req, res) {
 
-    req.session.user = { name: "test", _id: '5c49e7f329202200177264e7', image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg' }
+    req.session.user = {
+        name: "test", _id: '5c49e7f329202200177264e7', image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg',
+        USD: 1000, BTC: 0.7, ETH: 3.3
+    }
     req.session.user.logged_with = "MAIL"
 
     res.json({ logged: true });
@@ -133,6 +136,161 @@ router.post('/mailSignIn', function (req, res) {
 
 
 // REDIRECTS ROUTES /////////////////////////////////////////////////////
+
+// Buy / Sell
+router.post('/buy', async function (req, res) {
+    var _user = req.session.user
+
+    var response = {}
+
+    if (_user != null) {
+        var _user_id = _user._id;
+        var _currency = req.body.currency;
+        var _amount = parseFloat(req.body.amount);
+
+        try {
+            // Check if user has enough money
+            var current_price = (await axios.get(app_domain + '/price/prices')).data
+
+            var _USD_total
+            if (_currency == 'BTC')
+                _USD_total = _amount * parseFloat(current_price.BTC.BTCUSD)
+            else if (_currency == 'ETH')
+                _USD_total = _amount * parseFloat(current_price.ETH.ETHUSD)
+
+            if (_user.USD >= _USD_total) {
+
+                var new_transaction = {
+                    author: _user_id,
+                    action: 'BUY',
+                    USD: _USD_total
+                }
+                var new_balance = { USD: _user.USD - _USD_total }
+
+                if (_currency == 'BTC') {
+                    new_transaction.BTC = _amount
+                    new_balance.BTC = _user.BTC + _amount
+                }
+                else if (_currency == 'ETH') {
+                    new_transaction.ETH = _amount
+                    new_balance.ETH = _user.ETH + _amount
+                }
+
+
+                // Insert new transaction
+                var transaction = (await axios.post(app_domain + '/transaction', new_transaction)).data
+                if (transaction.hasOwnProperty("_id")) {
+
+                    // Update user's balance
+                    var new_user = (await axios.put(app_domain + '/user/' + _user_id + '/balance', new_balance)).data
+
+                    // Update session's variable
+                    req.session.user = new_user
+
+                    response.successful = true
+                    response.message = 'Successfully bought ' + _amount + ' ' + _currency + ' for ' + _USD_total + '$'
+                }
+                else {
+                    response.successful = false
+                    response.message = 'There was an error with the transaction'
+                }
+            }
+            else {
+                response.successful = false
+                response.message = 'Not enough money to perform operation. Required $' + _USD_total + '. You have $' + _user.USD
+            }
+        }
+        catch (err) {
+            console.log(err)
+
+            response.successful = false
+            response.message = err.message
+        }
+    }
+    else {
+        response.successful = false
+        response.message = 'User session variable not set'
+    }
+
+    res.json(response);
+});
+
+router.post('/sell', async function (req, res) {
+    var _user = req.session.user
+
+    var response = {}
+
+    if (_user != null) {
+        var _user_id = _user._id;
+        var _currency = req.body.currency;
+        var _amount = parseFloat(req.body.amount);
+
+        try {
+            // Check if user has enough BTC/ETH to sell
+            if ( (_currency == 'BTC' && _user.BTC >= _amount) || (_currency == 'ETH' && _user.ETH >= _amount) )  {
+
+                // Get current price
+                var current_price = (await axios.get(app_domain + '/price/prices')).data
+
+                var new_transaction = {
+                    author: _user_id,
+                    action: 'SELL'
+                }
+                var new_balance = { }
+
+                if (_currency == 'BTC') {
+                    new_transaction.BTC = _amount
+                    new_transaction.USD = _amount * current_price.BTC.BTCUSD
+
+                    new_balance.BTC = _user.BTC - _amount
+                }
+                else if (_currency == 'ETH') {
+                    new_transaction.ETH = _amount
+                    new_transaction.USD = _amount * current_price.ETH.ETHUSD
+
+                    new_balance.ETH = _user.ETH - _amount
+                }
+                new_balance.USD = _user.USD + new_transaction.USD
+
+
+                // Insert new transaction
+                var transaction = (await axios.post(app_domain + '/transaction', new_transaction)).data
+                if (transaction.hasOwnProperty("_id")) {
+
+                    // Update user's balance
+                    var new_user = (await axios.put(app_domain + '/user/' + _user_id + '/balance', new_balance)).data
+
+                    // Update session's variable
+                    req.session.user = new_user
+
+                    response.successful = true
+                    response.message = 'Successfully sold ' + _amount + ' ' + _currency + ' for ' + transaction.USD + '$'
+                }
+                else {
+                    response.successful = false
+                    response.message = 'There was an error with the transaction'
+                }
+            }
+            else {
+                response.successful = false
+                response.message = 'Not enough BTC/ETH to perform operation'
+            }
+        }
+        catch (err) {
+            console.log(err)
+
+            response.successful = false
+            response.message = err.message
+        }
+    }
+    else {
+        response.successful = false
+        response.message = 'User session variable not set'
+    }
+
+    res.json(response);
+});
+
 
 // User
 router.get('/user/:user_id', async function (req, res) {
@@ -159,7 +317,7 @@ router.get('/price/BTCUSD', async function (req, res) {
 
     console.log("Received request for BTCUSD history", _elem_number)
 
-    var price_history = (await axios.get(app_domain + '/price/BTCUSD?elem_number=' + _elem_number )).data;
+    var price_history = (await axios.get(app_domain + '/price/BTCUSD?elem_number=' + _elem_number)).data;
 
     res.json(price_history);
 });
@@ -169,7 +327,7 @@ router.get('/price/ETHUSD', async function (req, res) {
 
     console.log("Received request for ETHUSD history", _elem_number)
 
-    var price_history = (await axios.get(app_domain + '/price/ETHUSD?elem_number=' + _elem_number )).data;
+    var price_history = (await axios.get(app_domain + '/price/ETHUSD?elem_number=' + _elem_number)).data;
 
     res.json(price_history);
 });

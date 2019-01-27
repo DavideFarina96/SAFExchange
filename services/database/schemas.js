@@ -19,7 +19,7 @@ var PriceSchema = new mongoose.Schema({
 
 var TransactionSchema = new mongoose.Schema({
     author: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true },
-    action: { type: String, enum: ['buy', 'sell'], required: true },
+    action: { type: String, enum: ['BUY', 'SELL'], required: true },
     USD: { type: Number, required: true },
     BTC: Number,
     ETH: Number

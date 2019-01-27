@@ -20,13 +20,13 @@ router.put('/:user_id/balance', async function(req, res) { //user_id is the mond
     var _balance = req.body
 
     try {
-        var balance = (await axios.put(app_domain + '/database/user/' + req.params.user_id + '/balance', _balance)).data;
+        var user = (await axios.put(app_domain + '/database/user/' + req.params.user_id + '/balance', _balance)).data;
     }
     catch (err) {
         console.log(err)
     }
     
-    res.json(balance);
+    res.json(user);
 })
 
 router.put('/id_google', async function (req, res) {

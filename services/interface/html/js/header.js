@@ -38,9 +38,9 @@ function updateUserInfo() { // TODO
         type: 'GET'
     })
         .then(res => {            
-            $('#user-USD').html(res.USD ? res.USD : 0)
-            $('#user-BTC').html(res.BTC ? res.BTC : 0)
-            $('#user-ETH').html(res.ETH ? res.ETH : 0)
+            $('#user-USD').html(res.USD ? res.USD.toFixed(2) : 0)
+            $('#user-BTC').html(res.BTC ? res.BTC.toFixed(2) : 0)
+            $('#user-ETH').html(res.ETH ? res.ETH.toFixed(2) : 0)
 
             console.log('User info updated', res)
         })
