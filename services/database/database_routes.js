@@ -184,8 +184,8 @@ router.get('/price', async function (req, res) {
 
 	try {
 		// Get the last prices for both BTC and ETH and send them
-		_price.BTC = (await Price.findOne({ BTCUSD: { $exists: true } }, 'BTCUSD', { sort: { '_id': -1 } }));
-		_price.ETH = (await Price.findOne({ ETHUSD: { $exists: true } }, 'ETHUSD', { sort: { '_id': -1 } }));
+		_price.BTC = (await Price.findOne({ BTCUSD: { $exists: true } }, 'BTCUSD', { sort: { '_id': 1 } }));
+		_price.ETH = (await Price.findOne({ ETHUSD: { $exists: true } }, 'ETHUSD', { sort: { '_id': 1 } }));
 
 		console.log("Last read price", "BTCUSD: ", _price.BTC.BTCUSD, "ETHUSD: " + _price.ETH.ETHUSD)
 		res.json(_price);

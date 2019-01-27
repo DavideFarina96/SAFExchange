@@ -7,9 +7,9 @@ var UserSchema = new mongoose.Schema({
     id_google: { type: String, unique : true, sparse: true },
     id_facebook: { type: String, unique : true, sparse: true },
     image_url: String,
-    USD: Number,
-    BTC: Number,
-    ETH: Number
+    USD: { type: Number, required: true, default: 0 },
+    BTC: { type: Number, required: true, default: 0 },
+    ETH: { type: Number, required: true, default: 0 }
 });
 
 var PriceSchema = new mongoose.Schema({

@@ -16,7 +16,7 @@ router.get('/', function (req, res) {
     console.log('Request for home received')
     if (req.session.user != null) {
         console.log('User', JSON.stringify(req.session.user))
-        res.render('index', { user_id: req.session.user._id })
+        res.render('index', { user: req.session.user })
     }
     else {
         res.redirect(interface_path + '/login');
@@ -128,12 +128,22 @@ router.post('/mailSignIn', function (req, res) {
     req.session.user = { name: "test", _id: '5c49e7f329202200177264e7' }
     req.session.user.logged_with = "MAIL"
 
-    // Return index.html
     res.json({ logged: true });
 });
 
 
 // REDIRECTS ROUTES /////////////////////////////////////////////////////
+
+// User
+router.get('/user/:user_id', async function (req, res) {
+    var _user_id = req.params.user_id;
+    console.log("Received request for user", _user_id)
+
+    var user = (await axios.get(app_domain + '/user/' + _user_id)).data;
+
+    res.json(user);
+});
+
 
 // Price
 router.get('/price', async function (req, res) {
@@ -141,7 +151,6 @@ router.get('/price', async function (req, res) {
 
     var prices = (await axios.get(app_domain + '/price/prices')).data;
 
-    // Return index.html
     res.json(prices);
 });
 
@@ -152,7 +161,6 @@ router.get('/price/BTCUSD', async function (req, res) {
 
     var price_history = (await axios.get(app_domain + '/price/BTCUSD?elem_number=' + _elem_number )).data;
 
-    // Return index.html
     res.json(price_history);
 });
 
@@ -163,7 +171,6 @@ router.get('/price/ETHUSD', async function (req, res) {
 
     var price_history = (await axios.get(app_domain + '/price/ETHUSD?elem_number=' + _elem_number )).data;
 
-    // Return index.html
     res.json(price_history);
 });
 
@@ -175,7 +182,6 @@ router.get('/transaction/user/:user_id', async function (req, res) {
 
     var transaction_list = (await axios.get(app_domain + '/transaction/user/' + _user_id)).data;
 
-    // Return index.html
     res.json(transaction_list);
 });
 
@@ -187,7 +193,6 @@ router.get('/plannedaction/user/:user_id', async function (req, res) {
 
     var plannedaction_list = (await axios.get(app_domain + '/plannedaction/user/' + _user_id)).data;
 
-    // Return index.html
     res.json(plannedaction_list);
 });
 

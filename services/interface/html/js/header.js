@@ -1,3 +1,4 @@
+var user_get = '/interface/user/'
 var price_current_get = '/interface/price'
 
 var current_BTCUSD
@@ -33,17 +34,15 @@ function updatePrices() {
 
 function updateUserInfo() { // TODO
     $.ajax({
-        url: price_current_get,
+        url: user_get + user_id,
         type: 'GET'
     })
-        .then(res => {
-            current_BTCUSD = parseFloat(res.BTCUSD).toFixed(2)
-            current_ETHUSD = parseFloat(res.ETHUSD).toFixed(2)
+        .then(res => {            
+            $('#user-USD').html(res.USD ? res.USD : 0)
+            $('#user-BTC').html(res.BTC ? res.BTC : 0)
+            $('#user-ETH').html(res.ETH ? res.ETH : 0)
 
-            $('#current-BTCUSD').html(current_BTCUSD)
-            $('#current-ETHUSD').html(current_ETHUSD)
-
-            console.log('Prices updated', current_BTCUSD, current_ETHUSD)
+            console.log('User info updated', res)
         })
         .catch(err => {
             // If the promise resolves with an error, log it in console
@@ -51,7 +50,11 @@ function updateUserInfo() { // TODO
         });
 }
 
-// Update every 10 seconds
+
+// INIT
 updatePrices()
+updateUserInfo()
+
+// Update every 10 seconds
 setInterval(updatePrices, 10000);
 
