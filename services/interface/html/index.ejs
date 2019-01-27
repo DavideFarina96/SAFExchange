@@ -22,16 +22,16 @@
 
                 <div id="buy-panel" class="w3-border-top w3-margin-top">
                     <p>Buy</p>
-                    <input class="w3-input" type="number" placeholder="How many BTC to buy?">
-                    <p class="label-total-money">Total cost: <span id="buy-cost">10</span>$</p>
-                    <button class="w3-button w3-block w3-green">Buy</button>
+                    <input id="buy-amount" class="w3-input" type="number" placeholder="How many to buy?">
+                    <p class="label-total-money">Total cost: <span id="buy-cost">0</span>$</p>
+                    <button id='btn-buy' class="w3-button w3-block w3-green">Buy</button>
                 </div>
 
                 <div id="sell-panel" class="w3-border-top w3-margin-top">
                     <p>Sell</p>
-                    <input class="w3-input" type="number" placeholder="How many BTC to sell?">
-                    <p class="label-total-money">Total profit: <span id="sell-profit">10</span>$</p>
-                    <button class="w3-button w3-block w3-red">Sell</button>
+                    <input id="sell-amount" class="w3-input" type="number" placeholder="How many to sell?">
+                    <p class="label-total-money">Total profit: <span id="sell-profit">0</span>$</p>
+                    <button id='btn-sell' class="w3-button w3-block w3-red">Sell</button>
                 </div>
 
             </div>
@@ -69,7 +69,7 @@
 
                     <div class="w3-half" style="height: 100%;">
                         <div class="w3-container title-container">
-                            <h4>PlannedActions</h4>
+                            <h4>Planned Actions</h4>
                         </div>
                         <div class="table-wrapper scrollable">
                             <table class="w3-table w3-hoverable w3-centered">
@@ -99,6 +99,7 @@
     <% include ./partials/footer %>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/js/header.js"></script>
     <script src="/js/index.js"></script>
     <script src="/js/chart.bundle.js"></script>
     <script src="/js/chart.js"></script>

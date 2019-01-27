@@ -11,12 +11,12 @@ var verifier = require('google-id-token-verifier');
 var interface_path = "/interface"
 
 
-// PAGE ROUTES
+// PAGE ROUTES //////////////////////////////////////////////////////////
 router.get('/', function (req, res) {
     console.log('Request for home received')
     if (req.session.user != null) {
         console.log('User', JSON.stringify(req.session.user))
-        res.render('index', { user: req.session.user })
+        res.render('index', { user_id: req.session.user._id })
     }
     else {
         res.redirect(interface_path + '/login');
@@ -46,7 +46,8 @@ router.get('/tc', function (req, res) {
 })
 
 
-// LOGIN ROUTES
+// LOGIN ROUTES /////////////////////////////////////////////////////////
+// Google login
 router.post('/googleSignIn', function (req, res) {
     // Get token from page
     var token = req.body.tokenid;
@@ -85,7 +86,7 @@ router.post('/googleSignIn', function (req, res) {
     });
 });
 
-//facebook login
+// Facebook login
 router.post('/facebookSignIn', async function (req, res) {
     // Get token from page
     var token = req.body.tokenid;
@@ -98,37 +99,33 @@ router.post('/facebookSignIn', async function (req, res) {
     //check token validity
     var token_validity = (await axios.get("https://graph.facebook.com/debug_token?input_token=" + token + "&access_token=" + app_token)).data;
 
-    if(token_validity.data.is_valid == true)
-    {
+    if (token_validity.data.is_valid == true) {
         console.log("TOKEN IS VALID");
         var _user = req.body.user
         console.log(_user);
 
-            try {
-                // Get user from /user -> Create if not exists
-                var user = (await axios.put(app_domain + '/user/id_facebook', _user)).data;
-            }
-            catch (err) {
-                console.log(err)
-            }
+        try {
+            // Get user from /user -> Create if not exists
+            var user = (await axios.put(app_domain + '/user/id_facebook', _user)).data;
+        }
+        catch (err) {
+            console.log(err)
+        }
 
-            req.session.user = user;
-            req.session.user.logged_with = "FACEBOOK";
+        req.session.user = user;
+        req.session.user.logged_with = "FACEBOOK";
 
-            res.json(token_validity);
+        res.json(token_validity);
     }
-    else
-    {
+    else {
         res.json({ logged: false });
     }
 });
 
-
-
-// Authenticate user with credentials
+// Mail login
 router.post('/mailSignIn', function (req, res) {
 
-    req.session.user = { name: "test" }
+    req.session.user = { name: "test", _id: '5c49e7f329202200177264e7' }
     req.session.user.logged_with = "MAIL"
 
     // Return index.html
@@ -136,21 +133,53 @@ router.post('/mailSignIn', function (req, res) {
 });
 
 
+// REDIRECTS ROUTES /////////////////////////////////////////////////////
 
+// Price
+router.get('/price', async function (req, res) {
+    console.log("Received request for current prices")
 
-// REDIRECTS ROUTES
+    var prices = (await axios.get(app_domain + '/price/prices')).data;
 
+    // Return index.html
+    res.json(prices);
+});
+
+router.get('/price/BTCUSD', async function (req, res) {
+    var _elem_number = req.query.elem_number;
+
+    console.log("Received request for BTCUSD history", _elem_number)
+
+    var price_history = (await axios.get(app_domain + '/price/BTCUSD?elem_number=' + _elem_number )).data;
+
+    // Return index.html
+    res.json(price_history);
+});
+
+router.get('/price/ETHUSD', async function (req, res) {
+    var _elem_number = req.query.elem_number;
+
+    console.log("Received request for ETHUSD history", _elem_number)
+
+    var price_history = (await axios.get(app_domain + '/price/ETHUSD?elem_number=' + _elem_number )).data;
+
+    // Return index.html
+    res.json(price_history);
+});
+
+// Transaction
 router.get('/transaction/user/:user_id', async function (req, res) {
     var _user_id = req.params.user_id;
 
     console.log("Received request for transaction list", _user_id)
-    
+
     var transaction_list = (await axios.get(app_domain + '/transaction/user/' + _user_id)).data;
 
     // Return index.html
     res.json(transaction_list);
 });
 
+// Plannedaction
 router.get('/plannedaction/user/:user_id', async function (req, res) {
     var _user_id = req.params.user_id;
 

@@ -1,3 +1,9 @@
+// PATHS /////////////////////////////////////////////////////////////////
+var buy_post_path = '/interface/buy/'
+var sell_post_path = '/interface/sell/'
+
+var price_history_get_path = '/interface/price/'
+
 var transactions_get_path = '/interface/transaction/user/'
 var transactions_post_path = '/interface/transaction/'
 
@@ -6,6 +12,57 @@ var plannedactions_post_path = '/interface/plannedaction/'
 
 var currency = 'BTC'
 
+// BUY / SELL PANEL //////////////////////////////////////////////////////
+function buy() {
+    var _amount = $('#buy-amount').val();
+
+    $.ajax({
+        url: buy_post_path + currency,
+        data: { amount: _amount },
+        type: 'POST'
+    })
+        .then(res => {
+            if (res.successful) {
+                alert(res.message)
+
+                updateTransactionList()
+                updateUserInfo()
+            }
+            else {
+                alert(res.message)
+            }
+        })
+        .catch(err => {
+            // If the promise resolves with an error, log it in console
+            console.log(err);
+        });
+}
+
+function sell() {
+
+}
+
+// CHART PANEL ///////////////////////////////////////////////////////////
+var nElemHistory = 50;
+function getPriceHistory() {
+    $.ajax({
+        url: price_history_get_path + currency + 'USD',
+        data: { elem_number: nElemHistory },
+        type: 'GET'
+    })
+        .then(res => {
+            console.log(res.length, 'prices received');
+
+            parseAndDisplayData(res)
+        })
+        .catch(err => {
+            // If the promise resolves with an error, log it in console
+            console.log(err);
+        });
+}
+
+
+// TRANSACTION / PLANNED ACTION PANEL ///////////////////////////////////
 function updateTransactionList() {
     // HTTP request to interface to get the list
     $.ajax({
@@ -85,8 +142,7 @@ function createHTMLlist(list, type) {
 }
 
 
-// LISTENERS
-
+// LISTENERS ////////////////////////////////////////////////////////////
 $('#user-stats').click((event) => {
     $('#logout-container').toggle();
 })
@@ -98,11 +154,39 @@ $('#currency-selector').on('change', function (e) {
         currency = 'BTC'
     else if (this.value == 'ETHUSD')
         currency = 'ETH'
+
+
+    // Reset Buy/sell panel
+    $('#buy-amount').val('');
+    $('#buy-cost').html('0');
+    $('#sell-amount').val('');
+    $('#sell-profit').html('0')
+
+    // Get data for the chart and update it
+    getPriceHistory()
 })
 
+$('#buy-amount').on('input', function (e) {
+    if (currency == 'BTC')
+        $('#buy-cost').html(this.value * current_BTCUSD)
+    else if (currency == 'ETH')
+        $('#buy-cost').html(this.value * current_ETHUSD)
+})
 
+$('#sell-amount').on('input', function (e) {
+    if (currency == 'BTC')
+        $('#sell-profit').html(this.value * current_BTCUSD)
+    else if (currency == 'ETH')
+        $('#sell-profit').html(this.value * current_ETHUSD)
+})
+
+$('#btn-buy').click(buy)
+
+$('#btn-sell').click(sell)
+
+// INIT /////////////////////////////////////////////////////////////////
 // Trigger change / update on startup
-//$('#currency-selector').trigger('change');
+$('#currency-selector').trigger('change');
 
 // Update GUI
 updateTransactionList()

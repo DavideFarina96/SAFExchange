@@ -46,7 +46,7 @@ router.get('/prices', async function (req, res) {
 
 	try
 	{
-		var result = (await axios.get(app_domain + '/database/price/', null)).data;
+		var result = (await axios.get(app_domain + '/database/price')).data;
 		//console.log(result);
 		res.json(result);
 	}
