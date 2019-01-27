@@ -1,29 +1,27 @@
 Chart.defaults.global.defaultFontColor = 'white';
 
+var config = {
+    datasets: [{
+        backgroundColor: 'rgba(128,203,196, 0.4)',
+        borderColor: '#009688',
+        fill: 'start'
+    }]
+}
+
+var lastPoint = null
+
+
 function displayChart(data) {
 
     var config = {
         type: 'line',
-        data: {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [{
-                backgroundColor: 'rgba(128,203,196, 0.4)',
-                borderColor: '#009688',
-                data: [
-                    1,2,34,23,12,5,23
-
-                    // data
-
-                ],
-                fill: 'start'
-            }]
-        },
+        data: data,
         options: {
             responsive: true,
             maintainAspectRatio: false,
             title: {
                 display: true,
-                text: 'BTCUSD Trend'
+                text: currency + 'USD Trend'
             },
             legend: {
                 display: false
@@ -55,36 +53,67 @@ function displayChart(data) {
         }
     };
 
+    if (window.myLine)
+        window.myLine.destroy();
+
     var ctx = document.getElementById('canvas').getContext('2d');
     window.myLine = new Chart(ctx, config);
 
 }
 
+function parseAndDisplayData(res) {
+    var labels = []
+    var values = []
 
-// todo get the data to display
-displayChart()
+    res.forEach(price => {
 
+        labels.push(parseTimestampToDateString(price._id))
 
+        if (currency == 'BTC')
+            values.push(price.BTCUSD)
+        else if (currency == 'ETH')
+            values.push(price.ETHUSD)
+    });
 
+    config.labels = labels
+    config.datasets[0].data = values
 
+    displayChart(config)
 
-/*var colorNames = Object.keys(window.chartColors);
-document.getElementById('addDataset').addEventListener('click', function () {
-    var colorName = colorNames[config.data.datasets.length % colorNames.length];
-    var newColor = window.chartColors[colorName];
-    var newDataset = {
-        label: 'Dataset ' + config.data.datasets.length,
-        backgroundColor: newColor,
-        borderColor: newColor,
-        data: [],
-        fill: false
-    };
+    // Set last point
+    lastPoint = res[res.length - 1]
+}
 
-    for (var index = 0; index < config.data.labels.length; ++index) {
-        newDataset.data.push(randomScalingFactor());
+function parseTimestampToDateString(timestamp) {
+    timestamp = timestamp.toString().substring(0, 8)
+    date = new Date(parseInt(timestamp, 16) * 1000)
+
+    var hours = date.getHours();
+    // Minutes part from the timestamp
+    var minutes = "0" + date.getMinutes();
+
+    // Will display time in 10:30 format
+    return hours + ':' + minutes.substr(-2);
+}
+
+function newChartPoint(newPoint) {
+    if (lastPoint != null && lastPoint._id != newPoint._id) {
+        lastPoint = newPoint
+
+        // Add new point and remove oldest one
+        console.log('New point to be added in chart')
+
+        config.labels.push(parseTimestampToDateString(newPoint._id));
+        config.labels.shift()
+
+        if (currency == 'BTC')
+            var value = newPoint.BTCUSD
+        else if (currency == 'ETH')
+            var value = newPoint.ETHUSD
+
+        config.datasets[0].data.push(value)
+        config.datasets[0].data.shift()
+
+        window.myLine.update();
     }
-
-    config.data.datasets.push(newDataset);
-    window.myLine.update();
-});
-*/
+}
