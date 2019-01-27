@@ -67,12 +67,12 @@ function parseAndDisplayData(res) {
 
     res.forEach(price => {
 
-        labels.push(parseTimestampToDateString(price._id))
+        labels.unshift(parseTimestampToDateString(price._id))
 
         if (currency == 'BTC')
-            values.push(price.BTCUSD)
+            values.unshift(price.BTCUSD)
         else if (currency == 'ETH')
-            values.push(price.ETHUSD)
+            values.unshift(price.ETHUSD)
     });
 
     config.labels = labels
