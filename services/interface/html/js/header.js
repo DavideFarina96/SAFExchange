@@ -58,3 +58,9 @@ updateUserInfo()
 // Update every 10 seconds
 setInterval(updatePrices, 10000);
 
+
+// LISTENERS
+$('#user-stats').click((event) => {
+    $('#user-info-container').toggle();
+})
+

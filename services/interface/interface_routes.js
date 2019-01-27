@@ -125,7 +125,7 @@ router.post('/facebookSignIn', async function (req, res) {
 // Mail login
 router.post('/mailSignIn', function (req, res) {
 
-    req.session.user = { name: "test", _id: '5c49e7f329202200177264e7' }
+    req.session.user = { name: "test", _id: '5c49e7f329202200177264e7', image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg' }
     req.session.user.logged_with = "MAIL"
 
     res.json({ logged: true });

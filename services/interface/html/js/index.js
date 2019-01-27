@@ -143,10 +143,6 @@ function createHTMLlist(list, type) {
 
 
 // LISTENERS ////////////////////////////////////////////////////////////
-$('#user-stats').click((event) => {
-    $('#logout-container').toggle();
-})
-
 $('#currency-selector').on('change', function (e) {
     console.log('Selected', this.value)
 
