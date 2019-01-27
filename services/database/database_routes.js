@@ -184,8 +184,8 @@ router.get('/price', async function (req, res) {
 
 	try {
 		// Get the last prices for both BTC and ETH and send them
-		_price.BTC = (await Price.findOne({ BTCUSD: { $exists: true } }, 'BTCUSD', { sort: { '_id': 1 } }));
-		_price.ETH = (await Price.findOne({ ETHUSD: { $exists: true } }, 'ETHUSD', { sort: { '_id': 1 } }));
+		_price.BTC = (await Price.findOne({ BTCUSD: { $exists: true } }, 'BTCUSD', { sort: { '_id': -1 } }));
+		_price.ETH = (await Price.findOne({ ETHUSD: { $exists: true } }, 'ETHUSD', { sort: { '_id': -1 } }));
 
 		console.log("Last read price", "BTCUSD: ", _price.BTC.BTCUSD, "ETHUSD: " + _price.ETH.ETHUSD)
 		res.json(_price);
@@ -204,7 +204,7 @@ router.get('/price/BTCUSD', async function (req, res) {
 	try {
 		// Get the last prices for both BTC and ETH and send them
 		_prices = (await Price.find({ BTCUSD: { $exists: true } }, 'BTCUSD',
-			{ sort: { '_id': -1 }, limit: _elem_number }));
+			{ sort: { '_id': 1 }, limit: _elem_number }));
 
 		console.log("Read last " + _elem_number + " BTCUSD prices")
 		res.json(_prices);
@@ -223,7 +223,7 @@ router.get('/price/ETHUSD', async function (req, res) {
 	try {
 		// Get the last prices for both BTC and ETH and send them
 		_prices = (await Price.find({ ETHUSD: { $exists: true } }, 'ETHUSD',
-			{ sort: { '_id': -1 }, limit: _elem_number }));
+			{ sort: { '_id': 1 }, limit: _elem_number }));
 
 		console.log("Read last " + _elem_number + " ETHUSD prices")
 		res.json(_prices);
