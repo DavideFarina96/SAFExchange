@@ -19,7 +19,7 @@ function updatePrices() {
             console.log('Prices updated', current_BTCUSD, current_ETHUSD)
 
             // If we are on index page, update chart
-            if (typeof newChartPoint === "function") { 
+            if (typeof newChartPoint === "function") {
                 if (currency == 'BTC')
                     newChartPoint(res.BTC)
                 else if (currency == 'ETH')
@@ -33,21 +33,23 @@ function updatePrices() {
 }
 
 function updateUserInfo() { // TODO
-    $.ajax({
-        url: user_get + user_id,
-        type: 'GET'
-    })
-        .then(res => {            
-            $('#user-USD').html(res.USD ? res.USD.toFixed(2) : 0)
-            $('#user-BTC').html(res.BTC ? res.BTC.toFixed(2) : 0)
-            $('#user-ETH').html(res.ETH ? res.ETH.toFixed(2) : 0)
-
-            console.log('User info updated', res)
+    if (user_id != null) {
+        $.ajax({
+            url: user_get + user_id,
+            type: 'GET'
         })
-        .catch(err => {
-            // If the promise resolves with an error, log it in console
-            console.log(err);
-        });
+            .then(res => {
+                $('#user-USD').html(res.USD ? res.USD.toFixed(2) : 0)
+                $('#user-BTC').html(res.BTC ? res.BTC.toFixed(2) : 0)
+                $('#user-ETH').html(res.ETH ? res.ETH.toFixed(2) : 0)
+
+                console.log('User info updated', res)
+            })
+            .catch(err => {
+                // If the promise resolves with an error, log it in console
+                console.log(err);
+            });
+    }
 }
 
 
