@@ -39,7 +39,7 @@ function onFacebookSignIn(facebookData) {
             email: userData.email
         }
 
-        execute_post(url_facebook, { tokenid: id_token, user: user_obj });
+        //execute_post(url_facebook, { tokenid: id_token, user: user_obj });
     });
 }
 
