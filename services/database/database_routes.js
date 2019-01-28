@@ -73,52 +73,30 @@ router.get('/', function (req, res) {
 /** USER ROUTES **/
 router.put('/user/id_google', async function (req, res) {
 	var _user = req.body
+
 	try {
-		var user = await User.findOne({ id_google: _user.id_google });
+		// Updates data such as image_url and name or create new. Return user.
+		var user = await User.update({ id_google: _user.id_google }, _user, { upsert: true });
 	}
 	catch (err) {
 		console.log(err)
 	}
 
-	if (user) {
-		res.json(user);
-	}
-	else {
-		User.create(_user, function (err, user) {
-			if (err) return res.send(err);
-
-			console.log("New user created");
-			res.json(user);
-		});
-	}
+	res.json(user);
 });
 
 router.put('/user/id_facebook', async function (req, res) {
-	console.log("ID_FB")
-	console.log(req.body)
 	var _user = req.body
 
 	try {
-		var user = await User.findOne({ id_facebook: _user.id_facebook });
+		// Updates data such as image_url and name or create new. Return user.
+		var user = await User.update({ id_facebook: _user.id_facebook }, _user, { upsert: true });
 	}
 	catch (err) {
 		console.log(err)
 	}
-	
-	console.log("RESULTS")
-	console.log(user)
 
-	if (user) {
-		res.json(user);
-	}
-	else {
-		User.create(_user, function (err, user) {
-			if (err) return res.send(err);
-
-			console.log("New user created");
-			res.json(user);
-		});
-	}
+	res.json(user);
 });
 
 router.get('/user/:user_id', function (req, res) {
@@ -315,11 +293,11 @@ router.post('/plannedaction', function (req, res) {
 	var _plannedaction = req.body;
 
 	var _has_USD_field = _plannedaction.hasOwnProperty('USD');
-	var _has_BTC_field = _plannedaction.hasOwnProperty('BTC'); 
+	var _has_BTC_field = _plannedaction.hasOwnProperty('BTC');
 	var _has_ETH_field = _plannedaction.hasOwnProperty('ETH');
 
 	// XOR operand
-	if (_has_USD_field && ( (_has_BTC_field && !_has_ETH_field) || (!_has_BTC_field && _has_ETH_field) ) ) {
+	if (_has_USD_field && ((_has_BTC_field && !_has_ETH_field) || (!_has_BTC_field && _has_ETH_field))) {
 		PlannedAction.create(_plannedaction, function (err, plannedaction) {
 			if (err) return res.send(err);
 
