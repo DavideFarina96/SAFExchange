@@ -37,9 +37,9 @@
                 </div>
             </div>
 
-            <div id="user-info-container" class="hover-user-info w3-teal">
+            <div id="user-info-container" class="hover-user-info w3-teal w3-card-2">
 
-                <div class="w3-center w3-right-align">
+                <div class="w3-center">
                     <% if (locals.user) { %>
                     <h6>USD: <span id="user-USD"></span>
                     </h6>
@@ -50,7 +50,7 @@
                     <% } %>
                 </div>
 
-                <a href="/interface/logout">Logout</a>
+                <a class="w3-button w3-bar" style="background-color: #008275" href="/interface/logout">Logout</a>
             </div>
 
             <% } %>
