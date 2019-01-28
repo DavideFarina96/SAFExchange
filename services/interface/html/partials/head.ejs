@@ -8,7 +8,7 @@
     body {
         margin: 0;
         height: 100%;
-        min-width:800px;
+        min-width: 800px;
         font-family: "Segoe UI", Arial, sans-serif;
     }
 
@@ -42,7 +42,7 @@
     }
 
     .login-container {
-        width:50%;
+        width: 50%;
         text-align: center;
     }
 
@@ -121,5 +121,47 @@
 
     .table-wrapper {
         height: 80%;
+    }
+
+    .btn-add-plannedaction {
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        color: white;
+        font-size: 20px;
+        font-weight: 800;
+        margin-left: auto;
+        cursor: pointer;
+    }
+
+    .btn-add-plannedaction:hover {
+        background-color: gray;
+    }
+
+
+    /* BOX MODAL */
+    .box-modal {
+        display: none;
+        position: absolute;
+
+        height: 320px;
+        /* Firefox */
+        top: -moz-calc(50% - 160px);
+        /* WebKit */
+        top: -webkit-calc(50% - 160px);
+        /* Opera */
+        top: -o-calc(50% - 160px);
+        /* Standard */
+        top: calc(50% - 160px);
+
+        width: 600px;
+        /* Firefox */
+        left: -moz-calc(50% - 300px);
+        /* WebKit */
+        left: -webkit-calc(50% - 300px);
+        /* Opera */
+        left: -o-calc(50% - 300px);
+        /* Standard */
+        left: calc(50% - 300px);
     }
 </style>

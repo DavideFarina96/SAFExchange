@@ -70,6 +70,7 @@
                     <div class="w3-half" style="height: 100%;">
                         <div class="w3-container title-container">
                             <h4>Planned Actions</h4>
+                            <div id="btn-add-plannedaction" class="btn-add-plannedaction">+</div>
                         </div>
                         <div class="table-wrapper scrollable">
                             <table class="w3-table w3-hoverable w3-centered">
@@ -96,12 +97,65 @@
         </div>
     </div>
 
+
+    <!-- Message box -->
+    <div id="box-add-plannedaction" class="w3-dark-grey w3-card-4 box-modal">
+        <div class="w3-container w3-teal">
+            <h4>Add new planned action</h4>
+        </div>
+
+        <div class="w3-row-padding w3-margin-top">
+            <div class="w3-half">
+                <label>Action</label>
+                <select id="pa-box-action" class="w3-input">
+                    <option value="BUY">BUY</option>
+                    <option value="SELL">SELL</option>
+                </select>
+            </div>
+
+            <div class="w3-half">
+                <label>Currency</label>
+                <select id="pa-box-currency" class="w3-input">
+                    <option value="BTC">BTC</option>
+                    <option value="ETH">ETH</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="w3-row-padding w3-margin-top">
+            <div class="w3-half">
+                <label>Amount</label>
+                <input id="pa-box-amount" class="w3-input" type="number" placeholder="How many?">
+            </div>
+            <div class="w3-half">
+                <label>USD value</label>
+                <input id="pa-box-usd-value" class="w3-input" type="number" placeholder="At which price?">
+            </div>
+        </div>
+
+        <div class="w3-container">
+            <p class="label-total-money">Total USD: <span id="pa-box-total-usd">0</span>$</p>
+        </div>
+
+        <div class="w3-container" style="text-align: center; margin-top: auto">
+            <button id='pa-box-confirm' style="width:45%" class="w3-button w3-green">Confirm</button>
+            <button id='pa-box-cancel' style="width:45%" class="w3-button w3-grey">Cancel</button>
+        </div>
+
+    </div>
+
+
+
+
+
+
     <% include ./partials/footer %>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="/js/header.js"></script>
     <script src="/js/chart.bundle.js"></script>
     <script src="/js/chart.js"></script>
+    <script src="/js/modal-boxes.js"></script>
     <script src="/js/index.js"></script>
 </body>
 
