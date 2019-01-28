@@ -29,8 +29,7 @@ var PlannedActionSchema = new mongoose.Schema({
     author: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true },
     action: { type: String, enum: ['BUY', 'SELL'], required: true },
     state: { type: String, enum: ['IDLE', 'PROCESSING', 'COMPLETED', 'CANCELED'], required: true, default: 'IDLE' },
-    BTCUSD: Number,
-    ETHUSD: Number,
+    USD: Number,
     BTC: Number,
     ETH: Number
 });

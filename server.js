@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');                // pull information from
 var path = require('path');
 var morgan = require('morgan');                         // log requests to the console (express4)
 
-global.app_domain = "https://safexchange.herokuapp.com"
+global.app_domain = "https://safexchange.herokuapp.com" //"http://localhost:8080"
 
 // CONFIGURATION
 app.use(session({ secret: 'ssshhhhh', resave: true, saveUninitialized: true }));

@@ -5,10 +5,9 @@ var sell_post_path = '/interface/sell/'
 var price_history_get_path = '/interface/price/'
 
 var transactions_get_path = '/interface/transaction/user/'
-var transactions_post_path = '/interface/transaction/'
 
-var plannedactions_get_path = '/interface/plannedaction/user/'
-var plannedactions_post_path = '/interface/plannedaction/'
+var plannedaction_get_path = '/interface/plannedaction/user/'
+var plannedaction_post_path = '/interface/plannedaction/'
 
 var nElemHistory = 50;
 
@@ -119,7 +118,7 @@ function updateTransactionList() {
 function updatePlannedactionList() {
     // HTTP request to interface to get the list
     $.ajax({
-        url: plannedactions_get_path + user_id,
+        url: plannedaction_get_path + user_id,
         type: 'GET'
     })
         .then(res => {
@@ -139,7 +138,7 @@ function createHTMLlist(list, type) {
     html = ''
 
     if (list.length == 0) {
-        html = '<tr><td colspan=4>Nothing to show</td></tr>'
+        html = '<tr><td colspan=' + (type == 'plannedaction' ? 5 : 4) + '>Nothing to show</td></tr>'
     }
     else {
         rows = ''
@@ -156,21 +155,16 @@ function createHTMLlist(list, type) {
             if (t.hasOwnProperty('BTC')) {
                 row += '<td>BTC</td>'
                 row += '<td>' + t.BTC.toFixed(2) + '</td>'
-
-                if (type == 'transaction')
-                    row += '<td>' + t.USD.toFixed(2) + '</td>'
-                else if (type == 'plannedaction')
-                    row += '<td>' + t.BTCUSD.toFixed(2) + '</td>'
             }
             else if (t.hasOwnProperty('ETH')) {
                 row += '<td>ETH</td>'
                 row += '<td>' + t.ETH.toFixed(2) + '</td>'
-
-                if (type == 'transaction')
-                    row += '<td>' + t.USD.toFixed(2) + '</td>'
-                else if (type == 'plannedaction')
-                    row += '<td>' + t.ETHUSD.toFixed(2) + '</td>'
             }
+
+            row += '<td>' + t.USD.toFixed(2) + '</td>'
+
+            if( type == 'plannedaction')
+                row += '<td>' + t.state + '</td>'
 
             row += '</tr>'
 
@@ -180,6 +174,33 @@ function createHTMLlist(list, type) {
         html += rows
     }
     return html;
+}
+
+
+// ADD PLANNED ACTION ///////////////////////////////////////////////////
+function addPlannedAction(action, plannedaction) {
+    console.log('BUY', plannedaction.currency, plannedaction.amount, plannedaction.USD)
+
+    $.ajax({
+        url: plannedaction_post_path + action,
+        data: plannedaction,
+        type: 'POST'
+    })
+        .then(res => {
+            if (res.successful) {
+                alert(res.message)
+
+                updatePlannedactionList()
+                updateUserInfo()
+            }
+            else {
+                alert(res.message)
+            }
+        })
+        .catch(err => {
+            // If the promise resolves with an error, log it in console
+            console.log(err);
+        });
 }
 
 

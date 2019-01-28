@@ -111,12 +111,23 @@
     }
 
     .scrollable {
-        overflow: hidden;
-        overflow-y: scroll;
+        overflow-x: auto;
+        overflow-y: auto;
     }
-
     .scrollable::-webkit-scrollbar {
-        display: none;
+        width: 0.5em;
+        height: 0.5em;
+    }
+    .scrollable::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+    .scrollable::-webkit-scrollbar-thumb {
+        background-color: darkgrey;
+        outline: 1px solid slategrey;
+    }
+    .scrollable::-webkit-scrollbar-corner {
+        background-color: darkgrey;
     }
 
     .table-wrapper {

@@ -314,11 +314,12 @@ router.get('/plannedaction/user/:user_id', function (req, res) {
 router.post('/plannedaction', function (req, res) {
 	var _plannedaction = req.body;
 
-	var _has_BTC_field = _plannedaction.hasOwnProperty('BTC') && _plannedaction.hasOwnProperty('BTCUSD');
-	var _has_ETH_field = _plannedaction.hasOwnProperty('ETH') && _plannedaction.hasOwnProperty('ETHUSD');
+	var _has_USD_field = _plannedaction.hasOwnProperty('USD');
+	var _has_BTC_field = _plannedaction.hasOwnProperty('BTC'); 
+	var _has_ETH_field = _plannedaction.hasOwnProperty('ETH');
 
 	// XOR operand
-	if ((_has_BTC_field && !_has_ETH_field) || (!_has_BTC_field && _has_ETH_field)) {
+	if (_has_USD_field && ( (_has_BTC_field && !_has_ETH_field) || (!_has_BTC_field && _has_ETH_field) ) ) {
 		PlannedAction.create(_plannedaction, function (err, plannedaction) {
 			if (err) return res.send(err);
 
@@ -328,7 +329,7 @@ router.post('/plannedaction', function (req, res) {
 	}
 	else {
 		console.log("Error! Wrong data");
-		res.send("Error! The body request should contain either the fields BTC and BTCUSD or ETH and ETHUSD (exclusively)");
+		res.send("Error! The body request should contain either the fields USD and BTC or ETH (exclusively)");
 	}
 });
 
