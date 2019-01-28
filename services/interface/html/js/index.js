@@ -9,7 +9,7 @@ var transactions_get_path = '/interface/transaction/user/'
 var plannedaction_get_path = '/interface/plannedaction/user/'
 var plannedaction_post_path = '/interface/plannedaction/'
 
-var nElemHistory = 50;
+var nElemHistory = 100;
 
 var currency = 'BTC'
 
