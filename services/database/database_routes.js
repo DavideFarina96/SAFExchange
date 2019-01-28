@@ -74,29 +74,23 @@ router.get('/', function (req, res) {
 router.put('/user/id_google', async function (req, res) {
 	var _user = req.body
 
-	try {
-		// Updates data such as image_url and name or create new. Return user.
-		var user = await User.update({ id_google: _user.id_google }, _user, { upsert: true });
-	}
-	catch (err) {
-		console.log(err)
-	}
+	// Updates data such as image_url and name or create new. Return user.
+	User.findOneAndUpdate({ id_google: _user.id_google }, _user, { upsert: true, new: true }, function (err, user) {
+		if (err) res.send(err);
 
-	res.json(user);
+		res.json(user);
+	});
 });
 
 router.put('/user/id_facebook', async function (req, res) {
 	var _user = req.body
 
-	try {
-		// Updates data such as image_url and name or create new. Return user.
-		var user = await User.update({ id_facebook: _user.id_facebook }, _user, { upsert: true });
-	}
-	catch (err) {
-		console.log(err)
-	}
+	// Updates data such as image_url and name or create new. Return user.
+	User.findOneAndUpdate({ id_facebook: _user.id_facebook }, _user, { upsert: true, new: true }, function (err, user) {
+		if (err) res.send(err);
 
-	res.json(user);
+		res.json(user);
+	});
 });
 
 router.get('/user/:user_id', function (req, res) {
