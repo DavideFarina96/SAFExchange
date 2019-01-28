@@ -31,10 +31,10 @@ router.get('/login', function (req, res) {
 router.get('/logout', function (req, res) {
     console.log('Request for logout received')
 
-    var logged_with = req.session.user.logged_with
+    var _logged_with = req.session.logged_with
     req.session.user = null;
 
-    res.render('logout', { logged_with: logged_with })
+    res.render('logout', { logged_with: _logged_with })
 })
 
 router.get('/privacy', function (req, res) {
@@ -74,7 +74,7 @@ router.post('/googleSignIn', function (req, res) {
 
             // Set session variable
             req.session.user = user
-            req.session.user.logged_with = "GOOGLE"
+            req.session.logged_with = "GOOGLE"
 
             // Send data to page
             res.json(tokenInfo);
@@ -113,7 +113,7 @@ router.post('/facebookSignIn', async function (req, res) {
         }
 
         req.session.user = user;
-        req.session.user.logged_with = "FACEBOOK";
+        req.session.logged_with = "FACEBOOK";
 
         res.json(token_validity);
     }
@@ -129,7 +129,7 @@ router.post('/mailSignIn', function (req, res) {
         name: "test", _id: '5c49e7f329202200177264e7', image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg',
         USD: 1000, BTC: 0.7, ETH: 3.3
     }
-    req.session.user.logged_with = "MAIL"
+    req.session.logged_with = "MAIL"
 
     res.json({ logged: true });
 });
