@@ -1,3 +1,0 @@
-[0123/142300.922:ERROR:file_io_win.cc(179)] CreateFile C:\Program Files (x86)\Cansuck\settings.dat: Accesso negato. (0x5)
-[0123/142300.926:ERROR:registration_protocol_win.cc(84)] TransactNamedPipe: Pipe terminata. (0x6D)
-[0123/142300.927:ERROR:file_io_win.cc(179)] CreateFile C:\Program Files (x86)\Cansuck\settings.dat: Accesso negato. (0x5)
