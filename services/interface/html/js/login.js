@@ -35,11 +35,11 @@ function onFacebookSignIn(facebookData) {
         var user_obj = {
             id_facebook: userData.id,
             name: userData.name,
-            image_url: "",
+            image_url: 'http://graph.facebook.com/' + userData.id + '/picture?type=square',
             email: userData.email
         }
 
-        //execute_post(url_facebook, { tokenid: id_token, user: user_obj });
+        execute_post(url_facebook, { tokenid: id_token, user: user_obj });
     });
 }
 
