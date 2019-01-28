@@ -1,5 +1,5 @@
 <script>
-    var user_id = <%= (locals.user) ? (user._id).toString() : null %>
+    var user_id = <%= (locals.user) ? "'" + user._id + "'" : null %>
 </script>
 
 <div class="header w3-container w3-teal">
