@@ -227,7 +227,13 @@ router.post('/sell', async function (req, res) {
 
         try {
             // Check if user has enough BTC/ETH to sell
-            if ( (_currency == 'BTC' && _user.BTC >= _amount) || (_currency == 'ETH' && _user.ETH >= _amount) )  {
+            var _user_amount
+            if (_currency == 'BTC')
+                _user_amount = _user.BTC
+            else if (_currency == 'ETH')
+                _user_amount = _user.ETH
+
+            if (_user_amount >= _amount) {
 
                 // Get current price
                 var current_price = (await axios.get(app_domain + '/price/prices')).data
@@ -236,19 +242,19 @@ router.post('/sell', async function (req, res) {
                     author: _user_id,
                     action: 'SELL'
                 }
-                var new_balance = { }
+                var new_balance = {}
 
                 if (_currency == 'BTC') {
                     new_transaction.BTC = _amount
                     new_transaction.USD = _amount * current_price.BTC.BTCUSD
 
-                    new_balance.BTC = _user.BTC - _amount
+                    new_balance.BTC = _user_amount - _amount
                 }
                 else if (_currency == 'ETH') {
                     new_transaction.ETH = _amount
                     new_transaction.USD = _amount * current_price.ETH.ETHUSD
 
-                    new_balance.ETH = _user.ETH - _amount
+                    new_balance.ETH = _user_amount - _amount
                 }
                 new_balance.USD = _user.USD + new_transaction.USD
 
@@ -273,7 +279,7 @@ router.post('/sell', async function (req, res) {
             }
             else {
                 response.successful = false
-                response.message = 'Not enough BTC/ETH to perform operation'
+                response.message = 'Not enough BTC/ETH to perform operation. You have ' + _user_amount + ' ' + _currency
             }
         }
         catch (err) {
@@ -434,24 +440,30 @@ router.post('/plannedaction/sell', async function (req, res) {
 
         try {
             // Check if user has enough BTC/ETH to sell
-            if ( (_currency == 'BTC' && _user.BTC >= _amount) || (_currency == 'ETH' && _user.ETH >= _amount) )  {
+            var _user_amount
+            if (_currency == 'BTC')
+                _user_amount = _user.BTC
+            else if (_currency == 'ETH')
+                _user_amount = _user.ETH
+
+            if (_user_amount >= _amount) {
 
                 var new_plannedaction = {
                     author: _user_id,
                     action: 'SELL',
                     USD: _USD
                 }
-                var new_balance = { }
+                var new_balance = {}
 
                 if (_currency == 'BTC') {
                     new_plannedaction.BTC = _amount
 
-                    new_balance.BTC = _user.BTC - _amount
+                    new_balance.BTC = _user_amount - _amount
                 }
                 else if (_currency == 'ETH') {
                     new_plannedaction.ETH = _amount
 
-                    new_balance.ETH = _user.ETH - _amount
+                    new_balance.ETH = _user_amount - _amount
                 }
 
                 // Insert new plannedaction
@@ -474,7 +486,7 @@ router.post('/plannedaction/sell', async function (req, res) {
             }
             else {
                 response.successful = false
-                response.message = 'Not enough BTC/ETH to perform operation'
+                response.message = 'Not enough BTC/ETH to perform operation. You have ' + _user_amount + ' ' + _currency
             }
         }
         catch (err) {
