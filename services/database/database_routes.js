@@ -265,7 +265,29 @@ router.post('/transaction', function (req, res) {
 router.get('/plannedaction/:plannedaction_id', function (req, res) {
 	var _plannedaction_id = req.params.plannedaction_id;
 
-	PlannedAction.findById(_plannedaction_id, function (err, plannedaction) {
+	if(_plannedaction_id == "all_idle")
+	{
+		PlannedAction.find({state: "IDLE"}, function (err, plannedactions) {
+			if (err) return res.send(err);
+
+			res.json(plannedactions);
+		});
+	}
+	else
+	{
+		PlannedAction.findById(_plannedaction_id, function (err, plannedaction) {
+			if (err) return res.send(err);
+
+			res.json(plannedaction);
+		});
+	}
+
+});
+
+router.put('/plannedaction/:plannedaction_id', function (req, res) {
+	var _plannedaction_id = req.params.plannedaction_id;
+
+	PlannedAction.findByIdAndUpdate(_plannedaction_id, {$set: {state: req.body.state}}, {new: false}, function (err, plannedaction) {
 		if (err) return res.send(err);
 
 		res.json(plannedaction);
