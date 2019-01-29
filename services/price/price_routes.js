@@ -200,10 +200,10 @@ async function getPriceETH() {
 
 		tmpETHValue = (tmpCurrencyVal / numOfExchanges); // compute the average value of ETH among the N selected exchanges.
 
-		if(!hasBTCbeenInitialize) {
+		if(!hasETHbeenInitialize) {
 			// store the new computed value on this ws
 			ourETHValue = tmpETHValue; 
-			hasETHbeenInitializebeenInitialize = true;
+			hasETHbeenInitialize = true;
 		}
 		else
 		{

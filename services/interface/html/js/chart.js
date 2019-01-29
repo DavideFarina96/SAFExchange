@@ -90,7 +90,7 @@ function parseAndDisplayData(res) {
     displayChart(config)
 
     // Set last point
-    lastPoint = res[res.length - 1]
+    lastPoint = res[0]
 }
 
 function parseTimestampToDate(timestamp) {
