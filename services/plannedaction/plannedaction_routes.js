@@ -88,7 +88,7 @@ router.post('/checkTriggers', async function (req, res) {
 				// --------------- FOR BTC
 				if(btcValue != undefined && actions[i].BTC != undefined)
 				{
-					if(actions[i].USD > btcValue * 0.99 && actions[i].USD < btcValue * 1.01)
+					if(actions[i].USD > btcValue * 0.995 && actions[i].USD < btcValue * 1.005)
 					{
 						actionsPerformed++;
 
@@ -122,7 +122,7 @@ router.post('/checkTriggers', async function (req, res) {
 						if(actions[i].action == "BUY")
 							newBalance = { USD: user.USD, BTC: user.BTC + actions[i].BTC, ETH: user.ETH }
 						else if(actions[i].action == "SELL")
-							newBalance = { USD: user.USD + actions[i].USD * actions[i].BTC, BTC: user.BTC, ETH: user.ETH }
+							newBalance = { USD: user.USD + btcValue * actions[i].BTC, BTC: user.BTC, ETH: user.ETH }
 
 						//call user to update the balances
 						try {
@@ -151,7 +151,7 @@ router.post('/checkTriggers', async function (req, res) {
 				// --------------- FOR ETH
 				if(ethValue != undefined && actions[i].ETH != undefined)
 				{
-					if(actions[i].USD > ethValue * 0.99 && actions[i].USD < ethValue * 1.01)
+					if(actions[i].USD > ethValue * 0.995 && actions[i].USD < ethValue * 1.005)
 					{
 						actionsPerformed++;
 
@@ -185,7 +185,7 @@ router.post('/checkTriggers', async function (req, res) {
 						if(actions[i].action == "BUY")
 							newBalance = { USD: user.USD, BTC: user.BTC, ETH: user.ETH + actions[i].ETH }
 						else if(actions[i].action == "SELL")
-							newBalance = { USD: user.USD + actions[i].USD * actions[i].ETH, BTC: user.BTC, ETH: user.ETH }
+							newBalance = { USD: user.USD + ethValue * actions[i].ETH, BTC: user.BTC, ETH: user.ETH }
 
 						//call user to update the balances
 						try {
