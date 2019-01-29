@@ -37,6 +37,10 @@ function displayChart(data) {
             scales: {
                 xAxes: [{
                     display: true,
+                    type: 'time',
+                    time: {
+                        unit: 'minute'
+                    },
                     scaleLabel: {
                         display: true,
                         labelString: 'Time'
@@ -62,20 +66,22 @@ function displayChart(data) {
 }
 
 function parseAndDisplayData(res) {
-    var labels = []
     var values = []
 
     res.forEach(price => {
+        var tmp = {}
 
-        labels.unshift(parseTimestampToDateString(price._id))
+        tmp.x = parseTimestampToDate(price._id)
 
         if (currency == 'BTC')
-            values.unshift(price.BTCUSD)
+            tmp.y = price.BTCUSD
         else if (currency == 'ETH')
-            values.unshift(price.ETHUSD)
+            tmp.y = price.ETHUSD
+
+        values.unshift(tmp)
     });
 
-    config.labels = labels
+    //config.labels = labels
     config.datasets[0].data = values
 
     displayChart(config)
@@ -84,16 +90,11 @@ function parseAndDisplayData(res) {
     lastPoint = res[res.length - 1]
 }
 
-function parseTimestampToDateString(timestamp) {
+function parseTimestampToDate(timestamp) {
     timestamp = timestamp.toString().substring(0, 8)
     date = new Date(parseInt(timestamp, 16) * 1000)
 
-    var hours = date.getHours();
-    // Minutes part from the timestamp
-    var minutes = "0" + date.getMinutes();
-
-    // Will display time in 10:30 format
-    return hours + ':' + minutes.substr(-2);
+    return date;
 }
 
 function newChartPoint(newPoint) {
@@ -103,15 +104,16 @@ function newChartPoint(newPoint) {
         // Add new point and remove oldest one
         console.log('New point to be added in chart')
 
-        config.labels.push(parseTimestampToDateString(newPoint._id));
-        config.labels.shift()
+        var tmp = {}
+
+        tmp.x = parseTimestampToDate(newPoint._id)
 
         if (currency == 'BTC')
-            var value = newPoint.BTCUSD
+            tmp.y = newPoint.BTCUSD
         else if (currency == 'ETH')
-            var value = newPoint.ETHUSD
+            tmp.y = newPoint.ETHUSD
 
-        config.datasets[0].data.push(value)
+        config.datasets[0].data.push(tmp)
         config.datasets[0].data.shift()
 
         window.myLine.update();
