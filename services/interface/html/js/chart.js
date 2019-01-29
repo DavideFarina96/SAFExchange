@@ -34,6 +34,9 @@ function displayChart(data) {
                 mode: 'nearest',
                 intersect: true
             },
+            elements: {
+                point: { radius: 0, hitRadius: 10, hoverRadius: 10 }
+            },
             scales: {
                 xAxes: [{
                     display: true,

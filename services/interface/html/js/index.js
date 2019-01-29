@@ -239,6 +239,13 @@ $('#btn-buy').click(buy)
 
 $('#btn-sell').click(sell)
 
+$('#elem-history-selector').on('change', function(e) {
+    console.log('Chosen points', this.value)
+
+    nElemHistory = this.value
+    getPriceHistory()
+})
+
 // INIT /////////////////////////////////////////////////////////////////
 // Trigger change / update on startup
 $('#currency-selector').trigger('change');
