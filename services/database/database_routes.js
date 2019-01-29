@@ -71,7 +71,7 @@ router.get('/', function (req, res) {
 */
 
 /** USER ROUTES **/
-router.put('/user/id_google', async function (req, res) {
+router.put('/user/id_google', function (req, res) {
 	var _user = req.body
 
 	// Updates data such as image_url and name or create new. Return user.
@@ -82,7 +82,7 @@ router.put('/user/id_google', async function (req, res) {
 	});
 });
 
-router.put('/user/id_facebook', async function (req, res) {
+router.put('/user/id_facebook', function (req, res) {
 	var _user = req.body
 
 	// Updates data such as image_url and name or create new. Return user.
