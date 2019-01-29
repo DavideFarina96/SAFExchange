@@ -152,8 +152,17 @@ async function getPriceBTC() {
 
 		tmpBTCValue = (tmpCurrencyVal / numOfExchanges); // compute the average value of BTC among the N selected exchanges.
 
-		// store the new computed value on this ws
-		ourBTCValue = tmpBTCValue;
+		if(!hasBTCbeenInitialize) {
+			// store the new computed value on this ws
+			ourBTCValue = tmpBTCValue;
+			hasBTCbeenInitialize = true;
+		}
+		else
+		{
+			// store the new computed value on this ws
+			ourBTCValue = tmpBTCValue;
+		}
+		
 		return true;
 	}
 	catch (error) {
@@ -191,8 +200,16 @@ async function getPriceETH() {
 
 		tmpETHValue = (tmpCurrencyVal / numOfExchanges); // compute the average value of ETH among the N selected exchanges.
 
-		// store the new computed value on this ws
-		ourETHValue = tmpETHValue; 
+		if(!hasBTCbeenInitialize) {
+			// store the new computed value on this ws
+			ourETHValue = tmpETHValue; 
+			hasETHbeenInitializebeenInitialize = true;
+		}
+		else
+		{
+			// store the new computed value on this ws
+			ourETHValue = tmpETHValue; 
+		}
 	}
 	catch (error) {
 		// an unexpected error occours during the process, notify the caller.
@@ -232,14 +249,14 @@ function updateCurrency() {
 async function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
 	try {
 		var tmpObj = "";
-		if(_isBTCChanged == true && _isETHChanged == false) 
+		if(_isBTCChanged == true && _isETHChanged == false && hasBTCbeenInitialize == true) 
 		{
 			// step 1: create the object with the data to send
 			tmpObj = querystring.stringify({
 				BTCUSD: ourBTCValue			// last stored value for BTC
 			});
 		}
-		if(_isETHChanged == true && _isBTCChanged == false) 
+		if(_isETHChanged == true && _isBTCChanged == false && hasETHbeenInitialize == true) 
 		{
 			// step 1: create the object with the data to send
 			tmpObj = querystring.stringify({
