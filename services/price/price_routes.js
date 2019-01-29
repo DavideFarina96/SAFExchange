@@ -129,7 +129,6 @@ router.get('/ETHUSD', async function (req, res) {
  */
 async function getPriceBTC() {
 
-	var debugisBTCchanged = false;
 	var tmpCurrencyVal = 0;
 	var tmpBTCValue = 0;
 	var numOfExchanges = 4.0;
@@ -154,24 +153,12 @@ async function getPriceBTC() {
 		tmpBTCValue = (tmpCurrencyVal / numOfExchanges); // compute the average value of BTC among the N selected exchanges.
 
 		// store the new computed value on this ws
-		if (!hasBTCbeenInitialize) {
-			hasBTCbeenInitialize = true;
-			ourBTCValue = tmpBTCValue; // first initialization of the variable on the server
-			debugisBTCchanged = true;
-		}
-		else {
-			if (!((ourBTCValue - rangeBTC) < tmpBTCValue && (ourBTCValue + rangeBTC) > tmpBTCValue)) {	
-				// if true, the computed value is considered different from the one already stored in the variable "ourBTCValue"
-				ourBTCValue = tmpBTCValue;
-				debugisBTCchanged = true;
-			}
-		}
-		return debugisBTCchanged;
+		ourBTCValue = tmpBTCValue;
+		return true;
 	}
 	catch (error) {
 		// an unexpected error occours during the process, notify the caller.
 		console.error(error);
-		return false;
 	}
 
 
@@ -182,13 +169,11 @@ async function getPriceBTC() {
  */
 async function getPriceETH() {
 
-	var debugisETHchanged = false;
 	var tmpCurrencyVal = 0;
 	var tmpETHValue = 0;
 	var numOfExchanges = 4.0;
 
 	try {
-		debugisETHchanged = false;
 		tmpCurrencyVal = 0;
 
 		// get the value of ETH from the specified exchanges...
@@ -207,24 +192,11 @@ async function getPriceETH() {
 		tmpETHValue = (tmpCurrencyVal / numOfExchanges); // compute the average value of ETH among the N selected exchanges.
 
 		// store the new computed value on this ws
-		if (!hasETHbeenInitialize) {
-			hasETHbeenInitialize = true;
-			ourETHValue = tmpETHValue; // first initialization of the variable on the server
-			debugisETHchanged = true;
-		}
-		else {
-			if (!((ourETHValue - rangeETH) < tmpETHValue && (ourETHValue + rangeETH) > tmpETHValue)) {	
-				// if true, the computed value is considered different from the one already stored in the variable "ourETHValue"
-				ourETHValue = tmpETHValue;
-				debugisETHchanged = true;
-			}
-		}
-		return debugisETHchanged;
+		ourETHValue = tmpETHValue; 
 	}
 	catch (error) {
 		// an unexpected error occours during the process, notify the caller.
 		console.error(error);
-		return false;
 	}
 }
 
@@ -236,22 +208,16 @@ function updateCurrency() {
 	try {
 		// step 1: get the latest value of BTC
 		getPriceBTC()
-			.then((resIsBTCChanged) => { 
-				// step 2: if the value is different from the one already stored on this ws ...
-				if (resIsBTCChanged) { 
-					// ... then notify the ws "database".
-					organizeDataToBeSendAndSend(true, false);
-				}
+			.then(() => { 
+				// ... then notify the ws "database".
+				organizeDataToBeSendAndSend(true, false);
 			});
 
 		// step 1: get the latest value of BTC
 		getPriceETH()
-			.then((resIsETHChanged) => {
-				// step 2: if the value is different from the one already stored on this ws ...
-				if (resIsETHChanged) {
-					// ... then notify the ws "database".
-					organizeDataToBeSendAndSend(false, true);
-				}
+			.then(() => {
+				// ... then notify the ws "database".
+				organizeDataToBeSendAndSend(false, true);
 			});
 	}
 	catch (error) {
@@ -284,12 +250,13 @@ async function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
 		if(tmpObj != "")
 		{
 			// step 2: send the data to the ws "database".
-			var resultOBJ = (await axios.post(app_domain + '/database/price', tmpObj));
-			if(resultOBJ.data.BTCUSD == undefined && resultOBJ.data.ETHUSD == undefined)
+			var resultOBJ = (await axios.post(app_domain + '/database/price', tmpObj)).data;
+			if(resultOBJ.BTCUSD == undefined && resultOBJ.ETHUSD == undefined) 
 				console.log("No data received back from the database.");
 			else 
 			{	// ... called to ws database has been performed correctly.
-	
+				// debug: console.log(resultOBJ);
+
 				// step 3: notify the ws "plannedaction" in order to check if there are triggers that need to be executed.
 				var result_paws = (await axios.post(app_domain + '/plannedaction/checkTriggers', resultOBJ.data));
 
@@ -301,7 +268,7 @@ async function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
 
 		}
 		else {
-			console.log("ETH and BTC haven't changed. No need to called ws 'database' or 'plannedaction'");
+			console.log("Error while creating the object for the database.");
 		}
 	}
 	catch (error) {
@@ -318,7 +285,6 @@ async function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
  */
 var j = schedule.scheduleJob('*/10 * * * * *', function () { // execute the following code every 10 sec
   updateCurrency();
-  // debug: console.log(date.format(new Date(), 'HH:mm:ss'));
 });
 console.log("Timer \"price\" inizialized....");
 
