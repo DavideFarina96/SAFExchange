@@ -81,13 +81,11 @@ router.post('/checkTriggers', async function (req, res) {
 		catch (err) {
         	console.log(err)
     	}
-    	finalStatus = actions
 
 		for(var i = 0; i < actions.length; i++)
 		{
-			actionsPerformed++;
 			// --------------- FOR BTC
-			if(btcValue != undefined)
+			if(btcValue != undefined && actions[i].USD != undefined)
 			{
 				if(actions[i].USD > btcValue * 0.99 && actions[i].USD < btcValue * 1.01)
 				{
@@ -149,7 +147,7 @@ router.post('/checkTriggers', async function (req, res) {
 				}
 			}		
 			// --------------- FOR ETH
-			if(ethValue != undefined)
+			if(ethValue != undefined && actions[i].ETH != undefined)
 			{
 				if(actions[i].USD > ethValue * 0.99 && actions[i].ETH < ethValue * 1.01)
 				{
