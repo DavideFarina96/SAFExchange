@@ -286,9 +286,9 @@ router.get('/plannedaction/:plannedaction_id', function (req, res) {
 
 router.put('/plannedaction/:plannedaction_id', function (req, res) {
 	var _plannedaction_id = req.params.plannedaction_id;
-	var newState = req.body.state + "c";
+	var newState = req.body.state;
 
-	PlannedAction.findByIdAndUpdate(_plannedaction_id, {$set: {state: req.body.newState}}, {new: true}, function (err, plannedaction) {
+	PlannedAction.findByIdAndUpdate(_plannedaction_id, {$set: {state: newState}}, {new: true}, function (err, plannedaction) {
 		if (err) return res.send(err);
 
 		res.json(plannedaction);

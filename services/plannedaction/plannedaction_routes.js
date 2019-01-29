@@ -74,168 +74,149 @@ router.post('/checkTriggers', async function (req, res) {
 		var actions;
 		var btcValue = req.body.BTCUSD;
 		var ethValue = req.body.ETHUSD;
+		console.log(btcValue)
+		console.log(ethValue)
 
 	    try {
 	        actions = (await axios.get(app_domain + '/database/plannedaction/all_idle')).data;
-	    }
-		catch (err) {
-        	console.log(err)
-    	}
 
-		for(var i = 0; i < actions.length; i++)
-		{
-			// --------------- FOR BTC
-			if(btcValue != undefined && actions[i].BTC != undefined)
+	        for(var i = 0; i < actions.length; i++)
 			{
-				if(actions[i].USD > btcValue * 0.99 && actions[i].USD < btcValue * 1.01)
+				console.log("------" + i)
+				console.log(actions[i])
+				console.log(">")
+				// --------------- FOR BTC
+				if(btcValue != undefined && actions[i].BTC != undefined)
 				{
-					actionsPerformed++;
+					if(actions[i].USD > btcValue * 0.99 && actions[i].USD < btcValue * 1.01)
+					{
+						actionsPerformed++;
 
-					//set plannedaction as in progress
-					var action1;
-					var state = {state: "IN PROGRESS"}
-					try {
-					    action1 = ((await axios.put(app_domain + '/database/plannedaction/' + actions[i]._id).data), state);
-					}
-					catch (err) {
+						//set plannedaction as in progress
+						var action1;
+						var state = {state: "IN PROGRESS"}
+						try {
+						    action1 = (await axios.put(app_domain + '/database/plannedaction/' + actions[i]._id, state)).data;
+						}
+						catch (err) {
 
-					    console.log(err)
-					    finalStatus.push("ERR1")
-					    break;
-					}
+						    console.log(err)
+						    finalStatus.push("ERR1")
+						    break;
+						}
 
-					//get the current user balance so that you can update it
-					var user;
-					try {
-					    user = (await axios.get(app_domain + '/user/' + actions[i].author).data);
-					}
-					catch (err) {
-					    console.log(err);
-					    finalStatus.push("ERR2")
-					    break;
-					}
+						//get the current user balance so that you can update it
+						var user;
+						try {
+						    user = (await axios.get(app_domain + '/user/' + actions[i].author)).data;
+						    
+						}
+						catch (err) {
+						    console.log(err);
+						    finalStatus.push("ERR2")
+						    break;
+						}
+						console.log(user)
+						//create the new balance obj
+						var newBalance;
+						if(actions[i].action == "BUY")
+							newBalance = { USD: user.USD, BTC: user.BTC + actions[i].BTC, ETH: user.ETH }
+						else if(actions[i].action == "SELL")
+							newBalance = { USD: user.USD + actions[i].USD * actions[i].BTC, BTC: user.BTC, ETH: user.ETH }
 
-					//create the new balance obj
-					var newBalance;
-					if(actions[i].action == "BUY")
-						newBalance = { USD: user.USD, BTC: user.BTC + actions[i].BTC, ETH: user.ETH }
-					else if(actions[i].action == "SELL")
-						newBalance = { USD: user.USD + actions[i].USD * actions[i].BTC, BTC: user.BTC, ETH: user.ETH }
+						//call user to update the balances
+						try {
+						    var userNewBal = (await axios.put(app_domain + '/user/' + actions[i].author + '/balance', newBalance)).data;
+						}
+						catch (err) {
+						    console.log(err);
+						    finalStatus.push("ERR3")
+						    break;
+						}
 
-					//call user to update the balances
-					try {
-					    var userNewBal = (await axios.put(app_domain + '/user/' + actions[i].author + '/balance'), newBalance).data;
-					}
-					catch (err) {
-					    console.log(err);
-					    finalStatus.push("ERR3")
-					    break;
-					}
+						//set plannedaction as complete
+						var action2;
+						state = {state: "COMPLETED"}
+						try {
+						    action2 = (await axios.put(app_domain + '/database/plannedaction/' + actions[i]._id, state)).data;
+						}
+						catch (err) {
+						    console.log(err)
+						    finalStatus.push("ERR4")
+						    break;
+						}
 
-					//set plannedaction as complete
-					var action2;
-					state = {state: "COMPLETED"}
-					try {
-					    action2 = ((await axios.put(app_domain + '/database/plannedaction/' + actions[i]._id).data), state);
 					}
-					catch (err) {
-					    console.log(err)
-					    finalStatus.push("ERR4")
-					    break;
-					}
-
-				}
-			}		
-			// --------------- FOR ETH
-			if(ethValue != undefined && actions[i].ETH != undefined)
-			{
-				if(actions[i].USD > ethValue * 0.99 && actions[i].USD < ethValue * 1.01)
+				}		
+				// --------------- FOR ETH
+				if(ethValue != undefined && actions[i].ETH != undefined)
 				{
-					actionsPerformed++;
+					if(actions[i].USD > ethValue * 0.99 && actions[i].USD < ethValue * 1.01)
+					{
+						actionsPerformed++;
 
-					//set plannedaction as in progress
-					var action1;
-					var state = {state: "IN PROGRESS"}
-					try {
-					    action1 = ((await axios.put(app_domain + '/database/plannedaction/' + actions[i]._id).data), state);
-					}
-					catch (err) {
-					    console.log(err)
-					    finalStatus.push("ERR5")
-					    break;
-					}
+						//set plannedaction as in progress
+						var action1;
+						var state = {state: "IN PROGRESS"}
+						try {
+						    action1 = (await axios.put(app_domain + '/database/plannedaction/' + actions[i]._id, state)).data;
+						}
+						catch (err) {
+						    console.log(err)
+						    finalStatus.push("ERR5")
+						    break;
+						}
 
-					//get the current user balance so that you can update it
-					var user;
-					try {
-					    user = (await axios.get(app_domain + '/user/' + actions[i].author).data);
-					}
-					catch (err) {
-					    console.log(err);
-					    finalStatus.push("ERR6")
-					    break;
-					}
+						//get the current user balance so that you can update it
+						var user;
+						try {
+						    user = (await axios.get(app_domain + '/user/' + actions[i].author)).data;
+						    console.log(app_domain + '/user/' + actions[i].author)
+						    console.log(user)
+						}
+						catch (err) {
+						    console.log(err);
+						    finalStatus.push("ERR6")
+						    break;
+						}
 
-					//create the new balance obj
-					var newBalance;
-					if(actions[i].action == "BUY")
-						newBalance = { USD: user.USD, BTC: user.BTC, ETH: user.ETH + actions[i].ETH }
-					else if(actions[i].action == "SELL")
-						newBalance = { USD: user.USD + actions[i].USD * actions[i].ETH, BTC: user.BTC, ETH: user.ETH }
+						//create the new balance obj
+						var newBalance;
+						if(actions[i].action == "BUY")
+							newBalance = { USD: user.USD, BTC: user.BTC, ETH: user.ETH + actions[i].ETH }
+						else if(actions[i].action == "SELL")
+							newBalance = { USD: user.USD + actions[i].USD * actions[i].ETH, BTC: user.BTC, ETH: user.ETH }
 
-					//call user to update the balances
-					try {
-					    var userNewBal = (await axios.put(app_domain + '/user/' + actions[i].author + '/balance'), newBalance).data;
-					}
-					catch (err) {
-					    console.log(err);
-					    finalStatus.push("ERR7")
-					    break;
-					}
+						//call user to update the balances
+						try {
+						    var userNewBal = (await axios.put(app_domain + '/user/' + actions[i].author + '/balance', newBalance)).data;
+						}
+						catch (err) {
+						    console.log(err);
+						    finalStatus.push("ERR7")
+						    break;
+						}
 
-					//set plannedaction as complete
-					var action2;
-					state = {state: "COMPLETED"}
-					try {
-					    action2 = ((await axios.put(app_domain + '/database/plannedaction/' + actions[i]._id).data), state);
-					}
-					catch (err) {
-					    console.log(err)
-					    finalStatus.push("ERR8")
-					    break;
-					}
+						//set plannedaction as complete
+						var action2;
+						state = {state: "COMPLETED"}
+						try {
+						    action2 = (await axios.put(app_domain + '/database/plannedaction/' + actions[i]._id, state)).data;
+						}
+						catch (err) {
+						    console.log(err)
+						    finalStatus.push("ERR8")
+						    break;
+						}
 
+					}
 				}
 			}
-		}
+	    }
+		catch (err) {
+        	console.log("BLAH BLAH" + err)
+    	}
 
-		/*
-
-		//process
-		// req.body.param_name --> get the specified parameter sent through the request parameter
-		console.log("WS PLANNEDACTION");
-		var _receivedTime = (req.body.time); console.log("_receivedTime: " + _receivedTime);
-		var _receivedisBTCchanged = (req.body.isBTCchanged); console.log("_receivedisBTCchanged: " + _receivedisBTCchanged);
-		var _receivedisETHChanged = (req.body.isETHChanged); console.log("_receivedisETHChanged: " + _receivedisETHChanged);
-		var _receivedBTC = (req.body.BTC); console.log("_receivedBTC: " + _receivedBTC);
-		var _receivedETH = (req.body.ETH); console.log("_receivedETH: " + _receivedETH);
-
-
-
-		// store the element in the array 
-		debugObjectArray.push({
-			receivedTime: _receivedTime,
-			receivedisBTCchanged: _receivedisBTCchanged,
-			receivedisETHChanged: _receivedisETHChanged,
-			receivedBTC: _receivedBTC,
-			receivedETH: _receivedETH,
-		});
-
-		/////////////
-		/// do things..........
-		/////////////
-		//res.send(req.body)
-		*/
 		var responseObj = {status: finalStatus, actionsPerformed: actionsPerformed};
 		res.send(JSON.stringify(responseObj));
 	}

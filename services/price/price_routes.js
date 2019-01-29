@@ -293,7 +293,7 @@ async function organizeDataToBeSendAndSend(_isBTCChanged, _isETHChanged) {
 				// step 3: notify the ws "plannedaction" in order to check if there are triggers that need to be executed.
 				var result_paws = (await axios.post(app_domain + '/plannedaction/checkTriggers', resultOBJ.data));
 
-				if(result_paws.data.status != "OK") 
+				if(result_paws.data.status.length > 0) 
 				{	// ws "plannedaction" generated an error
 					console.log("Error: " + result_paws.data.status);
 				}
