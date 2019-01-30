@@ -135,10 +135,15 @@ router.post('/checkTriggers', async function (req, res) {
 						}
 						//create the new balance obj
 						var newBalance;
+
 						if(actions[i].action == "BUY")
+						{
 							newBalance = { USD: user.USD, BTC: user.BTC + actions[i].BTC, ETH: user.ETH }
+						}
 						else if(actions[i].action == "SELL")
+						{
 							newBalance = { USD: user.USD + btcValue * actions[i].BTC, BTC: user.BTC, ETH: user.ETH }
+						}
 
 						//call user to update the balances
 						try {
@@ -148,6 +153,21 @@ router.post('/checkTriggers', async function (req, res) {
 						    console.log(err);
 						    finalStatus.push("ERR3")
 						    break;
+						}
+
+						//add transaction completed in the db
+						var transaction = {
+							action: actions[i].action,
+							author: actions[i].author,
+							BTC: actions[i].BTC,
+							USD: btcValue * actions[i].BTC 
+						}
+
+						try {
+						    var transactionComp = (await axios.post(app_domain + '/database/transaction', transaction)).data;
+						}
+						catch (err) {
+						    console.log(err)
 						}
 
 						//set plannedaction as complete
@@ -213,6 +233,21 @@ router.post('/checkTriggers', async function (req, res) {
 						    console.log(err);
 						    finalStatus.push("ERR7")
 						    break;
+						}
+
+						//add transaction completed in the db
+						var transaction = {
+							action: actions[i].action,
+							author: actions[i].author,
+							ETH: actions[i].ETH,
+							USD: ethValue * actions[i].ETH 
+						}
+
+						try {
+						    var transactionComp = (await axios.post(app_domain + '/database/transaction', transaction)).data;
+						}
+						catch (err) {
+						    console.log(err)
 						}
 
 						//set plannedaction as complete
