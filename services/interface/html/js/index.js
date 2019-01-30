@@ -7,7 +7,7 @@ var price_history_get_path = '/interface/price/'
 var transactions_get_path = '/interface/transaction/user/'
 
 var plannedaction_get_path = '/interface/plannedaction/user/'
-var plannedaction_post_path = '/interface/plannedaction/'
+var plannedaction_post_delete_path = '/interface/plannedaction/'
 
 var nElemHistory = 100;
 
@@ -163,8 +163,20 @@ function createHTMLlist(list, type) {
 
             row += '<td>' + t.USD.toFixed(2) + '</td>'
 
-            if( type == 'plannedaction')
-                row += '<td>' + t.state + '</td>'
+            if (type == 'plannedaction') {
+                row += '<td>'
+
+                if (t.state == 'IDLE') {
+                    row += '<div class="w3-hover-red btn-cancel-plannedaction" data-pa_id="' + t._id + '">'
+                    row += '<div class="new-label"><span>' + t.state + '</span></div>'
+                    row += '</div>'
+                }
+                else {
+                    row += t.state
+                }
+
+                row += '</td>'
+            }
 
             row += '</tr>'
 
@@ -177,16 +189,40 @@ function createHTMLlist(list, type) {
 }
 
 
-// ADD PLANNED ACTION ///////////////////////////////////////////////////
+// PLANNED ACTION ///////////////////////////////////////////////////
 function addPlannedAction(action, plannedaction) {
     console.log('BUY', plannedaction.currency, plannedaction.amount, plannedaction.USD)
 
     $.ajax({
-        url: plannedaction_post_path + action,
+        url: plannedaction_post_delete_path + action,
         data: plannedaction,
         type: 'POST'
     })
         .then(res => {
+            if (res.successful) {
+                alert(res.message)
+
+                updatePlannedactionList()
+                updateUserInfo()
+            }
+            else {
+                alert(res.message)
+            }
+        })
+        .catch(err => {
+            // If the promise resolves with an error, log it in console
+            console.log(err);
+        });
+}
+
+function cancelPlannedaction(pa_id) {
+    $.ajax({
+        url: plannedaction_post_delete_path + pa_id,
+        type: 'DELETE'
+    })
+        .then(res => {
+            console.log(res);
+
             if (res.successful) {
                 alert(res.message)
 
@@ -239,12 +275,19 @@ $('#btn-buy').click(buy)
 
 $('#btn-sell').click(sell)
 
-$('#elem-history-selector').on('change', function(e) {
+$('#elem-history-selector').on('change', function (e) {
     console.log('Chosen points', this.value)
 
     nElemHistory = this.value
     getPriceHistory()
 })
+
+$('#plannedaction_list').on('click', '.btn-cancel-plannedaction', function () {
+    var pa_id = $(this).data('pa_id')
+    console.log( 'Cancel plannedaction', pa_id )
+    
+    cancelPlannedaction(pa_id)
+});
 
 // INIT /////////////////////////////////////////////////////////////////
 // Trigger change / update on startup

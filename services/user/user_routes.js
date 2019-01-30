@@ -20,13 +20,28 @@ router.put('/:user_id/balance', async function(req, res) { //user_id is the mond
     var _balance = req.body
 
     try {
-        var user = (await axios.put(app_domain + '/database/user/' + req.params.user_id + '/balance', _balance)).data;
+        // Read user from DB
+        var user = (await axios.get(app_domain + '/database/user/' + req.params.user_id)).data;
+
+        // Compute final amount from the difference
+        var new_balance = {}
+        if(_balance.hasOwnProperty('USD')) {
+            new_balance.USD = user.USD + _balance.USD
+        }
+        if(_balance.hasOwnProperty('BTC')) {
+            new_balance.BTC = user.BTC + _balance.BTC
+        }
+        if(_balance.hasOwnProperty('ETH')) {
+            new_balance.ETH = user.ETH + _balance.ETH
+        }
+
+        var new_user = (await axios.put(app_domain + '/database/user/' + req.params.user_id + '/balance', new_balance)).data;
     }
     catch (err) {
         console.log(err)
     }
     
-    res.json(user);
+    res.json(new_user);
 })
 
 router.put('/id_google', async function (req, res) {

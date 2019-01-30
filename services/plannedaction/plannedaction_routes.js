@@ -62,7 +62,6 @@ router.delete('/:action_id', async function(req, res) {
     res.json(action)
 })
 
-
 router.post('/checkTriggers', async function (req, res) {
 	var actionsPerformed = 0;
 	var finalStatus = [];
@@ -115,27 +114,16 @@ router.post('/checkTriggers', async function (req, res) {
 						    break;
 						}
 
-						//get the current user balance so that you can update it
-						var user;
-						try {
-						    user = (await axios.get(app_domain + '/user/' + actions[i].author)).data;
-						    
-						}
-						catch (err) {
-						    console.log(err);
-						    finalStatus.push("ERR2")
-						    break;
-						}
 						//create the new balance obj
 						var newBalance;
 
 						if(actions[i].action == "BUY")
 						{
-							newBalance = { USD: user.USD, BTC: user.BTC + actions[i].BTC, ETH: user.ETH }
+							newBalance = { BTC: actions[i].BTC }
 						}
 						else if(actions[i].action == "SELL")
 						{
-							newBalance = { USD: user.USD + btcValue * actions[i].BTC, BTC: user.BTC, ETH: user.ETH }
+							newBalance = { USD: btcValue * actions[i].BTC }
 						}
 
 						//call user to update the balances
@@ -198,25 +186,12 @@ router.post('/checkTriggers', async function (req, res) {
 						    break;
 						}
 
-						//get the current user balance so that you can update it
-						var user;
-						try {
-						    user = (await axios.get(app_domain + '/user/' + actions[i].author)).data;
-						    console.log(app_domain + '/user/' + actions[i].author)
-						    console.log(user)
-						}
-						catch (err) {
-						    console.log(err);
-						    finalStatus.push("ERR6")
-						    break;
-						}
-
 						//create the new balance obj
 						var newBalance;
 						if(actions[i].action == "BUY")
-							newBalance = { USD: user.USD, BTC: user.BTC, ETH: user.ETH + actions[i].ETH }
+							newBalance = { ETH: actions[i].ETH }
 						else if(actions[i].action == "SELL")
-							newBalance = { USD: user.USD + ethValue * actions[i].ETH, BTC: user.BTC, ETH: user.ETH }
+							newBalance = { USD: ethValue * actions[i].ETH }
 
 						//call user to update the balances
 						try {

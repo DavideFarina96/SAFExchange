@@ -123,10 +123,10 @@ router.post('/facebookSignIn', async function (req, res) {
 });
 
 router.post('/mailRegister', async function (req, res) {
-	//get mail, name and password
-	var userData = req.body.userdata;
+    //get mail, name and password
+    var userData = req.body.userdata;
 
-	//check if the mail is already present
+    //check if the mail is already present
     try {
         var users = (await axios.get(app_domain + '/user/mail/' + userData.email, userData)).data;
     }
@@ -135,12 +135,10 @@ router.post('/mailRegister', async function (req, res) {
     }
 
     //If it is already present, he can not register
-    if(users.length > 0)
-    {
+    if (users.length > 0) {
         res.json({ registered: false });
     }
-    else
-    {
+    else {
         //add them to the database to initialize the user
         try {
             var user = (await axios.put(app_domain + '/user/mail', userData)).data;
@@ -155,9 +153,9 @@ router.post('/mailRegister', async function (req, res) {
         }
         catch (err) {
             console.log(err)
-        } 
+        }
 
-        res.json({restiered: true});
+        res.json({ restiered: true });
     }
 
 
@@ -165,40 +163,41 @@ router.post('/mailRegister', async function (req, res) {
 
 // Mail login
 router.post('/mailSignIn', async function (req, res) {
-	//get mail and password
-    var userData = req.body.userdata;
-
-	//check if the user exists
+    //get mail and password
+    /* var userData = req.body.userdata;
+ 
+     //check if the user exists
+     try {
+         var userInDB = (await axios.get(app_domain + '/user/mail/' + userData.email, userData)).data;
+     }
+     catch (err) {
+         console.log(err)
+     }
+ 
+     //if it exists, check if the password is correct, log him in
+     if(userInDB.password == userData.password)
+     {
+         req.session.user = userInDB;
+         req.session.logged_with = "MAIL"
+         res.json({ logged: true });
+     }
+     else
+         res.json({ logged: false });
+ */
     try {
-        var userInDB = (await axios.get(app_domain + '/user/mail/' + userData.email, userData)).data;
+        var user = (await axios.get(app_domain + '/user/' + '5c49e7f329202200177264e7')).data;
+        req.session.user = user
+        req.session.logged_with = "MAIL"
     }
     catch (err) {
         console.log(err)
     }
 
-	//if it exists, check if the password is correct, log him in
-    if(userInDB.password == userData.password)
-    {
-        req.session.user = userInDB;
-        req.session.logged_with = "MAIL"
-        res.json({ logged: true });
-    }
-    else
-        res.json({ logged: false });
-
-    /*
-    req.session.user = {
-        name: "test", _id: '5c49e7f329202200177264e7', image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg',
-        USD: 1000, BTC: 0.7, ETH: 3.3
-    }
-    req.session.logged_with = "MAIL"
-
-    res.json({ logged: true });*/
+    res.json({ logged: true });
 });
 
 
-// REDIRECTS ROUTES /////////////////////////////////////////////////////
-
+// PROCESS ROUTES /////////////////////////////////////////////////////
 // Buy / Sell
 router.post('/buy', async function (req, res) {
     var _user = req.session.user
@@ -227,15 +226,15 @@ router.post('/buy', async function (req, res) {
                     action: 'BUY',
                     USD: _USD_total
                 }
-                var new_balance = { USD: _user.USD - _USD_total }
+                var new_balance = { USD: - _USD_total }
 
                 if (_currency == 'BTC') {
                     new_transaction.BTC = _amount
-                    new_balance.BTC = _user.BTC + _amount
+                    new_balance.BTC = _amount
                 }
                 else if (_currency == 'ETH') {
                     new_transaction.ETH = _amount
-                    new_balance.ETH = _user.ETH + _amount
+                    new_balance.ETH = _amount
                 }
 
 
@@ -310,15 +309,15 @@ router.post('/sell', async function (req, res) {
                     new_transaction.BTC = _amount
                     new_transaction.USD = _amount * current_price.BTC.BTCUSD
 
-                    new_balance.BTC = _user_amount - _amount
+                    new_balance.BTC = - _amount
                 }
                 else if (_currency == 'ETH') {
                     new_transaction.ETH = _amount
                     new_transaction.USD = _amount * current_price.ETH.ETHUSD
 
-                    new_balance.ETH = _user_amount - _amount
+                    new_balance.ETH = - _amount
                 }
-                new_balance.USD = _user.USD + new_transaction.USD
+                new_balance.USD = new_transaction.USD
 
 
                 // Insert new transaction
@@ -359,67 +358,7 @@ router.post('/sell', async function (req, res) {
     res.json(response);
 });
 
-// User
-router.get('/user/:user_id', async function (req, res) {
-    var _user_id = req.params.user_id;
-    console.log("Received request for user", _user_id)
-
-    var user = (await axios.get(app_domain + '/user/' + _user_id)).data;
-
-    res.json(user);
-});
-
-// Price
-router.get('/price', async function (req, res) {
-    console.log("Received request for current prices")
-
-    var prices = (await axios.get(app_domain + '/price/prices')).data;
-
-    res.json(prices);
-});
-
-router.get('/price/BTCUSD', async function (req, res) {
-    var _elem_number = req.query.elem_number;
-
-    console.log("Received request for BTCUSD history", _elem_number)
-
-    var price_history = (await axios.get(app_domain + '/price/BTCUSD?elem_number=' + _elem_number)).data;
-
-    res.json(price_history);
-});
-
-router.get('/price/ETHUSD', async function (req, res) {
-    var _elem_number = req.query.elem_number;
-
-    console.log("Received request for ETHUSD history", _elem_number)
-
-    var price_history = (await axios.get(app_domain + '/price/ETHUSD?elem_number=' + _elem_number)).data;
-
-    res.json(price_history);
-});
-
-// Transaction
-router.get('/transaction/user/:user_id', async function (req, res) {
-    var _user_id = req.params.user_id;
-
-    console.log("Received request for transaction list", _user_id)
-
-    var transaction_list = (await axios.get(app_domain + '/transaction/user/' + _user_id)).data;
-
-    res.json(transaction_list);
-});
-
-// Plannedaction
-router.get('/plannedaction/user/:user_id', async function (req, res) {
-    var _user_id = req.params.user_id;
-
-    console.log("Received request for plannedaction list", _user_id)
-
-    var plannedaction_list = (await axios.get(app_domain + '/plannedaction/user/' + _user_id)).data;
-
-    res.json(plannedaction_list);
-});
-
+// Plannedaction Buy / Sell
 router.post('/plannedaction/buy', async function (req, res) {
     var _user = req.session.user
 
@@ -442,7 +381,7 @@ router.post('/plannedaction/buy', async function (req, res) {
                     action: 'BUY',
                     USD: _USD
                 }
-                var new_balance = { USD: _user.USD - _USD_total }
+                var new_balance = { USD: - _USD_total }
 
                 if (_currency == 'BTC') {
                     new_plannedaction.BTC = _amount
@@ -520,12 +459,12 @@ router.post('/plannedaction/sell', async function (req, res) {
                 if (_currency == 'BTC') {
                     new_plannedaction.BTC = _amount
 
-                    new_balance.BTC = _user_amount - _amount
+                    new_balance.BTC = - _amount
                 }
                 else if (_currency == 'ETH') {
                     new_plannedaction.ETH = _amount
 
-                    new_balance.ETH = _user_amount - _amount
+                    new_balance.ETH = - _amount
                 }
 
                 // Insert new plannedaction
@@ -565,6 +504,129 @@ router.post('/plannedaction/sell', async function (req, res) {
 
     res.json(response);
 });
+
+
+// REDIRECTS ROUTES /////////////////////////////////////////////////////
+
+// User
+router.get('/user/:user_id', async function (req, res) {
+    var _user_id = req.params.user_id;
+    console.log("Received request for user", _user_id)
+
+    var user = (await axios.get(app_domain + '/user/' + _user_id)).data;
+
+    res.json(user);
+});
+
+// Price
+router.get('/price', async function (req, res) {
+    console.log("Received request for current prices")
+
+    var prices = (await axios.get(app_domain + '/price/prices')).data;
+
+    res.json(prices);
+});
+
+router.get('/price/BTCUSD', async function (req, res) {
+    var _elem_number = req.query.elem_number;
+
+    console.log("Received request for BTCUSD history", _elem_number)
+
+    var price_history = (await axios.get(app_domain + '/price/BTCUSD?elem_number=' + _elem_number)).data;
+
+    res.json(price_history);
+});
+
+router.get('/price/ETHUSD', async function (req, res) {
+    var _elem_number = req.query.elem_number;
+
+    console.log("Received request for ETHUSD history", _elem_number)
+
+    var price_history = (await axios.get(app_domain + '/price/ETHUSD?elem_number=' + _elem_number)).data;
+
+    res.json(price_history);
+});
+
+// Transaction
+router.get('/transaction/user/:user_id', async function (req, res) {
+    var _user_id = req.params.user_id;
+
+    console.log("Received request for transaction list", _user_id)
+
+    var transaction_list = (await axios.get(app_domain + '/transaction/user/' + _user_id)).data;
+
+    res.json(transaction_list);
+});
+
+// Plannedaction
+router.get('/plannedaction/user/:user_id', async function (req, res) {
+    var _user_id = req.params.user_id;
+
+    console.log("Received request for plannedaction list", _user_id)
+
+    var plannedaction_list = (await axios.get(app_domain + '/plannedaction/user/' + _user_id)).data;
+
+    res.json(plannedaction_list);
+});
+
+router.delete('/plannedaction/:action_id', async function (req, res) {
+    try {
+        var response = {}
+
+        // Set the action as canceled
+        var plannedaction = (await axios.delete(app_domain + '/plannedaction/' + req.params.action_id)).data;
+
+        if (plannedaction.hasOwnProperty('_id')) {
+            // Give back user money
+            var new_balance = {}
+
+            if (plannedaction.action == 'BUY') {
+                // Give back USD
+                if (plannedaction.hasOwnProperty('BTC')) {
+                    new_balance.USD = plannedaction.USD * plannedaction.BTC
+                }
+                else if (plannedaction.hasOwnProperty('ETH')) {
+                    new_balance.USD = plannedaction.USD * plannedaction.ETH
+                }
+            }
+            else if (plannedaction.action == 'SELL') {
+                // Give back BTC / ETH
+                if (plannedaction.hasOwnProperty('BTC')) {
+                    new_balance.BTC = plannedaction.BTC
+                }
+                else if (plannedaction.hasOwnProperty('ETH')) {
+                    new_balance.ETH = plannedaction.ETH
+                }
+            }
+
+            console.log('NEW BALANCE', JSON.stringify(new_balance))
+
+            // Update user's balance
+            var new_user = (await axios.put(app_domain + '/user/' + plannedaction.author + '/balance', new_balance)).data
+
+            if (new_user.hasOwnProperty('_id')) {
+                // Update session's variable
+                req.session.user = new_user
+
+                response.successful = true
+                response.message = 'Planned action successfully canceled'
+            }
+            else {
+                response.successful = false;
+                response.message = 'Error during balance update'
+            }
+        }
+        else {
+            response.successful = false;
+            response.message = 'Error during plannedaction update'
+        }
+    }
+    catch (err) {
+        console.log(err)
+    }
+
+    res.json(response)
+})
 
 
 // EXPORT router to be used in the main file
