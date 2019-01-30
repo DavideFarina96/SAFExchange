@@ -122,16 +122,78 @@ router.post('/facebookSignIn', async function (req, res) {
     }
 });
 
-// Mail login
-router.post('/mailSignIn', function (req, res) {
+router.post('/mailRegister', async function (req, res) {
+	//get mail, name and password
+	var userData = req.body.userdata;
 
+	//check if the mail is already present
+    try {
+        var users = (await axios.get(app_domain + '/user/mail/' + userData.email, userData)).data;
+    }
+    catch (err) {
+        console.log(err)
+    }
+
+    //If it is already present, he can not register
+    if(users.length > 0)
+    {
+        res.json({ registered: false });
+    }
+    else
+    {
+        //add them to the database to initialize the user
+        try {
+            var user = (await axios.put(app_domain + '/user/mail', userData)).data;
+        }
+        catch (err) {
+            console.log(err)
+        }
+
+        //log the user in
+        try {
+            user = (await axios.post(app_domain + '/interface/mailSignIn', userData)).data;
+        }
+        catch (err) {
+            console.log(err)
+        } 
+
+        res.json({restiered: true});
+    }
+
+
+});
+
+// Mail login
+router.post('/mailSignIn', async function (req, res) {
+	//get mail and password
+    var userData = req.body.userdata;
+
+	//check if the user exists
+    try {
+        var userInDB = (await axios.get(app_domain + '/user/mail/' + userData.email, userData)).data;
+    }
+    catch (err) {
+        console.log(err)
+    }
+
+	//if it exists, check if the password is correct, log him in
+    if(userInDB.password == userData.password)
+    {
+        req.session.user = userInDB;
+        req.session.logged_with = "MAIL"
+        res.json({ logged: true });
+    }
+    else
+        res.json({ logged: false });
+
+    /*
     req.session.user = {
         name: "test", _id: '5c49e7f329202200177264e7', image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg',
         USD: 1000, BTC: 0.7, ETH: 3.3
     }
     req.session.logged_with = "MAIL"
 
-    res.json({ logged: true });
+    res.json({ logged: true });*/
 });
 
 

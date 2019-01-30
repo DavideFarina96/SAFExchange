@@ -93,6 +93,25 @@ router.put('/user/id_facebook', function (req, res) {
 	});
 });
 
+router.put('/user/mail', function (req, res) {
+	var _user = req.body
+
+	// Create the user
+	User.create(_user, function (err, user) {
+		if (err) res.send(err);
+
+		res.json(user);
+	});
+});
+
+router.get('/user/mail/:mail', function (req, res) {
+	//find all users who registered with the email only (no google and fb)
+	User.find({"id_google" : {"$exists": false}, "id_facebook" : {"$exists": false}, "email": req.params.mail }, function (err, users) {
+		if (err) res.send(err);
+		res.json(users);
+	});
+})
+
 router.get('/user/:user_id', function (req, res) {
 	User.findById(req.params.user_id, function (err, user) {
 		if (err) res.send(err);
