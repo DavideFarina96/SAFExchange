@@ -78,13 +78,6 @@ router.post('/checkTriggers', async function (req, res) {
 		try
 		{
 			last2pricesBTC = (await axios.get(app_domain + '/price/BTCUSD?elem_number=2')).data;
-		}
-		catch (err) {
-			console.log(err)
-		}
-
-		try
-		{
 			last2pricesETH = (await axios.get(app_domain + '/price/ETHUSD?elem_number=2')).data;
 		}
 		catch (err) {
