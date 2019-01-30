@@ -70,25 +70,42 @@ router.post('/checkTriggers', async function (req, res) {
 	res.statusCode = 200;
 	res.header('Content-type', 'application/json');
 
+	var last2pricesBTC;
+	var last2pricesETH;
+
 	try {
 		var actions;
+		try
+		{
+			last2pricesBTC = (await axios.get(app_domain + '/price/BTCUSD?elem_number=2')).data;
+		}
+		catch (err) {
+			console.log(err)
+		}
+
+		try
+		{
+			last2pricesETH = (await axios.get(app_domain + '/price/ETHUSD?elem_number=2')).data;
+		}
+		catch (err) {
+			console.log(err)
+		}
+
 		var btcValue = req.body.BTCUSD;
 		var ethValue = req.body.ETHUSD;
-		console.log(btcValue)
-		console.log(ethValue)
 
 	    try {
 	        actions = (await axios.get(app_domain + '/database/plannedaction/all_idle')).data;
 
 	        for(var i = 0; i < actions.length; i++)
 			{
-				console.log("------" + i)
-				console.log(actions[i])
-				console.log(">")
 				// --------------- FOR BTC
+				var mostrecent = last2pricesBTC[0].BTCUSD;
+				var leastrecent = last2pricesBTC[1].BTCUSD;
+
 				if(btcValue != undefined && actions[i].BTC != undefined)
 				{
-					if(btcValue > actions[i].USD * 0.995 && btcValue < actions[i].USD * 1.005)
+					if((actions[i].USD > mostrecent && actions[i].USD < leastrecent) || (actions[i].USD < mostrecent && actions[i].USD > leastrecent))
 					{
 						actionsPerformed++;
 
@@ -116,7 +133,6 @@ router.post('/checkTriggers', async function (req, res) {
 						    finalStatus.push("ERR2")
 						    break;
 						}
-						console.log(user)
 						//create the new balance obj
 						var newBalance;
 						if(actions[i].action == "BUY")
@@ -149,9 +165,11 @@ router.post('/checkTriggers', async function (req, res) {
 					}
 				}		
 				// --------------- FOR ETH
+				var mostrecent = last2pricesETH[0].ETHUSD;
+				var leastrecent = last2pricesETH[1].ETHUSD;
 				if(ethValue != undefined && actions[i].ETH != undefined)
 				{
-					if(ethValue > actions[i].USD * 0.995 && ethValue < actions[i].USD * 1.005)
+					if((actions[i].USD > mostrecent && actions[i].USD < leastrecent) || (actions[i].USD < mostrecent && actions[i].USD > leastrecent))
 					{
 						actionsPerformed++;
 
