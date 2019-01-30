@@ -105,7 +105,7 @@ router.post('/checkTriggers', async function (req, res) {
 
 				if(btcValue != undefined && actions[i].BTC != undefined)
 				{
-					if((actions[i].USD > mostrecent && actions[i].USD < leastrecent) || (actions[i].USD < mostrecent && actions[i].USD > leastrecent))
+					if((actions[i].USD >= mostrecent && actions[i].USD <= leastrecent) || (actions[i].USD <= mostrecent && actions[i].USD >= leastrecent))
 					{
 						actionsPerformed++;
 
@@ -169,7 +169,7 @@ router.post('/checkTriggers', async function (req, res) {
 				var leastrecent = last2pricesETH[1].ETHUSD;
 				if(ethValue != undefined && actions[i].ETH != undefined)
 				{
-					if((actions[i].USD > mostrecent && actions[i].USD < leastrecent) || (actions[i].USD < mostrecent && actions[i].USD > leastrecent))
+					if((actions[i].USD >= mostrecent && actions[i].USD <= leastrecent) || (actions[i].USD <= mostrecent && actions[i].USD >= leastrecent))
 					{
 						actionsPerformed++;
 
