@@ -83,7 +83,7 @@ router.put('/mail', async function (req, res) {
     res.json(user)
 })
 
-router.get('/mail/:mail', function (req, res) {
+router.get('/mail/:mail', async function (req, res) {
     //find all users who registered with the email only (no google and fb)
     try {
         var user = (await axios.get(app_domain + '/database/user/mail/' + req.params.mail)).data;
