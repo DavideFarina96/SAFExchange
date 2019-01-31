@@ -1,6 +1,7 @@
 // PATHS /////////////////////////////////////////////////////////////////
 var buy_post_path = '/interface/buy/'
 var sell_post_path = '/interface/sell/'
+var add_money_post_path = '/interface/add_money/'
 
 var price_history_get_path = '/interface/price/'
 
@@ -73,6 +74,28 @@ function clearBuySellPanel() {
     $('#buy-cost').html('0');
     $('#sell-amount').val('');
     $('#sell-profit').html('0')
+}
+
+function addMoney() {
+    $.ajax({
+        url: add_money_post_path,
+        data: { amount: 1000 },
+        type: 'POST'
+    })
+        .then(res => {
+            if (res.successful) {
+                alert(res.message)
+
+                updateUserInfo()
+            }
+            else {
+                alert(res.message)
+            }
+        })
+        .catch(err => {
+            // If the promise resolves with an error, log it in console
+            console.log(err);
+        });
 }
 
 
@@ -274,6 +297,8 @@ $('#sell-amount').on('input', function (e) {
 $('#btn-buy').click(buy)
 
 $('#btn-sell').click(sell)
+
+$('#btn-add-money').click(addMoney)
 
 $('#elem-history-selector').on('change', function (e) {
     console.log('Chosen points', this.value)
