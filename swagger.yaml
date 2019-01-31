@@ -1,0 +1,614 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: "SAFExchange"
+  x-summary: Collection of API provided by the web service PRICE
+  description: API description for the project SAFExchange of the course Introduction to Service Design and Engineering.
+  license:
+    name: MIT
+    url: https://github.com/apiaryio/polls-api/blob/master/LICENSE
+host: safexchange.herokuapp.com
+basePath: /
+schemes:
+- https
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+
+###################### PRICE
+  /price/API:
+    get:
+      summary: GET the list of available actions
+      responses:
+        200:
+          description: list of all actions 
+          schema:
+            type: string
+          examples: # OSS: | means every line is on a distinct one.
+            application/text: | 
+              GET /prices -> get the latest value of Bitcoin and Ethereum
+              GET /BTCUSD	-> get the latest Bitcoin value stored
+              GET /BTCUSD?elem_number=N -> get the latest N Bitcoin values stored.
+              GET /ETHUSD -> get the latest Ethereum value stored
+              GET /ETHUSD?elem_number=N -> get the latest N Ethereum values stored.
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+  /price/:
+    get:
+      summary: GET Bitcoin and Ethereum value
+      description: |
+        This API provides updated values of both Bitcoin and Ethereum from our exchange.
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/Prices'
+          examples:
+            application/json:
+              BTC: 
+                _id: '5c507afa1a3910001752de18'
+                BTCUSD: 3433.4275
+              ETH: 
+                _id: '5c507afa1a3910001752de17'
+                ETHUSD: 106.1075
+                 
+              
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+            
+  /price/BTCUSD:
+    get:
+      summary: GET the value of Bitcoin
+      description: |
+        This API returns the value of Bitcoin from our exchange.
+        Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Bitcoin.
+        Example: /BTCUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
+      parameters:
+        - name: elem_number
+          in: query
+          description: If specified, the API returns the latest N value of Bitcoin stored on the database.
+          required: false 
+          type: integer
+          
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/BTCUSDarray'
+          examples:
+            application/json:
+              - _id: '5c50803d1a3910001752dee4'
+                BTCUSD: 3439.0675
+              - _id: '5c5080331a3910001752dee3'
+                BTCUSD: 3438.8925
+              - _id: '5c5080281a3910001752dee1'
+                BTCUSD: 3439.3224999999998
+              
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error' 
+            
+  /price/ETHUSD:
+    get:
+      summary: GET the value of Ethereum
+      description: |
+        This API returns the value of Ethereum on our exchange.
+        Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Ethereum.
+        Example: /ETHUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
+      parameters:
+        - name: elem_number
+          in: query
+          description: If specified, the API returns the latest N value of Ethereum stored on the database.
+          required: false 
+          type: integer
+          
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/ETHUSDarray'
+          examples:
+            application/json:
+              - _id: '5c5087271d89e2001739fa41'
+                ETHUSD: 105.33250000000001
+              - _id: '5c50871c1d89e2001739fa3f'
+                ETHUSD: 105.3425
+              - _id: '5c5087131d89e2001739fa3e'
+                ETHUSD: 105.3675
+      
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'  
+    
+###################### TRANSACTION
+  /transaction/user/{user_id}:
+    get:
+      summary: GET user transaction history
+      description: |
+        This API provide the full history of transaction performed by the specified user, both for selling and buying.
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+      
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/TransactionUser'
+          examples:
+            application/json:
+              - _id: '5c4de5cbf31add5f84e4375f'
+                author: '5c49e7f329202200177264e7'
+                action: 'BUY'
+                USD: 114.25750000000001 
+                ETH: 1
+                _v: 0
+              - _id: '5c4de5f230a8dc2530b73a0d'
+                author: '5c49e7f329202200177264e7'
+                action: 'SELL'
+                USD: 356.93825 
+                ETH: 0.1
+                _v: 0
+                  
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+  /transaction/: 
+    post:
+      summary: POST allows user to buy/sell
+      description: |
+        This API allows the user to buy or sell either Bitcoin or Ethereum at the current price.
+      parameters:
+        - name: req
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/NewUserTransaction'
+            
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/NewUserTransaction'
+          examples:
+            application/json:
+                author: '5c4c430e66f8f600177f2d3f'
+                action: 'BUY'
+                state: 'IDLE'
+                BTC: 3601.00
+                USD: 1
+
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    
+###################### USER
+  /user/{user_id}:
+    get:
+      summary: GET user informations
+      description: |
+        This API provide all the informations and data of the specified user.
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+          
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/UserProfile'
+          examples:
+            application/json:
+              _id: '5c49e7f329202200177264e7'
+              id_google: '101790666037013555749'
+              name: 'Francesco Bruschetti'
+              image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg'
+              email: 'francesco.bruschetti@studenti.unitn.it'
+              __v: 0
+              ETH: 117.1
+              BTC: 2.5999999999999996
+              USD: 583.2955000000002
+              
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+  /user/{user_id}/balance:
+    put:
+      summary: PUT update the balance of the user
+      description: |
+        This API allows to initiate and update the balance of the user due to transactions or when it deposits money on its wallet.
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+      #requestBody:
+      #content:
+      #  application/json:
+      #    schema:      # Request body contents
+      #      type: object
+      #      properties:
+      #        ETH:
+      #          type: number
+      #        BTC:
+      #          type: number
+      #        USD: 
+      #          type: number
+      #      example:   # Sample object
+      #        ETH: 1
+      #        BTC: 1
+      #        USD: 1
+          
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/UserBalance'
+          examples:
+            application/json:
+              _id: '5c49e7f329202200177264e7'
+              id_google: '101790666037013555749'
+              name: 'Francesco Bruschetti'
+              image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg'
+              email: 'francesco.bruschetti@studenti.unitn.it'
+              __v: 0
+              ETH: 117.1
+              BTC: 2.5999999999999996
+              USD: 583.2955000000002
+              
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+  # DA FARE
+  /user/id_google:
+    put:
+      summary: PUT update the google date of the user
+      description: |
+        This API allows to
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/UserGoogle'
+          
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        
+  # DA FARE    
+  /user/id_facebook:
+    put:
+      summary: PUT update the facebook date of the user
+      description: |
+        This API allows to
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/UserFacebook'
+          
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+   
+  # DA FARE         
+  /user/mail:
+    put:
+      summary: PUT ...
+      description: |
+        This API allows to ...
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/Mail'
+          
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+  # DA FARE
+  /user/mail/{mail}:
+    get:
+      summary: GET ....
+      description: |
+        This API ....
+      parameters:
+        - name: mail
+          in: path
+          description: mail of the user
+          required: true
+          type: string
+          
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/Mail'
+              
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'        
+ 
+###################### PLANNED_ACTION # DA FARE
+  /plannedaction/user/{user_id}:
+    get:
+      summary: GET ...
+      description: |
+        This API ...
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+          
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/UserProfile'
+          
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+            
+  /plannedaction/{action_id}:
+    get:
+      summary: GET ...
+      description: |
+        This API ...
+      parameters:
+        - name: action_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+          
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/UserProfile'
+          
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+            
+  /plannedaction/:
+    post:
+      summary: POST ...
+      description: |
+        This API ...
+      
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/UserProfile'
+          
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      
+  #/plannedaction/{action_id}:
+  #  delete:
+  #    summary: POST ...
+  #    description: |
+  #      This API ...
+  #    parameters:
+  #      - name: action_id
+  #        in: path
+  #        description: ID of the user
+  #        required: true
+  #        type: string
+  #    
+  #    responses:
+  #      200:
+  #        description: Success
+  #        schema:
+  #            $ref: '#/definitions/UserProfile'
+  #        
+  #      default:
+  #        description: Unexpected error
+  #        schema:
+  #          $ref: '#/definitions/Error'
+
+  /plannedaction/checkTriggers:
+    post:
+      summary: POST ...
+      description: |
+        This API ...
+      
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/UserProfile'
+          
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+            
+###################### DATABASE # DA FARE
+
+###################### ACCOUNT # DA FARE
+
+###################### ACTION # DA FARE
+
+###################### INTERFACE # DA FARE
+
+###################### REDIRECT # DA FARE
+
+definitions:
+  #Actions:
+  #  allOf:
+  #    - $ref: '#/definitions/Actions'
+  
+###################### PRICE      
+  Prices: 
+    properties:
+      BTC: 
+        type: object
+        properties:
+          _id:
+            type: string
+          BTCUSD:
+            type: number
+                    
+      ETH:
+        type: object
+        properties:
+          _id:
+            type: string
+          ETHUSD:
+            type: number
+  
+  BTCUSDarray: 
+    type: object
+    properties:
+      _id:
+        type: string
+      BTCUSD:
+        type: number
+  
+  ETHUSDarray: 
+    type: object
+    properties:
+      _id:
+        type: string
+      ETHUSD:
+        type: number
+
+###################### TRANSACTION      
+  TransactionUser: 
+    properties:
+      _id: 
+        type: string
+      author: 
+        type: string
+      action: 
+        type: string
+      USD: 
+        type: number
+      ETH:    # ETH and BTC must be mutually exclusive
+        type: number
+      BTC: 
+        type: number
+
+  NewUserTransaction: 
+    type: object
+    properties:
+      author:
+        type: string
+      action:
+        type: string
+      state:
+        type: string
+      BTC:            # TODO: BTC deve essere mutualmente esclusivo con ETH
+        type: number
+      ETH:
+        type: number
+      USD:
+        type: number
+    #oneOf:
+    #  - required: [author]
+    #  - required: [action]
+    #  - required: [state]
+  
+###################### USER      
+  UserProfile:
+    properties:
+      _id:
+        type: string
+      id_google:  # id_google e id_facebook devono essere mutualmente esclusive
+        type: string
+      id_facebook:
+        type: string
+      name:
+        type: string
+      image_url:
+        type: string
+      email:
+        type: string
+      _v: 
+        type: number
+      ETH:
+        type: number
+      BTC: 
+        type: number
+      USD:
+        type: number
+        
+  UserBalance:
+    properties:
+      ETH:
+        type: number
+      BTC: 
+        type: number
+      USD:
+        type: number
+        
+  # DA FARE      
+  UserGoogle:
+    properties:
+      id: 
+        type: string
+  
+  # DA FARE  
+  UserFacebook:
+    properties:
+      id: 
+        type: string
+  # DA FARE     
+  Mail:
+    properties:
+      id: 
+        type: string
+
+###################### ERROR
+  Error:
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
