@@ -23,7 +23,7 @@ const rangeBTC = 0.1, rangeETH = 0.009; // used to check whether a new value of 
 var hasBTCbeenInitialize = false, hasETHbeenInitialize = false; // used to update "ourBTCValue" and "ourETHValue" only when the values have changed. 
 
 var possible_routes =
-	"GET \t	/prices -> get the latest value of BTC and ETH" + "<br>" +
+	"GET \t	/ -> get the latest value of BTC and ETH" + "<br>" +
 	"GET \t	/BTCUSD	-> get the latest BTC value stored" + "<br>" +
 	"GET \t	/BTCUSD?elem_number=N -> get the latest N BTC values stored." + "<br>" +
 	"GET \t	/ETHUSD -> get the latest ETH value stored" + "<br>" +
@@ -37,14 +37,14 @@ var possible_routes =
 /* 
  * Provide the user the list of available operation on this server 
  */
-router.get('/', function (req, res) {
+router.get('/API', function (req, res) {
 	res.send(possible_routes);
 });
 
 /*
  *  This router provide the up-to-date value of both BTC and ETH.
  */
-router.get('/prices', async function (req, res) { 
+router.get('/', async function (req, res) { 
 	res.header('Content-type', 'application/json');
 
 	try
@@ -58,7 +58,7 @@ router.get('/prices', async function (req, res) {
 	catch(error)
 	{
 		// an unexpected error occours during the process, notify the caller.
-		console.log("[GET /prices] " + error);
+		console.log("[GET /] " + error);
 		res.json({error: error});
 	}
 });

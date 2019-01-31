@@ -211,7 +211,7 @@ router.post('/buy', async function (req, res) {
 
         try {
             // Check if user has enough money
-            var current_price = (await axios.get(app_domain + '/price/prices')).data
+            var current_price = (await axios.get(app_domain + '/price/')).data
 
             var _USD_total
             if (_currency == 'BTC')
@@ -297,7 +297,7 @@ router.post('/sell', async function (req, res) {
             if (_user_amount >= _amount) {
 
                 // Get current price
-                var current_price = (await axios.get(app_domain + '/price/prices')).data
+                var current_price = (await axios.get(app_domain + '/price/')).data
 
                 var new_transaction = {
                     author: _user_id,
@@ -522,7 +522,7 @@ router.get('/user/:user_id', async function (req, res) {
 router.get('/price', async function (req, res) {
     console.log("Received request for current prices")
 
-    var prices = (await axios.get(app_domain + '/price/prices')).data;
+    var prices = (await axios.get(app_domain + '/price/')).data;
 
     res.json(prices);
 });
