@@ -49,6 +49,18 @@ var interface_module = require('./services/interface/interface_routes.js');
 interface_module.setup_env(app);
 app.use('/interface', interface_module.router);
 
+// Include REDIRECT routes
+var redirect_module = require('./services/redirect/redirect_routes.js');
+app.use('/redirect', redirect_module.router);
+
+// Include ACTION routes
+var action_module = require('./services/action/action_routes.js');
+app.use('/action', action_module.router);
+
+// Include ACCOUNT routes
+var account_module = require('./services/account/account_routes.js');
+app.use('/account', account_module.router);
+
 // Include USER routes
 var user_routes = require('./services/user/user_routes.js');
 app.use('/user', user_routes);

@@ -1,14 +1,14 @@
 // PATHS /////////////////////////////////////////////////////////////////
-var buy_post_path = '/interface/buy/'
-var sell_post_path = '/interface/sell/'
-var add_money_post_path = '/interface/add_money/'
+var buy_post_path = '/action/buy/'
+var sell_post_path = '/action/sell/'
+var add_money_post_path = '/action/add_money/'
 
-var price_history_get_path = '/interface/price/'
+var price_history_get_path = '/redirect/price/'
 
-var transactions_get_path = '/interface/transaction/user/'
+var transactions_get_path = '/redirect/transaction/user/'
 
-var plannedaction_get_path = '/interface/plannedaction/user/'
-var plannedaction_post_delete_path = '/interface/plannedaction/'
+var plannedaction_get_path = '/redirect/plannedaction/user/'
+var plannedaction_post_delete_path = '/action/plannedaction/'
 
 var nElemHistory = 100;
 

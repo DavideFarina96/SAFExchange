@@ -1,6 +1,6 @@
-var url_google = '/interface/googleSignIn'
-var url_facebook = '/interface/facebookSignIn'
-var url_mail = '/interface/mailSignIn'
+var url_google = '/account/googleSignIn'
+var url_facebook = '/account/facebookSignIn'
+var url_mail = '/account/mailSignIn'
 
 
 function onGoogleSignIn(googleUser) {

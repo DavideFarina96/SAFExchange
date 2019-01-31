@@ -1,5 +1,5 @@
-var user_get = '/interface/user/'
-var price_current_get = '/interface/price'
+var user_get = '/redirect/user/'
+var price_current_get = '/redirect/price'
 
 var current_BTCUSD
 var current_ETHUSD
