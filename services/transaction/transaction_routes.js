@@ -17,7 +17,7 @@ var possible_routes =
 /* 
  * DEFAULT ROUTER: return the list of available actions for this specific ws.
  */
-router.get('/', function (req, res) {
+router.get('/API', function (req, res) {
 	res.send(possible_routes);
 });
 
@@ -56,33 +56,13 @@ router.get('/user/:user_id', async function (req, res) {
 	}
 });
 
-/* 
- *	This router receives the command from the ws "plannedaction" and performs a "buy" or a "sell" action, depending on what is specified in the "action" parameter of the request.
- */
-router.post('/plannedaction/', async function (req, res) { 
-	res.header('Content-type', 'application/json');
-
-	try
-	{	
-		// called the transaction_plannedaction function in order to perform the "buy/sell" operation.
-		var resp = (await transaction_plannedaction(req));
-		// return a feedback to the caller.
-		res.json(resp);
-	}
-	catch(error)
-	{
-		// an unexpected error occours during the process, notify the caller.
-		console.log("[POST /plannedaction] " + error);
-		res.json({ error: error});
-	}
-});
 
 /* 
  *	This router receives the command from the ws "user" and performs a "buy" or a "sell" action, depending on what is specified in the "action" parameter of the request.
  */
 router.post('/', async function (req, res) { 
 
-	var _transaction = req.body
+	var _transaction = req.body;
 
     try {
         var transaction = (await axios.post(app_domain + '/database/transaction', _transaction)).data;
