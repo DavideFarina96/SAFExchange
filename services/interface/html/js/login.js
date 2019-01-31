@@ -1,6 +1,7 @@
 var url_google = '/account/googleSignIn'
 var url_facebook = '/account/facebookSignIn'
-var url_mail = '/account/mailSignIn'
+var url_login_mail = '/account/mailSignIn'
+var url_register_mail = '/account/mailRegister'
 
 
 function onGoogleSignIn(googleUser) {
@@ -22,7 +23,7 @@ function onGoogleSignIn(googleUser) {
     //SEND TOKEN TO BACKEND
     var id_token = googleUser.getAuthResponse().id_token;
 
-    execute_post(url_google, { tokenid: id_token, user: user_obj });
+    execute_post(url_google, { tokenid: id_token, user: user_obj }, (() => { $('#error_msg').show(); }));
 }
 
 function onFacebookSignIn(facebookData) {
@@ -39,16 +40,33 @@ function onFacebookSignIn(facebookData) {
             email: userData.email
         }
 
-        execute_post(url_facebook, { tokenid: id_token, user: user_obj });
+        execute_post(url_facebook, { tokenid: id_token, user: user_obj }, (() => { $('#error_msg').show(); }));
     });
 }
 
-function onMailSignIn() {
-    execute_post(url_mail);
+function onMailLogin() {
+    var email = $('#ma-box-email').val()
+    var psw = $('#ma-box-password').val()
+
+    execute_post(url_login_mail, { email: email, password: psw }, (() => { $('#ma-error-wrong-login').show() }));
+}
+
+function onMailRegister() {
+    var email = $('#ma-box-email').val()
+    var username = $('#ma-box-username').val()
+    var image_url = 'https://www.iconspng.com/images/-abstract-user-icon-1/-abstract-user-icon-1.jpg'
+    var psw = $('#ma-box-password').val()
+    var re_psw = $('#ma-box-repeat-password').val()
+
+    if (psw != re_psw)
+        $('#ma-error-different-passwords').show()
+    else
+        execute_post(url_register_mail, { email: email, name: username, image_url: image_url, password: psw },
+             (() => { $('#ma-error-register').show() }));
 }
 
 
-function execute_post(url, params) {
+function execute_post(url, params, err_callback) {
     // Send it to /interface
     $.ajax({
         url: url,
@@ -57,12 +75,13 @@ function execute_post(url, params) {
         contentType: 'application/x-www-form-urlencoded'
     })
         .then(res => {
-            if (res.logged = true) {
+            console.log(res)
+            if (res.success) {
                 console.log('Signed in as');
                 window.location.href = "/interface";
             }
             else {
-                $('#error_msg').show();
+                err_callback()
             }
         })
         .catch(err => {
@@ -74,7 +93,6 @@ function execute_post(url, params) {
 
 // FACEBOOK //////////////////////////////////////////////////////////////
 var FB;
-
 window.fbAsyncInit = function () {
     FB.init({
         appId: '2178730182445130',
@@ -95,11 +113,6 @@ window.fbAsyncInit = function () {
     fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
 
-
-//checkLoginState();
-
-
-// FUNCTIONS
 function statusChangeCallback(response) {
     console.log('statusChangeCallback');
     console.log(response);
@@ -136,3 +149,31 @@ function login() {
         { scope: 'email' }
     );
 }
+
+
+// LISTENER /////////////////////////////////////////////////////////////
+$('#btn-mail-account').click(e => {
+    $('#box-mail-account').show()
+})
+
+$('#ma-box-login').click(e => {
+    onMailLogin()
+})
+
+$('#ma-box-register').click(e => {
+    onMailRegister()
+})
+
+$('#ma-box-cancel').click(e => {
+    $('#box-mail-account').hide()
+})
+
+$('#ma-login-msg').on('click', e => {
+    $('.ma-login-elem').hide()
+    $('.ma-register-elem').show()
+})
+
+$('#ma-register-msg').on('click', e => {
+    $('.ma-login-elem').show()
+    $('.ma-register-elem').hide()
+})

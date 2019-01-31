@@ -42,8 +42,12 @@
     }
 
     .login-container {
-        width: 50%;
+        width: 100%;
         text-align: center;
+    }
+
+    .button-mail {
+        width: 100%
     }
 
     .footer {
@@ -76,6 +80,7 @@
 
     .user-icon {
         height: 30px;
+        border-radius: 15px;
         display: inline-block;
         vertical-align: middle;
     }
@@ -171,6 +176,14 @@
         cursor: pointer;
     }
 
+    .ma-message {
+        cursor: pointer;
+    }
+
+    .ma-register-elem {
+        display: none;
+    }
+
     /* BOX MODAL */
     .box-modal {
         display: none;
@@ -195,5 +208,29 @@
         left: -o-calc(50% - 300px);
         /* Standard */
         left: calc(50% - 300px);
+    }
+
+    .box-modal-mail {
+        display: none;
+        position: absolute;
+
+        /* Firefox */
+        top: -moz-calc(50% - 200px);
+        /* WebKit */
+        top: -webkit-calc(50% - 200px);
+        /* Opera */
+        top: -o-calc(50% - 200px);
+        /* Standard */
+        top: calc(50% - 200px);
+
+        width: 400px;
+        /* Firefox */
+        left: -moz-calc(50% - 200px);
+        /* WebKit */
+        left: -webkit-calc(50% - 200px);
+        /* Opera */
+        left: -o-calc(50% - 200px);
+        /* Standard */
+        left: calc(50% - 200px);
     }
 </style>

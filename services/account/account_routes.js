@@ -20,8 +20,7 @@ router.post('/googleSignIn', function (req, res) {
     verifier.verify(token, clientId, async function (err, tokenInfo) {
         if (!err) {
             // Token is valid
-
-            tokenInfo.logged = true
+            tokenInfo.success = true
 
             // Get user data from Google
             var _user = req.body.user
@@ -43,7 +42,7 @@ router.post('/googleSignIn', function (req, res) {
         }
         else {
             console.log(err)
-            res.json({ logged: false });
+            res.json({ success: false });
         }
     });
 });
@@ -80,54 +79,49 @@ router.post('/facebookSignIn', async function (req, res) {
         res.json(token_validity);
     }
     else {
-        res.json({ logged: false });
+        res.json({ success: false });
     }
 });
 
 // Mail register
 router.post('/mailRegister', async function (req, res) {
     //get mail, name and password
-    var userData = req.body.userdata;
+    var userData = req.body;
 
     //check if the mail is already present
     try {
-        var users = (await axios.get(app_domain + '/user/mail/' + userData.email, userData)).data;
+        var user = (await axios.get(app_domain + '/user/mail/' + userData.email)).data;
     }
     catch (err) {
         console.log(err)
     }
 
     //If it is already present, he can not register
-    if (users.length > 0) {
-        res.json({ registered: false });
+    if (user != null) {
+        console.log('User already present')
+        res.json({ success: false });
     }
     else {
         //add them to the database to initialize the user
         try {
-            var user = (await axios.put(app_domain + '/user/mail', userData)).data;
+            var user = (await axios.post(app_domain + '/user/mail', userData)).data;
+            console.log('New user registered with mail')
         }
         catch (err) {
             console.log(err)
         }
 
         //log the user in
-        try {
-            user = (await axios.post(app_domain + '/account/mailSignIn', userData)).data;
-        }
-        catch (err) {
-            console.log(err)
-        }
-
-        res.json({ registered: true });
+        req.session.user = user;
+        req.session.logged_with = "MAIL"
+        res.json({ success: true });
     }
-
-
 });
 
 // Mail login
 router.post('/mailSignIn', async function (req, res) {
     //get mail and password
-    /* var userData = req.body.userdata;
+    var userData = req.body;
  
      //check if the user exists
      try {
@@ -136,17 +130,18 @@ router.post('/mailSignIn', async function (req, res) {
      catch (err) {
          console.log(err)
      }
- 
+
      //if it exists, check if the password is correct, log him in
-     if(userInDB.password == userData.password)
+     if(userInDB != null && userInDB.password == userData.password)
      {
          req.session.user = userInDB;
          req.session.logged_with = "MAIL"
-         res.json({ logged: true });
+         res.json({ success: true });
      }
      else
-         res.json({ logged: false });
- */
+         res.json({ success: false });
+ 
+    /*
     try {
         var user = (await axios.get(app_domain + '/user/' + '5c49e7f329202200177264e7')).data;
         req.session.user = user
@@ -157,6 +152,7 @@ router.post('/mailSignIn', async function (req, res) {
     }
 
     res.json({ logged: true });
+    */
 });
 
 

@@ -10,7 +10,7 @@ function completeLogout(logged_with) {
             break;
 
         case "MAIL":
-            mailLogout(); break;
+            loggedOut(); break;
     }
 }
 
@@ -45,7 +45,7 @@ function googleLogout() {
 // FACEBOOK
 var FB;
 
-window.fbAsyncInit = function() {
+window.fbAsyncInit = function () {
     FB.init({
         appId: '2178730182445130',
         cookie: true,
@@ -69,7 +69,7 @@ async function facebookLogout() {
         statusChangeCallback(response);
     });
 
-    
+
 }
 
 function statusChangeCallback(response) {
@@ -80,10 +80,4 @@ function statusChangeCallback(response) {
     } else {
         console.log("Error");
     }
-}
-
-
-// MAIL
-function mailLogout() {
-    // LOG OUT
 }

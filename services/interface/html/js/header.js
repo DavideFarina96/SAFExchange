@@ -57,8 +57,18 @@ function updateUserInfo() { // TODO
 updatePrices()
 updateUserInfo()
 
+function timerStep() {
+    updatePrices()
+
+    if (typeof updateUserInfo === "function")
+        updateUserInfo()
+
+    if (typeof updatePlannedactionList === "function")
+        updatePlannedactionList()
+}
+
 // Update every 10 seconds
-setInterval(updatePrices, 10000);
+setInterval(timerStep, 10000);
 
 
 // LISTENERS

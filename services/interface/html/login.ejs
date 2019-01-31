@@ -11,32 +11,68 @@
 
     <% include ./partials/header %>
 
-    <div class="wrapper w3-row w3-padding-16">
-        <div class="w3-col" style="width:20%">&nbsp;</div>
-
-        <div class="w3-col w3-card-2" style="width:60%">
+    <div class="wrapper w3-padding-16">
+        <div class="w3-card-2" style="width:60%; margin: auto">
             <div class="w3-container w3-teal">
                 <h1>Log In</h1>
             </div>
-            <div class="w3-container w3-margin-bottom">
+            <div class="w3-container" style="padding-bottom: 16px">
                 <h4>Choose a method to perform the login / register</h4>
 
-                <div class="w3-auto login-container">
-                    <div class="w3-button w3-block g-signin2" data-onsuccess="onGoogleSignIn"></div>
+                <div class="w3-auto w3-margin-top login-container">
+                    <div class="g-signin2" data-onsuccess="onGoogleSignIn"></div>
+
                     <br>
-                    <div class="fb-login-button" data-size="large" data-button-type="continue_with"
+
+                    <div class="fb-login-button" style="display: block;" data-size="large" data-button-type="continue_with"
                         data-auto-logout-link="false" data-use-continue-as="false" onlogin="login()"></div>
-                    <br><br>
-                    <div class="w3-button w3-block w3-green" onclick="onMailSignIn()">Mail</div>
+
+                    <br>
+
+                    <div id="btn-mail-account" class="w3-button w3-green button-mail" style="max-width: 255px">Mail</div>
                 </div>
-
-                <h4 id="error_msg" class="w3-red" style="display: none">Something went wrong. Please try again.</h4>
             </div>
-        </div>
 
-        <div class="w3-col" style="width:20%">&nbsp;</div>
+            <h4 id="error_msg" class="w3-red" style="display: none">Something went wrong. Please try again.</h4>
+        </div>
     </div>
 
+
+    <!-- Message box -->
+    <div id="box-mail-account" class="w3-dark-grey w3-card-4 box-modal-mail">
+        <div class="w3-container w3-teal">
+            <h4 class="ma-login-elem">Login</h4>
+            <h4 class="ma-register-elem">Register</h4>
+        </div>
+
+        <div class="w3-container w3-margin-top">
+            <label>Email</label>
+            <input id="ma-box-email" class="w3-input" type="email" placeholder="Your email">
+
+            <label class="ma-register-elem">Username</label>
+            <input id="ma-box-username" class="w3-input ma-register-elem" type="text" placeholder="Your username">
+
+            <label>Password</label>
+            <input id="ma-box-password" class="w3-input" type="password" placeholder="Your password">
+
+            <label class="ma-register-elem">Repeat password</label>
+            <input id="ma-box-repeat-password" class="w3-input ma-register-elem" type="password" placeholder="Confirm password">
+
+            <p id="ma-error-wrong-login" style="display: none" class="w3-red">Wrong email or password</p>
+            <p id="ma-error-register" style="display: none" class="w3-red">There was an error</p>
+            <p id="ma-error-different-passwords" style="display: none" class="w3-red">The passwords don't match</p>
+        </div>
+
+        <div class="w3-container w3-margin-top" style="text-align: center; margin-top: auto">
+            <button id='ma-box-login' style="width:45%" class="w3-button w3-green ma-login-elem">Login</button>
+            <button id='ma-box-register' style="width:45%" class="w3-button w3-green ma-register-elem">Register</button>
+            <button id='ma-box-cancel' style="width:45%" class="w3-button w3-grey">Cancel</button>
+
+            <p id="ma-login-msg" class="ma-login-elem ma-message">Don't have an account? Register</p>
+            <p id="ma-register-msg" class="ma-register-elem ma-message">Already have an account? Login</p>
+        </div>
+
+    </div>
 
     <% include ./partials/footer %>
 

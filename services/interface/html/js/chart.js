@@ -4,6 +4,7 @@ var config = {
     datasets: [{
         backgroundColor: 'rgba(128,203,196, 0.4)',
         borderColor: '#009688',
+        lineTension: 0,
         fill: 'start'
     }]
 }

@@ -70,11 +70,11 @@ router.put('/id_facebook', async function (req, res) {
     res.json(user)
 })
 
-router.put('/mail', async function (req, res) {
+router.post('/mail', async function (req, res) {
     var _user = req.body
 
     try {
-        var user = (await axios.put(app_domain + '/database/user/mail', _user)).data;
+        var user = (await axios.post(app_domain + '/database/user/mail', _user)).data;
     }
     catch (err) {
         console.log(err)
