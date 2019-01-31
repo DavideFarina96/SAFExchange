@@ -83,5 +83,16 @@ router.put('/mail', async function (req, res) {
     res.json(user)
 })
 
+router.get('/mail/:mail', function (req, res) {
+    //find all users who registered with the email only (no google and fb)
+    try {
+        var user = (await axios.get(app_domain + '/database/user/mail/' + req.params.mail)).data;
+    }
+    catch (err) {
+        console.log(err)
+    }
+    res.json(user)
+})
+
 // EXPORT router to be used in the main file
 module.exports = router;
