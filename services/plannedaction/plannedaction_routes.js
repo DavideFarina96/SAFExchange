@@ -108,23 +108,18 @@ router.post('/checkTriggers', async function (req, res) {
 						    action1 = (await axios.put(app_domain + '/database/plannedaction/' + actions[i]._id, state)).data;
 						}
 						catch (err) {
-
 						    console.log(err)
-						    finalStatus.push("ERR1")
+						    console.log("Unexpected error while updating the status of the planned adction to IN PROGRESS.");
+						    finalStatus.push("Unexpected error while updating the status of the planned adction to IN PROGRESS.")
 						    break;
 						}
 
 						//create the new balance obj
 						var newBalance;
-
 						if(actions[i].action == "BUY")
-						{
 							newBalance = { BTC: actions[i].BTC }
-						}
 						else if(actions[i].action == "SELL")
-						{
 							newBalance = { USD: btcValue * actions[i].BTC }
-						}
 
 						//call user to update the balances
 						try {
@@ -132,7 +127,8 @@ router.post('/checkTriggers', async function (req, res) {
 						}
 						catch (err) {
 						    console.log(err);
-						    finalStatus.push("ERR3")
+						    console.log("Unexpected error while updating the balance of the user.");
+						    finalStatus.push("Unexpected error while updating the balance of the user.")
 						    break;
 						}
 
@@ -145,10 +141,12 @@ router.post('/checkTriggers', async function (req, res) {
 						}
 
 						try {
-						    var transactionComp = (await axios.post(app_domain + '/database/transaction', transaction)).data;
+						    var transactionComp = (await axios.post(app_domain + '/transaction', transaction)).data;
 						}
 						catch (err) {
 						    console.log(err)
+						    console.log("Unexpected error while adding the transaction to the database.");
+						    finalStatus.push("Unexpected error while adding the transaction to the database.")
 						}
 
 						//set plannedaction as complete
@@ -159,7 +157,8 @@ router.post('/checkTriggers', async function (req, res) {
 						}
 						catch (err) {
 						    console.log(err)
-						    finalStatus.push("ERR4")
+						    console.log("Unexpected error while updating the status of the planned adction to COMPLETED.");
+						    finalStatus.push("Unexpected error while updating the status of the planned adction to COMPLETED.")
 						    break;
 						}
 
@@ -182,7 +181,8 @@ router.post('/checkTriggers', async function (req, res) {
 						}
 						catch (err) {
 						    console.log(err)
-						    finalStatus.push("ERR5")
+						    console.log("Unexpected error while updating the status of the planned adction to IN PROGRESS.");
+						    finalStatus.push("Unexpected error while updating the status of the planned adction to IN PROGRESS.")
 						    break;
 						}
 
@@ -199,7 +199,8 @@ router.post('/checkTriggers', async function (req, res) {
 						}
 						catch (err) {
 						    console.log(err);
-						    finalStatus.push("ERR7")
+						    console.log("Unexpected error while updating the balance of the user.");
+						    finalStatus.push("Unexpected error while updating the balance of the user.")
 						    break;
 						}
 
@@ -212,10 +213,12 @@ router.post('/checkTriggers', async function (req, res) {
 						}
 
 						try {
-						    var transactionComp = (await axios.post(app_domain + '/database/transaction', transaction)).data;
+						    var transactionComp = (await axios.post(app_domain + '/transaction', transaction)).data;
 						}
 						catch (err) {
 						    console.log(err)
+						    console.log("Unexpected error while adding the transaction to the database.");
+						    finalStatus.push("Unexpected error while adding the transaction to the database.")
 						}
 
 						//set plannedaction as complete
@@ -226,7 +229,8 @@ router.post('/checkTriggers', async function (req, res) {
 						}
 						catch (err) {
 						    console.log(err)
-						    finalStatus.push("ERR8")
+						    console.log("Unexpected error while updating the status of the planned adction to COMPLETED.");
+						    finalStatus.push("Unexpected error while updating the status of the planned adction to COMPLETED.")
 						    break;
 						}
 
