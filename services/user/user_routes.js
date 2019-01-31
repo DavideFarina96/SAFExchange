@@ -57,7 +57,6 @@ router.put('/id_google', async function (req, res) {
     res.json(user)
 })
 
-
 router.put('/id_facebook', async function (req, res) {
     var _user = req.body
 

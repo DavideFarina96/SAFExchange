@@ -46,7 +46,7 @@ router.get('/tc', function (req, res) {
 })
 
 
-// LOGIN ROUTES /////////////////////////////////////////////////////////
+// ACCOUNT WS -> LOGIN ROUTES /////////////////////////////////////////////////////////
 // Google login
 router.post('/googleSignIn', function (req, res) {
     // Get token from page
@@ -155,7 +155,7 @@ router.post('/mailRegister', async function (req, res) {
             console.log(err)
         }
 
-        res.json({ restiered: true });
+        res.json({ registered: true });
     }
 
 
@@ -168,7 +168,7 @@ router.post('/mailSignIn', async function (req, res) {
  
      //check if the user exists
      try {
-         var userInDB = (await axios.get(app_domain + '/user/mail/' + userData.email, userData)).data;
+         var userInDB = (await axios.get(app_domain + '/user/mail/' + userData.email)).data;
      }
      catch (err) {
          console.log(err)
@@ -197,7 +197,7 @@ router.post('/mailSignIn', async function (req, res) {
 });
 
 
-// PROCESS ROUTES /////////////////////////////////////////////////////
+// ACTION WS -> PROCESS ROUTES /////////////////////////////////////////////////////
 // Buy / Sell
 router.post('/buy', async function (req, res) {
     var _user = req.session.user
@@ -341,6 +341,49 @@ router.post('/sell', async function (req, res) {
             else {
                 response.successful = false
                 response.message = 'Not enough BTC/ETH to perform operation. You have ' + _user_amount + ' ' + _currency
+            }
+        }
+        catch (err) {
+            console.log(err)
+
+            response.successful = false
+            response.message = err.message
+        }
+    }
+    else {
+        response.successful = false
+        response.message = 'User session variable not set'
+    }
+
+    res.json(response);
+});
+
+router.post('/add_money', async function (req, res) {
+    var _user = req.session.user
+
+    var response = {}
+    if (_user != null) {
+        var _user_id = _user._id;
+        var _amount = parseFloat(req.body.amount);
+
+        try {
+            var new_balance = {
+                USD: _amount
+            }
+
+            // Update user's balance
+            var new_user = (await axios.put(app_domain + '/user/' + _user_id + '/balance', new_balance)).data
+
+            if (new_user.hasOwnProperty('_id')) {
+                // Update session's variable
+                req.session.user = new_user
+
+                response.successful = true
+                response.message = 'Successfully added ' + _amount + '$'
+            }
+            else {
+                response.successful = false
+                response.message = 'There was an error in the user update'
             }
         }
         catch (err) {
