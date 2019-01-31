@@ -62,6 +62,9 @@ router.post('/facebookSignIn', async function (req, res) {
 
     if (token_validity.data.is_valid == true) {
         console.log("TOKEN IS VALID");
+
+        token_validity.success = true
+
         var _user = req.body.user
         console.log(_user);
 
