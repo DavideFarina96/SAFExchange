@@ -2,119 +2,284 @@ swagger: '2.0'
 info:
   version: '1.0'
   title: "SAFExchange"
-  description: Polls is a simple API allowing consumers to view polls and vote in them.
+  x-summary: Collection of API provided by the web service PRICE
+  description: API description for the SAFExchange project
   license:
     name: MIT
     url: https://github.com/apiaryio/polls-api/blob/master/LICENSE
-host: polls.apiblueprint.org
+host: safexchange.herokuapp.com
 basePath: /
 schemes:
-- http
+- https
 consumes:
 - application/json
 produces:
 - application/json
 paths:
-  /questions:
-    x-summary: Questions Collection
+  /price/API:
     get:
-      summary: List All Questions
+      summary: GET the list of available actions
       responses:
         200:
-          description: Successful Response
+          description: list of all actions 
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/Question'
+            type: string
+          examples: # OSS: | means every line is on a distinct one.
+            application/text: | 
+              GET /prices -> get the latest value of Bitcoin and Ethereum
+              GET /BTCUSD	-> get the latest Bitcoin value stored
+              GET /BTCUSD?elem_number=N -> get the latest N Bitcoin values stored.
+              GET /ETHUSD -> get the latest Ethereum value stored
+              GET /ETHUSD?elem_number=N -> get the latest N Ethereum values stored.
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+  /price/:
+    get:
+      summary: GET Bitcoin and Ethereum value
+      description: |
+        This API provides updated values of both Bitcoin and Ethereum from our exchange.
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/Prices'
           examples:
             application/json:
-              - question: Favourite programming language?
-                published_at: '2015-08-05T08:40:51.620Z'
-                choices:
-                  - choice: Swift
-                    votes: 2048
-                  - choice: Python
-                    votes: 1024
-                  - choice: Objective-C
-                    votes: 512
-                  - choice: Ruby
-                    votes: 256
-    post:
-      description: >-
-        You may create your own question using this action. It takes a JSON
-        object containing a question and a collection of answers in the
-        form of choices.
-      summary: Create a New Question
+              BTC: 
+                _id: '5c507afa1a3910001752de18'
+                BTCUSD: 3433.4275
+              ETH: 
+                _id: '5c507afa1a3910001752de17'
+                ETHUSD: 106.1075
+                 
+              
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+            
+  /price/BTCUSD:
+    get:
+      summary: GET the value of Bitcoin
+      description: |
+        This API returns the value of Bitcoin from our exchange.
+        Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Bitcoin.
+        Example: /BTCUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
       parameters:
-        - name: body
+        - name: elem_number
+          in: query
+          description: If specified, the API returns the latest N value of Bitcoin stored on the database.
+          required: false 
+          type: integer
+          
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/BTCUSDarray'
+          examples:
+            application/json:
+              - _id: '5c50803d1a3910001752dee4'
+                BTCUSD: 3439.0675
+              - _id: '5c5080331a3910001752dee3'
+                BTCUSD: 3438.8925
+              - _id: '5c5080281a3910001752dee1'
+                BTCUSD: 3439.3224999999998
+              
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error' 
+            
+  /price/ETHUSD:
+    get:
+      summary: GET the value of Ethereum
+      description: |
+        This API returns the value of Ethereum on our exchange.
+        Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Ethereum.
+        Example: /ETHUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
+      parameters:
+        - name: elem_number
+          in: query
+          description: If specified, the API returns the latest N value of Ethereum stored on the database.
+          required: false 
+          type: integer
+          
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/ETHUSDarray'
+          examples:
+            application/json:
+              - _id: '5c5087271d89e2001739fa41'
+                ETHUSD: 105.33250000000001
+              - _id: '5c50871c1d89e2001739fa3f'
+                ETHUSD: 105.3425
+              - _id: '5c5087131d89e2001739fa3e'
+                ETHUSD: 105.3675
+      
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'  
+    
+  /transaction/user/{user_id}:
+    get:
+      summary: GET user transaction history
+      description: |
+        This API provide the full history of transaction performed by the specified user, both for selling and buying.
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+      
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/TransactionUser'
+          examples:
+            application/json:
+              - _id: '5c4de5cbf31add5f84e4375f'
+                author: '5c49e7f329202200177264e7'
+                action: 'BUY'
+                USD: 114.25750000000001 
+                ETH: 1
+                _v: 0
+              - _id: '5c4de5f230a8dc2530b73a0d'
+                author: '5c49e7f329202200177264e7'
+                action: 'SELL'
+                USD: 356.93825 
+                ETH: 0.1
+                _v: 0
+                  
+                  
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+  /transaction/: 
+    post:
+      summary: POST allows user to buy/sell
+      description: |
+        This API allows the user to buy or sell either Bitcoin or Ethereum at the current price.
+      parameters:
+        - name: req
           in: body
           required: true
           schema:
-            $ref: '#/definitions/QuestionRequest'
+            $ref: '#/definitions/NewUserTransaction'
+            
       responses:
-        201:
-          description: ''
+        200:
+          description: Success
           schema:
-            $ref: '#/definitions/Question'
+            $ref: '#/definitions/NewUserTransaction'
           examples:
             application/json:
-                question: Favourite programming language?
-                published_at: '2015-08-05T08:40:51.620Z'
-                choices:
-                  - choice: Swift
-                    votes: 0
-                  - choice: Python
-                    votes: 0
-                  - choice: Objective-C
-                    votes: 0
-                  - choice: Ruby
-                    votes: 0
+                author: '5c4c430e66f8f600177f2d3f'
+                action: 'BUY'
+                state: 'IDLE'
+                BTC: 3601.00
+                USD: 1
+
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
 definitions:
-  Question:
-    title: Question
+  #Actions:
+  #  allOf:
+  #    - $ref: '#/definitions/Actions'
+      
+  Prices: 
+    properties:
+      BTC: 
+        type: object
+        properties:
+          _id:
+            type: string
+          BTCUSD:
+            type: number
+                    
+      ETH:
+        type: object
+        properties:
+          _id:
+            type: string
+          ETHUSD:
+            type: number
+  
+  BTCUSDarray: 
     type: object
     properties:
-      question:
+      _id:
         type: string
-      published_at:
+      BTCUSD:
+        type: number
+  
+  ETHUSDarray: 
+    type: object
+    properties:
+      _id:
         type: string
-      choices:
-        type: array
-        items:
-          $ref: '#/definitions/Choice'
+      ETHUSD:
+        type: number
+  
+  TransactionUser: 
+    properties:
+      _id: 
+        type: string
+      author: 
+        type: string
+      action: 
+        type: string
+      USD: 
+        type: number
+      ETH: 
+        type: number
+      BTC: 
+        type: number
+
+  NewUserTransaction: 
+    type: object
+    properties:
+      author:
+        type: string
+      action:
+        type: string
+      state:
+        type: string
+      BTC:            # TODO: BTC deve essere mutualmente esclusivo con ETH
+        type: number
+      ETH:
+        type: number
+      USD:
+        type: number
+    #oneOf:
+    #  - required: [author]
+    #  - required: [action]
+    #  - required: [state]
+  
+  Error:
     required:
-      - question
-      - published_at
-      - choices
-  Choice:
-    title: Choice
-    type: object
+      - code
+      - message
     properties:
-      votes:
+      code:
         type: integer
         format: int32
-      choice:
+      message:
         type: string
-    required:
-      - votes
-      - choice
-  QuestionRequest:
-    title: Question Request
-    type: object
-    properties:
-      question:
-        type: string
-      choices:
-        type: array
-        items:
-          type: string
-    required:
-      - question
-      - choices
-    example:
-      question: Favourite programming language?
-      choices:
-        - Swift
-        - Python
-        - Objective-C
-        - Ruby
