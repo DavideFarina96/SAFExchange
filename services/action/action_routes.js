@@ -180,31 +180,37 @@ router.post('/edit_money', async function (req, res) {
         var _user_id = _user._id;
         var _amount = parseFloat(req.body.amount);
 
-        try {
-            var new_balance = {
-                USD: _amount
-            }
+        if (_amount >= 0 || ((await axios.get(app_domain + '/user/' + _user_id)).data.USD + _amount) > 0) {
+            try {
+                var new_balance = {
+                    USD: _amount
+                }
 
-            // Update user's balance
-            var new_user = (await axios.put(app_domain + '/user/' + _user_id + '/balance', new_balance)).data
+                // Update user's balance
+                var new_user = (await axios.put(app_domain + '/user/' + _user_id + '/balance', new_balance)).data
 
-            if (new_user.hasOwnProperty('_id')) {
-                response.successful = true
-                if (_amount > 0)
-                    response.message = 'Successfully deposited ' + _amount + '$'
-                else
-                    response.message = 'Successfully withdrawed ' + _amount + '$'
+                if (new_user.hasOwnProperty('_id')) {
+                    response.successful = true
+                    if (_amount > 0)
+                        response.message = 'Successfully deposited ' + _amount + '$'
+                    else
+                        response.message = 'Successfully withdrawed ' + _amount + '$'
+                }
+                else {
+                    response.successful = false
+                    response.message = err_user_update
+                }
             }
-            else {
+            catch (err) {
+                console.log(err)
+
                 response.successful = false
-                response.message = err_user_update
+                response.message = err.message
             }
         }
-        catch (err) {
-            console.log(err)
-
+        else {
             response.successful = false
-            response.message = err.message
+            response.message = err_negative_amount
         }
     }
     else {
