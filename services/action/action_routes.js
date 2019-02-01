@@ -5,6 +5,14 @@ const axios = require('axios')
 
 
 //PROCESS ROUTES /////////////////////////////////////////////////////
+var err_user_session = 'User session variable not set'
+var err_user_update = 'There was an error with the user update'
+var err_transaction = 'There was an error with the transaction'
+var err_plannedaction ='There was an error with the plannedaction'
+var err_not_enough_money = 'Not enough money to perform operation.'
+var err_not_enough_BTC_ETH = 'Not enough BTC/ETH to perform operation.'
+var success_plannedaction = 'Planned action successfully inserted'
+
 
 // Buy / Sell
 router.post('/buy', async function (req, res) {
@@ -12,6 +20,7 @@ router.post('/buy', async function (req, res) {
 
     var response = {}
 
+    // Check if user is logged
     if (_user != null) {
         var _user_id = _user._id;
         var _currency = req.body.currency;
@@ -19,15 +28,12 @@ router.post('/buy', async function (req, res) {
 
         try {
             // Check if user has enough money
+            var user_USD_balance = (await axios.get(app_domain + '/user/' + _user_id)).data.USD
             var current_price = (await axios.get(app_domain + '/price')).data
 
-            var _USD_total
-            if (_currency == 'BTC')
-                _USD_total = _amount * parseFloat(current_price.BTC.BTCUSD)
-            else if (_currency == 'ETH')
-                _USD_total = _amount * parseFloat(current_price.ETH.ETHUSD)
+            var _USD_total = _amount * parseFloat(current_price[_currency][_currency + 'USD'])
 
-            if (_user.USD >= _USD_total) {
+            if (user_USD_balance >= _USD_total) {
 
                 var new_transaction = {
                     author: _user_id,
@@ -36,14 +42,8 @@ router.post('/buy', async function (req, res) {
                 }
                 var new_balance = { USD: - _USD_total }
 
-                if (_currency == 'BTC') {
-                    new_transaction.BTC = _amount
-                    new_balance.BTC = _amount
-                }
-                else if (_currency == 'ETH') {
-                    new_transaction.ETH = _amount
-                    new_balance.ETH = _amount
-                }
+                new_transaction[_currency] = _amount
+                new_balance[_currency] = _amount
 
 
                 // Insert new transaction
@@ -53,20 +53,23 @@ router.post('/buy', async function (req, res) {
                     // Update user's balance
                     var new_user = (await axios.put(app_domain + '/user/' + _user_id + '/balance', new_balance)).data
 
-                    // Update session's variable
-                    req.session.user = new_user
-
-                    response.successful = true
-                    response.message = 'Successfully bought ' + _amount + ' ' + _currency + ' for ' + _USD_total + '$'
+                    if (new_user.hasOwnProperty('_id')) {
+                        response.successful = true
+                        response.message = 'Successfully bought ' + _amount + ' ' + _currency + ' for ' + _USD_total + '$'
+                    }
+                    else {
+                        response.successful = false
+                        response.message = err_user_update
+                    }
                 }
                 else {
                     response.successful = false
-                    response.message = 'There was an error with the transaction'
+                    response.message = err_transaction
                 }
             }
             else {
                 response.successful = false
-                response.message = 'Not enough money to perform operation. Required $' + _USD_total + '. You have $' + _user.USD
+                response.message = err_not_enough_money + ' Required $' + _USD_total + '. You have $' + _user.USD
             }
         }
         catch (err) {
@@ -78,7 +81,7 @@ router.post('/buy', async function (req, res) {
     }
     else {
         response.successful = false
-        response.message = 'User session variable not set'
+        response.message = err_user_session
     }
 
     res.json(response);
@@ -96,11 +99,7 @@ router.post('/sell', async function (req, res) {
 
         try {
             // Check if user has enough BTC/ETH to sell
-            var _user_amount
-            if (_currency == 'BTC')
-                _user_amount = _user.BTC
-            else if (_currency == 'ETH')
-                _user_amount = _user.ETH
+            var _user_amount = (await axios.get(app_domain + '/user/' + _user_id)).data[_currency]
 
             if (_user_amount >= _amount) {
 
@@ -111,20 +110,11 @@ router.post('/sell', async function (req, res) {
                     author: _user_id,
                     action: 'SELL'
                 }
+                new_transaction[_currency] = _amount
+                new_transaction.USD = _amount * current_price[_currency][_currency + 'USD']
+
                 var new_balance = {}
-
-                if (_currency == 'BTC') {
-                    new_transaction.BTC = _amount
-                    new_transaction.USD = _amount * current_price.BTC.BTCUSD
-
-                    new_balance.BTC = - _amount
-                }
-                else if (_currency == 'ETH') {
-                    new_transaction.ETH = _amount
-                    new_transaction.USD = _amount * current_price.ETH.ETHUSD
-
-                    new_balance.ETH = - _amount
-                }
+                new_balance[_currency] = - _amount
                 new_balance.USD = new_transaction.USD
 
 
@@ -135,20 +125,23 @@ router.post('/sell', async function (req, res) {
                     // Update user's balance
                     var new_user = (await axios.put(app_domain + '/user/' + _user_id + '/balance', new_balance)).data
 
-                    // Update session's variable
-                    req.session.user = new_user
-
-                    response.successful = true
-                    response.message = 'Successfully sold ' + _amount + ' ' + _currency + ' for ' + transaction.USD + '$'
+                    if (new_user.hasOwnProperty('_id')) {
+                        response.successful = true
+                        response.message = 'Successfully sold ' + _amount + ' ' + _currency + ' for ' + transaction.USD + '$'
+                    }
+                    else {
+                        response.successful = false
+                        response.message = err_user_update
+                    }
                 }
                 else {
                     response.successful = false
-                    response.message = 'There was an error with the transaction'
+                    response.message = err_transaction
                 }
             }
             else {
                 response.successful = false
-                response.message = 'Not enough BTC/ETH to perform operation. You have ' + _user_amount + ' ' + _currency
+                response.message = err_not_enough_BTC_ETH + ' You have ' + _user_amount + ' ' + _currency
             }
         }
         catch (err) {
@@ -160,7 +153,7 @@ router.post('/sell', async function (req, res) {
     }
     else {
         response.successful = false
-        response.message = 'User session variable not set'
+        response.message = err_user_session
     }
 
     res.json(response);
@@ -183,15 +176,12 @@ router.post('/add_money', async function (req, res) {
             var new_user = (await axios.put(app_domain + '/user/' + _user_id + '/balance', new_balance)).data
 
             if (new_user.hasOwnProperty('_id')) {
-                // Update session's variable
-                req.session.user = new_user
-
                 response.successful = true
                 response.message = 'Successfully added ' + _amount + '$'
             }
             else {
                 response.successful = false
-                response.message = 'There was an error in the user update'
+                response.message = err_user_update
             }
         }
         catch (err) {
@@ -203,7 +193,7 @@ router.post('/add_money', async function (req, res) {
     }
     else {
         response.successful = false
-        response.message = 'User session variable not set'
+        response.message = err_user_session
     }
 
     res.json(response);
@@ -223,23 +213,19 @@ router.post('/plannedaction/buy', async function (req, res) {
 
         try {
             // Check if user has enough money
+            var user_USD_balance = (await axios.get(app_domain + '/user/' + _user_id)).data.USD
             var _USD_total = _amount * _USD
 
-            if (_user.USD >= _USD_total) {
+            if (user_USD_balance >= _USD_total) {
 
                 var new_plannedaction = {
                     author: _user_id,
                     action: 'BUY',
                     USD: _USD
                 }
-                var new_balance = { USD: - _USD_total }
+                new_plannedaction[_currency] = _amount
 
-                if (_currency == 'BTC') {
-                    new_plannedaction.BTC = _amount
-                }
-                else if (_currency == 'ETH') {
-                    new_plannedaction.ETH = _amount
-                }
+                var new_balance = { USD: - _USD_total }
 
                 // Insert new plannedaction
                 var plannedaction = (await axios.post(app_domain + '/plannedaction', new_plannedaction)).data
@@ -248,20 +234,23 @@ router.post('/plannedaction/buy', async function (req, res) {
                     // Update user's balance
                     var new_user = (await axios.put(app_domain + '/user/' + _user_id + '/balance', new_balance)).data
 
-                    // Update session's variable
-                    req.session.user = new_user
-
-                    response.successful = true
-                    response.message = 'Planned action successfully inserted'
+                    if (new_user.hasOwnProperty('_id')) {
+                        response.successful = true
+                        response.message = success_plannedaction
+                    }
+                    else {
+                        response.successful = false
+                        response.message = err_user_update
+                    }
                 }
                 else {
                     response.successful = false
-                    response.message = 'There was an error with the plannedaction'
+                    response.message = err_plannedaction
                 }
             }
             else {
                 response.successful = false
-                response.message = 'Not enough money to perform operation. Required $' + _USD_total + '. You have $' + _user.USD
+                response.message = err_not_enough_money + ' Required $' + _USD_total + '. You have $' + _user.USD
             }
         }
         catch (err) {
@@ -273,7 +262,7 @@ router.post('/plannedaction/buy', async function (req, res) {
     }
     else {
         response.successful = false
-        response.message = 'User session variable not set'
+        response.message = err_user_session
     }
 
     res.json(response);
@@ -292,11 +281,7 @@ router.post('/plannedaction/sell', async function (req, res) {
 
         try {
             // Check if user has enough BTC/ETH to sell
-            var _user_amount
-            if (_currency == 'BTC')
-                _user_amount = _user.BTC
-            else if (_currency == 'ETH')
-                _user_amount = _user.ETH
+            var _user_amount = (await axios.get(app_domain + '/user/' + _user_id)).data[_currency]
 
             if (_user_amount >= _amount) {
 
@@ -305,18 +290,10 @@ router.post('/plannedaction/sell', async function (req, res) {
                     action: 'SELL',
                     USD: _USD
                 }
+                new_plannedaction[_currency] = _amount
+
                 var new_balance = {}
-
-                if (_currency == 'BTC') {
-                    new_plannedaction.BTC = _amount
-
-                    new_balance.BTC = - _amount
-                }
-                else if (_currency == 'ETH') {
-                    new_plannedaction.ETH = _amount
-
-                    new_balance.ETH = - _amount
-                }
+                new_balance[_currency] = - _amount
 
                 // Insert new plannedaction
                 var plannedaction = (await axios.post(app_domain + '/plannedaction', new_plannedaction)).data
@@ -325,20 +302,23 @@ router.post('/plannedaction/sell', async function (req, res) {
                     // Update user's balance
                     var new_user = (await axios.put(app_domain + '/user/' + _user_id + '/balance', new_balance)).data
 
-                    // Update session's variable
-                    req.session.user = new_user
-
-                    response.successful = true
-                    response.message = 'Planned action successfully inserted'
+                    if (new_user.hasOwnProperty('_id')) {
+                        response.successful = true
+                        response.message = success_plannedaction
+                    }
+                    else {
+                        response.successful = false
+                        response.message = err_user_update
+                    }
                 }
                 else {
                     response.successful = false
-                    response.message = 'There was an error with the plannedaction'
+                    response.message = err_plannedaction
                 }
             }
             else {
                 response.successful = false
-                response.message = 'Not enough BTC/ETH to perform operation. You have ' + _user_amount + ' ' + _currency
+                response.message = err_not_enough_BTC_ETH + ' You have ' + _user_amount + ' ' + _currency
             }
         }
         catch (err) {
@@ -350,7 +330,7 @@ router.post('/plannedaction/sell', async function (req, res) {
     }
     else {
         response.successful = false
-        response.message = 'User session variable not set'
+        response.message = err_user_session
     }
 
     res.json(response);

@@ -8,6 +8,16 @@ var verifier = require('google-id-token-verifier');
 
 
 //LOGIN ROUTES /////////////////////////////////////////////////////////
+function setSession(req, _user, _logged_with) {
+    req.session.user = {
+        _id: _user._id,
+        name: _user.name,
+        email: _user.email,
+        image_url: _user.image_url,
+    };
+    
+    req.session.logged_with = _logged_with
+}
 
 // Google login
 router.post('/googleSignIn', function (req, res) {
@@ -34,8 +44,7 @@ router.post('/googleSignIn', function (req, res) {
             }
 
             // Set session variable
-            req.session.user = user
-            req.session.logged_with = "GOOGLE"
+            setSession(req, user, 'GOOGLE')
 
             // Send data to page
             res.json(tokenInfo);
@@ -76,8 +85,7 @@ router.post('/facebookSignIn', async function (req, res) {
             console.log(err)
         }
 
-        req.session.user = user;
-        req.session.logged_with = "FACEBOOK";
+        setSession(req, user, 'FACEBOOK')
 
         res.json(token_validity);
     }
@@ -115,8 +123,8 @@ router.post('/mailRegister', async function (req, res) {
         }
 
         //log the user in
-        req.session.user = user;
-        req.session.logged_with = "MAIL"
+        setSession(req, user, 'MAIL')
+
         res.json({ success: true });
     }
 });
@@ -125,25 +133,24 @@ router.post('/mailRegister', async function (req, res) {
 router.post('/mailSignIn', async function (req, res) {
     //get mail and password
     var userData = req.body;
- 
-     //check if the user exists
-     try {
-         var userInDB = (await axios.get(app_domain + '/user/mail/' + userData.email)).data;
-     }
-     catch (err) {
-         console.log(err)
-     }
 
-     //if it exists, check if the password is correct, log him in
-     if(userInDB != null && userInDB.password == userData.password)
-     {
-         req.session.user = userInDB;
-         req.session.logged_with = "MAIL"
-         res.json({ success: true });
-     }
-     else
-         res.json({ success: false });
- 
+    //check if the user exists
+    try {
+        var userInDB = (await axios.get(app_domain + '/user/mail/' + userData.email)).data;
+    }
+    catch (err) {
+        console.log(err)
+    }
+
+    //if it exists, check if the password is correct, log him in
+    if (userInDB != null && userInDB.password == userData.password) {
+        setSession(req, userInDB, 'MAIL')
+
+        res.json({ success: true });
+    }
+    else
+        res.json({ success: false });
+
     /*
     try {
         var user = (await axios.get(app_domain + '/user/' + '5c49e7f329202200177264e7')).data;
