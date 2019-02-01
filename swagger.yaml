@@ -20,7 +20,6 @@ produces:
 paths:
 
 ###################### ACCOUNT # DA TESTARE # DA COMMENTARE
-
   # da testare
   /account/googleSignIn:
     post:
@@ -71,7 +70,8 @@ paths:
             application/json:
               success: true 
 
-  /account/mailRegister: # da testare
+  # da testare
+  /account/mailRegister: 
     post:
       summary: POST ...
       description: |
@@ -94,7 +94,8 @@ paths:
               image_url: 'https://www.iconspng.com/images/-abstract-user-icon-1/-abstract-user-icon-1.jpg'
               password: 'Password'
 
-  /account/mailSignIn: # da testare
+  # da testare
+  /account/mailSignIn: 
     post:
       summary: POST ...
       description: |
@@ -119,35 +120,139 @@ paths:
             application/json:
               success: true
 
-###################### ACTION # DA TESTARE # DA COMMENTARE
-  /action/user/{user_id}:
-    get:
-      summary: GET user informations
-      description: |
-        This API provide all the informations and data of the specified user.
+###################### ACTION # DONE. In order to work, the following API need a session to be stored on the client. The schema of the session is:
+  #  {
+  #   _id: _user._id,
+  #   name: _user.name,
+  #   email: _user.email,
+  #   image_url: _user.image_url
+  # }
+  
+  /action/buy:
+    post:
+      summary: POST action BUY
       parameters:
-        - name: user_id
-          in: path
-          description: ID of the user
+        - name: req
+          in: body
           required: true
-          type: string
+          schema:
+            $ref: '#/definitions/ActionBuy'
       responses:
         200:
           description: Success
           schema:
-              $ref: '#/definitions/UserProfile'
-          examples:
-            application/json:
-              _id: '5c49e7f329202200177264e7'
-              id_google: '101790666037013555749'
-              name: 'Francesco Bruschetti'
-              image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg'
-              email: 'francesco.bruschetti@studenti.unitn.it'
-              __v: 0
-              ETH: 117.1
-              BTC: 2.5999999999999996
-              USD: 583.2955000000002
+              type: object
+              properties:
+                success:
+                  type: boolean
+                message:
+                  type: string
+                  
+  /action/sell:
+    post:
+      summary: POST action SELL
+      parameters:
+        - name: req
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ActionSell'
+      responses:
+        200:
+          description: Success
+          schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                message:
+                  type: string
+  
+  /action/edit_money:
+    post:
+      summary: POST action edit user money
+      parameters:
+        - name: req
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              amount:
+                type: integer
+      responses:
+        200:
+          description: Success
+          schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                message:
+                  type: string
+  
+  /action/plannedaction/buy:
+    post:
+      summary: POST planned action BUY event
+      parameters:
+        - name: req
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ActionPlannedactionBuy'
+      responses:
+        200:
+          description: Success
+          schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                message:
+                  type: string
+  
+  /action/plannedaction/sell:
+    post:
+      summary: POST planned action SELL event
+      parameters:
+        - name: req
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ActionPlannedactionSell'
+      responses:
+        200:
+          description: Success
+          schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                message:
+                  type: string
+  
+  /action/plannedaction/{action_id}:
+    delete:
+      summary: DELETE planned action
+      parameters:
+        - name: action_id
+          in: path
+          description: ID of the plannedaction
+          required: true
+          type: string
+      
+      responses:  # if the action_id doesn't exists, schema will contain a field "message" : "Description of the error"
+        200:
+          description: Success
+          schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                message:
+                  type: string
 
+  #vvvvvvvvvvvvvvvvv DA TOGLIERE vvvvvvvvvvvvvv
   /action/price/:
     get:
       summary: GET Bitcoin and Ethereum value
@@ -167,7 +272,7 @@ paths:
                 _id: '5c507afa1a3910001752de17'
                 ETHUSD: 106.1075
 
-  /account/price/BTCUSD:
+  /action/price/BTCUSD:
     get:
       summary: GET the value of Bitcoin
       description: |
@@ -197,7 +302,7 @@ paths:
               - _id: '5c5080281a3910001752dee1'
                 BTCUSD: 3439.3224999999998
 
-  /account/price/ETHUSD:
+  /action/price/ETHUSD:
     get:
       summary: GET the value of Ethereum
       description: |
@@ -228,7 +333,7 @@ paths:
               - _id: '5c5087131d89e2001739fa3e'
                 ETHUSD: 105.3675
 
-  /account/transaction/user/{user_id}:
+  /action/transaction/user/{user_id}:
     get:
       summary: GET user transaction history
       description: |
@@ -259,7 +364,7 @@ paths:
                 ETH: 0.1
                 _v: 0
 
-  /account/plannedaction/user/{user_id}:
+  /action/plannedaction/user/{user_id}:
     get:
       summary: GET all the planned actions scheduled by the user
       description: |
@@ -275,6 +380,7 @@ paths:
           description: Success
           schema:
               $ref: '#/definitions/PlannedactionSchema'
+  #^^^^^^^^^^^^^^^^ DA TOGLIERE ^^^^^^^^^^^^^^^
 
 ###################### DATABASE # DA TESTARE # DA COMMENTARE
   /database/:
@@ -1351,6 +1457,44 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/FacebookUser'
+
+######################ACTION
+  ActionBuy:
+    type: object
+    properties:
+      currency: 
+        type: string
+      amount:
+        type: integer
+  
+  ActionSell:
+    type: object
+    properties:
+      currency: 
+        type: string
+      amount:
+        type: integer
+        
+  ActionPlannedactionBuy:
+    type: object
+    properties:
+      currency: 
+        type: string
+      amount:
+        type: integer
+      USD:
+        type: number
+
+  ActionPlannedactionSell:
+    type: object
+    properties:
+      currency: 
+        type: string
+      amount:
+        type: integer
+      USD:
+        type: number
+
 
 ###################### PLANNEDACTION
   # no idea what this is
