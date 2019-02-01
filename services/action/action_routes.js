@@ -194,7 +194,7 @@ router.post('/edit_money', async function (req, res) {
                     if (_amount > 0)
                         response.message = 'Successfully deposited ' + _amount + '$'
                     else
-                        response.message = 'Successfully withdrawed ' + _amount + '$'
+                        response.message = 'Successfully withdrawed ' + (-_amount) + '$'
                 }
                 else {
                     response.successful = false
@@ -210,7 +210,7 @@ router.post('/edit_money', async function (req, res) {
         }
         else {
             response.successful = false
-            response.message = err_negative_amount
+            response.message = err_not_enough_money
         }
     }
     else {
