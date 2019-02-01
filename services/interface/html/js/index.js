@@ -76,10 +76,10 @@ function clearBuySellPanel() {
     $('#sell-profit').html('0')
 }
 
-function addMoney() {
+function editMoney(_amount) {
     $.ajax({
         url: add_money_post_path,
-        data: { amount: 1000 },
+        data: { amount: _amount },
         type: 'POST'
     })
         .then(res => {
@@ -298,7 +298,8 @@ $('#btn-buy').click(buy)
 
 $('#btn-sell').click(sell)
 
-$('#btn-add-money').click(addMoney)
+$('#btn-add-money').click(function() { editMoney(1000) })
+$('#btn-remove-money').click(function() { editMoney(-1000) })
 
 $('#elem-history-selector').on('change', function (e) {
     console.log('Chosen points', this.value)
