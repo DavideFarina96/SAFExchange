@@ -17,7 +17,7 @@ produces:
 - application/json
 paths:
 
-###################### PRICE
+###################### PRICE  # COMPLETED
   /price/API:
     get:
       summary: GET the list of available actions
@@ -29,15 +29,11 @@ paths:
           examples: # OSS: | means every line is on a distinct one.
             application/text: | 
               GET /prices -> get the latest value of Bitcoin and Ethereum
-              GET /BTCUSD	-> get the latest Bitcoin value stored
+              GET /BTCUSD  -> get the latest Bitcoin value stored
               GET /BTCUSD?elem_number=N -> get the latest N Bitcoin values stored.
               GET /ETHUSD -> get the latest Ethereum value stored
               GET /ETHUSD?elem_number=N -> get the latest N Ethereum values stored.
-        default:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  
+
   /price/:
     get:
       summary: GET Bitcoin and Ethereum value
@@ -56,12 +52,7 @@ paths:
               ETH: 
                 _id: '5c507afa1a3910001752de17'
                 ETHUSD: 106.1075
-                 
-              
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+
             
   /price/BTCUSD:
     get:
@@ -92,11 +83,7 @@ paths:
                 BTCUSD: 3438.8925
               - _id: '5c5080281a3910001752dee1'
                 BTCUSD: 3439.3224999999998
-              
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error' 
+
             
   /price/ETHUSD:
     get:
@@ -127,13 +114,9 @@ paths:
                 ETHUSD: 105.3425
               - _id: '5c5087131d89e2001739fa3e'
                 ETHUSD: 105.3675
-      
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'  
+ 
     
-###################### TRANSACTION
+###################### TRANSACTION # COMPLETED
   /transaction/user/{user_id}:
     get:
       summary: GET user transaction history
@@ -165,11 +148,7 @@ paths:
                 USD: 356.93825 
                 ETH: 0.1
                 _v: 0
-                  
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+
   
   /transaction/: 
     post:
@@ -196,12 +175,8 @@ paths:
                 BTC: 3601.00
                 USD: 1
 
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
     
-###################### USER
+###################### USER # NOT COMPLETED
   /user/{user_id}:
     get:
       summary: GET user informations
@@ -230,11 +205,7 @@ paths:
               ETH: 117.1
               BTC: 2.5999999999999996
               USD: 583.2955000000002
-              
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+
   
   /user/{user_id}/balance:
     put:
@@ -247,23 +218,7 @@ paths:
           description: ID of the user
           required: true
           type: string
-      #requestBody:
-      #content:
-      #  application/json:
-      #    schema:      # Request body contents
-      #      type: object
-      #      properties:
-      #        ETH:
-      #          type: number
-      #        BTC:
-      #          type: number
-      #        USD: 
-      #          type: number
-      #      example:   # Sample object
-      #        ETH: 1
-      #        BTC: 1
-      #        USD: 1
-          
+
       responses:
         200:
           description: Success
@@ -280,11 +235,7 @@ paths:
               ETH: 117.1
               BTC: 2.5999999999999996
               USD: 583.2955000000002
-              
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+
   
   # DA FARE
   /user/id_google:
@@ -297,11 +248,7 @@ paths:
           description: Success
           schema:
               $ref: '#/definitions/UserGoogle'
-          
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+
         
   # DA FARE    
   /user/id_facebook:
@@ -314,35 +261,33 @@ paths:
           description: Success
           schema:
               $ref: '#/definitions/UserFacebook'
-          
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+
    
-  # DA FARE         
-  /user/mail:
-    put:
-      summary: PUT ...
+  # --> identico a /account/mailRegister 
+  # DA TESTARE
+  /user/mail: 
+    post:
+      summary: POST insert the data of the new user
       description: |
-        This API allows to ...
+        This API allows the user to sign up in the site
       responses:
         200:
           description: Success
           schema:
               $ref: '#/definitions/Mail'
-          
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+          examples: # how to test: paste this code in the field "Body" of the Console
+            application/json:
+              email: 'mail@test.it'
+              name: 'UsernameTest'
+              image_url: 'https://www.iconspng.com/images/-abstract-user-icon-1/-abstract-user-icon-1.jpg'
+              password: 'Password'
+
   
-  # DA FARE
   /user/mail/{mail}:
     get:
-      summary: GET ....
+      summary: GET details of the user that has registered with mail.
       description: |
-        This API ....
+        This API retreive all the informations about the user with the specified mail, that has registered to the site.
       parameters:
         - name: mail
           in: path
@@ -355,18 +300,24 @@ paths:
           description: Success
           schema:
               $ref: '#/definitions/Mail'
-              
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'        
+          examples:
+            _id: '5c5406b4eb968f0017bcf388'
+            email: 'francesco.bruschetti@yahoo.it'
+            name: 'Francesco'
+            image_url: 'https://www.iconspng.com/images/-abstract-user-icon-1/-abstract-user-icon-1.jpg'
+            password: 'Password'
+            ETH: 0
+            BTC: 0
+            USD: 0
+            __v: 0
  
-###################### PLANNED_ACTION # DA FARE
+ 
+###################### PLANNED_ACTION # COMPLETED
   /plannedaction/user/{user_id}:
     get:
-      summary: GET ...
+      summary: GET all the planned actions scheduled by the user
       description: |
-        This API ...
+        This API allows to get the details of every planned actions the the user has scheduled.
       parameters:
         - name: user_id
           in: path
@@ -378,12 +329,8 @@ paths:
         200:
           description: Success
           schema:
-              $ref: '#/definitions/UserProfile'
-          
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+              $ref: '#/definitions/PlannedactionSchema'
+
             
   /plannedaction/{action_id}:
     get:
@@ -401,13 +348,25 @@ paths:
         200:
           description: Success
           schema:
-              $ref: '#/definitions/UserProfile'
-          
-        default:
-          description: Unexpected error
+              $ref: '#/definitions/PlannedactionSchema'
+    
+    delete:
+      summary: POST ...
+      description: |
+        This API ...
+      parameters:
+        - name: action_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+      
+      responses:
+        200:
+          description: Success
           schema:
-            $ref: '#/definitions/Error'
-            
+              $ref: '#/definitions/PlannedactionSchema'
+
   /plannedaction/:
     post:
       summary: POST ...
@@ -419,34 +378,6 @@ paths:
           description: Success
           schema:
               $ref: '#/definitions/UserProfile'
-          
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-      
-  #/plannedaction/{action_id}:
-  #  delete:
-  #    summary: POST ...
-  #    description: |
-  #      This API ...
-  #    parameters:
-  #      - name: action_id
-  #        in: path
-  #        description: ID of the user
-  #        required: true
-  #        type: string
-  #    
-  #    responses:
-  #      200:
-  #        description: Success
-  #        schema:
-  #            $ref: '#/definitions/UserProfile'
-  #        
-  #      default:
-  #        description: Unexpected error
-  #        schema:
-  #          $ref: '#/definitions/Error'
 
   /plannedaction/checkTriggers:
     post:
@@ -459,22 +390,650 @@ paths:
           description: Success
           schema:
               $ref: '#/definitions/UserProfile'
-          
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+
             
 ###################### DATABASE # DA FARE
+
+  /database/:
+    get:
+      summary: GET the list of available actions
+      responses:
+        200:
+          description: list of all actions 
+          schema:
+            type: string
+          examples: # OSS: | means every line is on a distinct one.
+            application/text: |
+              GET  /user 
+              GET  /user/BTC 
+              GET  /user/ETH 
+              GET  /user/USD 
+              POST /user 
+              PUT /user/balance 
+              GET /price 
+              POST /price 
+              GET  /transaction 
+              POST /transaction 
+              GET  /plannedaction 
+              POST /plannedaction 
+              DELETE /plannedaction/:id
+  
+  # TO DO
+  # /database/user/id_google:
+  #   put
+  
+  # TO DO
+  # /database/user/id_facebook:
+  #   put
+  
+  #/database/user/mail: #identico a /user/mail
+  #  post:
+  
+  /database/user/mail/{mail}:
+    get:
+      summary: GET details of the user that has registered with mail.
+      description: |
+        This API retreive all the informations about the user with the specified mail, that has registered to the site.
+      parameters:
+        - name: mail
+          in: path
+          description: mail of the user
+          required: true
+          type: string
+          
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/Mail'
+          examples:
+            _id: '5c5406b4eb968f0017bcf388'
+            email: 'francesco.bruschetti@yahoo.it'
+            name: 'Francesco'
+            image_url: 'https://www.iconspng.com/images/-abstract-user-icon-1/-abstract-user-icon-1.jpg'
+            password: 'Password'
+            ETH: 0
+            BTC: 0
+            USD: 0
+            __v: 0
+
+            
+  /database/user/{user_id}:
+    get:
+      summary: GET user informations
+      description: |
+        This API provide all the informations and data of the specified user.
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+          
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/UserProfile'
+          examples:
+            application/json:
+              _id: '5c49e7f329202200177264e7'
+              id_google: '101790666037013555749'
+              name: 'Francesco Bruschetti'
+              image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg'
+              email: 'francesco.bruschetti@studenti.unitn.it'
+              __v: 0
+              ETH: 117.1
+              BTC: 2.5999999999999996
+              USD: 583.2955000000002
+
+            
+  /database/user/{user_id}/balance:
+    put:
+      summary: PUT update the balance of the user
+      description: |
+        This API allows to initiate and update the balance of the user due to transactions or when it deposits money on its wallet.
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/UserBalance'
+          examples:
+            application/json:
+              _id: '5c49e7f329202200177264e7'
+              id_google: '101790666037013555749'
+              name: 'Francesco Bruschetti'
+              image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg'
+              email: 'francesco.bruschetti@studenti.unitn.it'
+              __v: 0
+              ETH: 117.1
+              BTC: 2.5999999999999996
+              USD: 583.2955000000002
+
+
+  /database/user:
+    post:
+      summary: POST allows userto store user information in the database
+      description: |
+        This API aallows userto store user information in the database.
+      parameters:
+        - name: req
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/UserProfile'
+
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/UserProfile'
+          examples:
+            application/json:
+              _id: 'unique_user_id'
+              id_google: 'id_google_value'
+              name: 'Francesco Bruschetti'
+              image_url: 'url_of_profile_image'
+              email: 'email'
+              __v: 0
+              ETH: 0
+              BTC: 0
+              USD: 0
+
+
+  /database/price:
+    get:
+      summary: GET Bitcoin and Ethereum value
+      description: |
+        This API provides updated values of both Bitcoin and Ethereum from our exchange.
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/Prices'
+          examples:
+            application/json:
+              BTC: 
+                _id: '5c507afa1a3910001752de18'
+                BTCUSD: 3433.4275
+              ETH: 
+                _id: '5c507afa1a3910001752de17'
+                ETHUSD: 106.1075
+
+            
+    post: # da testare
+      summary: POST set the value of Bitcoin and Ethereum
+      description: |
+        This API set values of both Bitcoin and Ethereum.
+      parameters:
+        - name: req
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/DatabasePostPrice'
+      
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/Prices'
+          examples:
+            application/json:
+              BTC: 
+                _id: '5c507afa1a3910001752de18'
+                BTCUSD: 3433.4275
+
+  /database/price/BTCUSD:
+    get:
+      summary: GET the value of Bitcoin
+      description: |
+        This API returns the value of Bitcoin from our exchange.
+        Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Bitcoin.
+        Example: /BTCUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
+      parameters:
+        - name: elem_number
+          in: query
+          description: If specified, the API returns the latest N value of Bitcoin stored on the database.
+          required: true 
+          type: integer
+          default: 1
+          
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/BTCUSDarray'
+          examples:
+            application/json:
+              - _id: '5c50803d1a3910001752dee4'
+                BTCUSD: 3439.0675
+              - _id: '5c5080331a3910001752dee3'
+                BTCUSD: 3438.8925
+              - _id: '5c5080281a3910001752dee1'
+                BTCUSD: 3439.3224999999998
+
+            
+  /database/price/ETHUSD:
+    get:
+      summary: GET the value of Ethereum
+      description: |
+        This API returns the value of Ethereum on our exchange.
+        Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Ethereum.
+        Example: /ETHUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
+      parameters:
+        - name: elem_number
+          in: query
+          description: If specified, the API returns the latest N value of Ethereum stored on the database.
+          required: true 
+          type: integer
+          default: 1
+          
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/ETHUSDarray'
+          examples:
+            application/json:
+              - _id: '5c5087271d89e2001739fa41'
+                ETHUSD: 105.33250000000001
+              - _id: '5c50871c1d89e2001739fa3f'
+                ETHUSD: 105.3425
+              - _id: '5c5087131d89e2001739fa3e'
+                ETHUSD: 105.3675
+ 
+            
+  /database/transaction/{transaction_id}:
+    get:
+      summary: GET informations about the specified transaction
+      description: |
+        This API provide all the informations  about the specified transaction.
+      parameters:
+        - name: transaction_id
+          in: path
+          description: ID of the the transaction
+          required: true
+          type: string
+          
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/TransactionUser'
+          examples:
+            application/json:
+              _id: '5c4de5cbf31add5f84e4375f'
+              author: '5c49e7f329202200177264e7'
+              action: 'BUY'
+              ETH: 1
+              USD: 114.25750000000001
+
+    
+  /database/transaction/user/{user_id}:
+    get:
+      summary: GET user transaction history
+      description: |
+        This API provide the full history of transaction performed by the specified user, both for selling and buying.
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+      
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/TransactionUser'
+          examples:
+            application/json:
+              - _id: '5c4de5cbf31add5f84e4375f'
+                author: '5c49e7f329202200177264e7'
+                action: 'BUY'
+                USD: 114.25750000000001 
+                ETH: 1
+                _v: 0
+              - _id: '5c4de5f230a8dc2530b73a0d'
+                author: '5c49e7f329202200177264e7'
+                action: 'SELL'
+                USD: 356.93825 
+                ETH: 0.1
+                _v: 0
+
+            
+  /database/transaction/: #da testare 
+    post:
+      summary: POST allows user to buy/sell
+      description: |
+        This API allows the user to buy or sell either Bitcoin or Ethereum at the current price.
+      parameters:
+        - name: req
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/NewUserTransaction'
+            
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/NewUserTransaction'
+          examples:
+            application/json:
+                author: '5c4c430e66f8f600177f2d3f'
+                action: 'BUY'
+                state: 'IDLE'
+                BTC: 3601.00
+                USD: 1
+
+  
+  /database/plannedaction/user/{user_id}:
+    get:
+      summary: GET the list of all planned action of the specified user
+      description: |
+        This API allows to retreive the list of all planned action of the specified user transaction.
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+          
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PlannedactionSchema'
+  
+  /database/plannedaction/{action_id}: #da testare 
+    get:
+      summary: GET ...
+      description: |
+        This API ...
+      parameters:
+        - name: action_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+          
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/PlannedactionSchema'
+
+    delete:
+      summary: POST ...
+      description: |
+        This API ...
+      parameters:
+        - name: action_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+      
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/PlannedactionSchema'
+
+    put:
+      summary: PUT modify the details of the specified transaction
+      description: |
+        This API allows to modify the details of the specified transaction.
+      parameters:
+        - name: action_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+        #- in: body
+        #  name: state
+        #  description: New state of the transaction
+        #  required: true
+        #  type: string
+          
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/PlannedactionSchema'
+
+  /database/plannedaction/: #da testare
+    post: 
+      summary: POST allows user to set a planned action
+      description: |
+        This API allows user to set a planned action.
+      parameters:
+        - name: req
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/PlannedactionPost'
+            
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/PlannedactionSchema'
+
+  
+###################### REDIRECT # in progress 
+  # DA ERRORI sui parameters 
+  #/database/user/{user_id}/{currency}:
+  #  get:
+  #    summary: GET the user balance for the specified currency
+  #    description: |
+  #    parameters:
+  #      - name: user_id
+  #        in: path
+  #        description: ID of the user
+  #        required: true
+  #        type: string
+  #      - name: currency
+  #        in: path
+  #        description: 
+  #          "Currency of interest. IMPORTANT: Currency can only be BTC, ETH or USD."
+  #        required: true
+  #        type: string
+          
+  #    responses:
+  #      200:
+  #        description: Success
+  #        type: string
 
 ###################### ACCOUNT # DA FARE
 
 ###################### ACTION # DA FARE
 
-###################### INTERFACE # DA FARE
+###################### INTERFACE
+  # NON HO CAPITO COSA RITORNANO LE FUNZIONI
 
-###################### REDIRECT # DA FARE
+###################### REDIRECT # COMPLETED 
+  /redirect/user/{user_id}:
+    get:
+      summary: GET user informations
+      description: |
+        This API provide all the informations and data of the specified user.
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+          
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/UserProfile'
+          examples:
+            application/json:
+              _id: '5c49e7f329202200177264e7'
+              id_google: '101790666037013555749'
+              name: 'Francesco Bruschetti'
+              image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg'
+              email: 'francesco.bruschetti@studenti.unitn.it'
+              __v: 0
+              ETH: 117.1
+              BTC: 2.5999999999999996
+              USD: 583.2955000000002
+              
+  /redirect/price/:
+    get:
+      summary: GET Bitcoin and Ethereum value
+      description: |
+        This API provides updated values of both Bitcoin and Ethereum from our exchange.
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/Prices'
+          examples:
+            application/json:
+              BTC: 
+                _id: '5c507afa1a3910001752de18'
+                BTCUSD: 3433.4275
+              ETH: 
+                _id: '5c507afa1a3910001752de17'
+                ETHUSD: 106.1075
 
+
+  /redirect/price/BTCUSD:
+    get:
+      summary: GET the value of Bitcoin
+      description: |
+        This API returns the value of Bitcoin from our exchange.
+        Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Bitcoin.
+        Example: /BTCUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
+      parameters:
+        - name: elem_number
+          in: query
+          description: If specified, the API returns the latest N value of Bitcoin stored on the database.
+          required: false 
+          type: integer
+          
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/BTCUSDarray'
+          examples:
+            application/json:
+              - _id: '5c50803d1a3910001752dee4'
+                BTCUSD: 3439.0675
+              - _id: '5c5080331a3910001752dee3'
+                BTCUSD: 3438.8925
+              - _id: '5c5080281a3910001752dee1'
+                BTCUSD: 3439.3224999999998
+
+            
+  /redirect/price/ETHUSD:
+    get:
+      summary: GET the value of Ethereum
+      description: |
+        This API returns the value of Ethereum on our exchange.
+        Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Ethereum.
+        Example: /ETHUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
+      parameters:
+        - name: elem_number
+          in: query
+          description: If specified, the API returns the latest N value of Ethereum stored on the database.
+          required: false 
+          type: integer
+          
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/ETHUSDarray'
+          examples:
+            application/json:
+              - _id: '5c5087271d89e2001739fa41'
+                ETHUSD: 105.33250000000001
+              - _id: '5c50871c1d89e2001739fa3f'
+                ETHUSD: 105.3425
+              - _id: '5c5087131d89e2001739fa3e'
+                ETHUSD: 105.3675
+
+
+  /redirect/transaction/user/{user_id}:
+    get:
+      summary: GET user transaction history
+      description: |
+        This API provide the full history of transaction performed by the specified user, both for selling and buying.
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+      
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/TransactionUser'
+          examples:
+            application/json:
+              - _id: '5c4de5cbf31add5f84e4375f'
+                author: '5c49e7f329202200177264e7'
+                action: 'BUY'
+                USD: 114.25750000000001 
+                ETH: 1
+                _v: 0
+              - _id: '5c4de5f230a8dc2530b73a0d'
+                author: '5c49e7f329202200177264e7'
+                action: 'SELL'
+                USD: 356.93825 
+                ETH: 0.1
+                _v: 0
+                  
+
+  /redirect/plannedaction/user/{user_id}:
+    get:
+      summary: GET all the planned actions scheduled by the user
+      description: |
+        This API allows to get the details of every planned actions the the user has scheduled.
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          type: string
+          
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/UserProfile'
+
+
+
+############################################ 
+###################### DEFINITIONS      
+############################################ 
 definitions:
   #Actions:
   #  allOf:
@@ -512,6 +1071,14 @@ definitions:
     properties:
       _id:
         type: string
+      ETHUSD:
+        type: number
+        
+  DatabasePostPrice:
+    type: object
+    properties: # non possono esserci entrambi contemporaneamente
+      BTCUSD:
+        type: number
       ETHUSD:
         type: number
 
@@ -595,11 +1162,79 @@ definitions:
     properties:
       id: 
         type: string
-  # DA FARE     
+        
   Mail:
     properties:
-      id: 
+      _id:
         type: string
+      name:
+        type: string
+      image_url:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      _v: 
+        type: number
+      ETH:
+        type: number
+      BTC: 
+        type: number
+      USD:
+        type: number
+  
+###################### PLANNEDACTION
+
+  # no idea what this is
+  Plannedaction: 
+    properties:
+      _id:
+        type: string
+      id_google:  # id_google e id_facebook devono essere mutualmente esclusive e possono non esserci se l'utente ha fatto il login con la mail
+        type: string
+      id_facebook:
+        type: string
+      name:
+        type: string
+      image_url:
+        type: string
+      email:
+        type: string
+      _v: 
+        type: number
+      ETH:
+        type: number
+      BTC: 
+        type: number
+      USD:
+        type: number
+        
+  PlannedactionSchema:
+    type: object
+    properties:
+      author:
+        type: string
+      action:
+        type: string
+      state:
+        type: string
+      BTC:            # TODO: BTC deve essere mutualmente esclusivo con ETH
+        type: number
+      ETH:
+        type: number
+      USD:
+        type: number
+
+  PlannedactionPost:
+    type: object
+    properties: 
+      USD:
+        type: number
+      BTC:  # BTC e ETH mutualmente esclusivi
+        type: number
+      ETH:
+        type: number
 
 ###################### ERROR
   Error:
