@@ -1,7 +1,7 @@
 // PATHS /////////////////////////////////////////////////////////////////
 var buy_post_path = '/action/buy/'
 var sell_post_path = '/action/sell/'
-var add_money_post_path = '/action/add_money/'
+var add_money_post_path = '/action/edit_money/'
 
 var price_history_get_path = '/redirect/price/'
 
