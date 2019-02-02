@@ -4,11 +4,7 @@ router = express.Router();
 var mongoose = require('mongoose');                     // mongoose for mongodb
 require('./schemas.js');								// create the models for the objs
 
-//var db_path = '';
-//if (process.env.NODE && ~process.env.NODE.indexOf("heroku"))
-//	db_path = 'mongodb:// path to DB'
-//else
-
+// URL on which the DB is stored
 var db_path = 'mongodb://administrator:admin_obv1@ds163164.mlab.com:63164/safexchangedb';
 
 
@@ -26,30 +22,6 @@ var User = mongoose.model('users');
 var Price = mongoose.model('prices');
 var Transaction = mongoose.model('transactions');
 var PlannedAction = mongoose.model('plannedactions');
-
-
-// ROUTES
-var possible_routes =
-	"GET		/user" + "<br>" +
-	"/user/BTC" + "<br>" +
-	"/user/ETH" + "<br>" +
-	"/user/USD" + "<br>" +
-	"POST 		/user" + "<br>" +
-	"PUT 		/user/balance" + "<br>" +
-
-	"GET 		/price" + "<br>" +
-	"POST 		/price" + "<br>" +
-
-	"GET		/transaction" + "<br>" +
-	"POST 		/transaction" + "<br>" +
-
-	"GET		/plannedaction" + "<br>" +
-	"POST 		/plannedaction" + "<br>" +
-	"DELETE		/plannedaction/:id";
-
-router.get('/', function (req, res) {
-	res.send(possible_routes);
-});
 
 /*
 	GET		/user
@@ -70,7 +42,7 @@ router.get('/', function (req, res) {
 	DELETE	/plannedaction/:id
 */
 
-/** USER ROUTES **/
+// USER ROUTES //////////////////////////////////////////////////////////////////////////////
 router.put('/user/id_google', function (req, res) {
 	var _user = req.body
 
@@ -109,20 +81,23 @@ router.post('/user/mail', function (req, res) {
 router.get('/user/mail/:mail', function (req, res) {
 	email = req.params.mail.toLowerCase();
 
-	//find all users who registered with the email only (no google and fb)
-	User.findOne({"id_google" : {"$exists": false}, "id_facebook" : {"$exists": false}, "email": email }, function (err, user) {
+	// Find the user registered with the email only (no google and fb) and is the same as the param
+	User.findOne({ "id_google": { "$exists": false }, "id_facebook": { "$exists": false }, "email": email }, function (err, user) {
 		if (err) res.send(err);
 		res.json(user);
 	});
 })
 
 router.get('/user/:user_id', function (req, res) {
+	// Given the _id, return the corresponding user
 	User.findById(req.params.user_id, function (err, user) {
 		if (err) res.send(err);
 		res.json(user);
 	});
 });
+
 router.get('/user/:user_id/:currency', function (req, res) {
+	// Get the amount of a single currency for a certain user
 	User.findById(req.params.user_id, function (err, user) {
 		if (err) res.send(err);
 
@@ -141,6 +116,7 @@ router.get('/user/:user_id/:currency', function (req, res) {
 });
 
 router.put('/user/:user_id/balance', function (req, res) {
+	// Update user balance
 	var _user_id = req.params.user_id;
 	var _balance = {}
 
@@ -163,6 +139,7 @@ router.post('/user', function (req, res) {
 	// Get user params
 	var _user = req.body;
 
+	// Create a user with the object received
 	User.create(_user, function (err, user) {
 		if (err) return res.send(err);
 
@@ -172,8 +149,8 @@ router.post('/user', function (req, res) {
 });
 
 
-/** PRICE ROUTES **/
-// Defines the /price API, which is used from pricews for saving the new value of the currencies
+// PRICE ROUTES /////////////////////////////////////////////////////////////////////////////
+// Defines the /price API, which is used from price ws for saving the new value of the currencies
 router.get('/price', async function (req, res) {
 	var _price = {};
 
@@ -197,7 +174,7 @@ router.get('/price/BTCUSD', async function (req, res) {
 	var _prices = [];
 
 	try {
-		// Get the last prices for both BTC and ETH and send them
+		// Get the last prices for BTC and send it
 		_prices = (await Price.find({ BTCUSD: { $exists: true } }, 'BTCUSD',
 			{ sort: { '_id': -1 }, limit: _elem_number }));
 
@@ -216,7 +193,7 @@ router.get('/price/ETHUSD', async function (req, res) {
 	var _prices = [];
 
 	try {
-		// Get the last prices for both BTC and ETH and send them
+		// Get the last prices for ETH and send it
 		_prices = (await Price.find({ ETHUSD: { $exists: true } }, 'ETHUSD',
 			{ sort: { '_id': -1 }, limit: _elem_number }));
 
@@ -230,6 +207,7 @@ router.get('/price/ETHUSD', async function (req, res) {
 });
 
 router.post('/price', function (req, res) {
+	// Insert a new price in DB
 	var _price = req.body;
 
 	Price.create(_price, function (err, price) {
@@ -241,10 +219,11 @@ router.post('/price', function (req, res) {
 });
 
 
-/** TRANSACTION ROUTES **/
+// TRANSACTION ROUTES //////////////////////////////////////////////////////////////////////
 router.get('/transaction/:transaction_id', function (req, res) {
 	var _transaction_id = req.params.transaction_id;
 
+	// Return transaction corresponding to the provided _id
 	Transaction.findById(_transaction_id, function (err, transaction) {
 		if (err) return res.send(err);
 
@@ -255,6 +234,7 @@ router.get('/transaction/:transaction_id', function (req, res) {
 router.get('/transaction/user/:user_id', function (req, res) {
 	var _user_id = req.params.user_id;
 
+	// Return all transaction of a user identified by its _id
 	Transaction.find({ author: _user_id }, function (err, transactions) {
 		if (err) return res.send(err);
 
@@ -263,55 +243,56 @@ router.get('/transaction/user/:user_id', function (req, res) {
 });
 
 router.post('/transaction', function (req, res) {
+	// Insert a new transaction in DB
 	var _transaction = req.body;
 
+	var _has_USD_field = _transaction.hasOwnProperty('USD');
 	var _has_BTC_field = _transaction.hasOwnProperty('BTC');
 	var _has_ETH_field = _transaction.hasOwnProperty('ETH');
 
-	// XOR operand
-	if ((_has_BTC_field && !_has_ETH_field) || (!_has_BTC_field && _has_ETH_field)) {
+	// XOR operand. Transaction can contain (USD and BTC) XOR (USD and ETH)
+	if (_has_USD_field && ((_has_BTC_field && !_has_ETH_field) || (!_has_BTC_field && _has_ETH_field))) {
 		Transaction.create(_transaction, function (err, transaction) {
 			if (err) return res.send(err);
 
-			console.log("New transaction inserted");
 			res.json(transaction);
 		});
 	}
 	else {
 		console.log("Error! Wrong data");
-		res.send("Error! The body request should contain either the field BTC or ETH (exclusively)");
+		res.json({ message: "Error! The body request should contain either the field BTC or ETH (exclusively)" });
 	}
 });
 
 
-/** PLANNEDACTION ROUTES **/
+// PLANNEDACTION ROUTES ///////////////////////////////////////////////////////////////////
 router.get('/plannedaction/:plannedaction_id', function (req, res) {
 	var _plannedaction_id = req.params.plannedaction_id;
 
-	if(_plannedaction_id == "all_idle")
-	{
-		PlannedAction.find({state: "IDLE"}, function (err, plannedactions) {
+	// Get all planned actions in idle (used to check if some planned action should be triggered)
+	if (_plannedaction_id == "all_idle") {
+		PlannedAction.find({ state: "IDLE" }, function (err, plannedactions) {
 			if (err) return res.send(err);
 
 			res.json(plannedactions);
 		});
 	}
-	else
-	{
+	// Return the planned action with the provided _id
+	else {
 		PlannedAction.findById(_plannedaction_id, function (err, plannedaction) {
 			if (err) return res.send(err);
 
 			res.json(plannedaction);
 		});
 	}
-
 });
 
 router.put('/plannedaction/:plannedaction_id', function (req, res) {
 	var _plannedaction_id = req.params.plannedaction_id;
 	var newState = req.body.state;
 
-	PlannedAction.findByIdAndUpdate(_plannedaction_id, {$set: {state: newState}}, {new: true}, function (err, plannedaction) {
+	// Update the state of a planned action
+	PlannedAction.findByIdAndUpdate(_plannedaction_id, { $set: { state: newState } }, { new: true }, function (err, plannedaction) {
 		if (err) return res.send(err);
 
 		res.json(plannedaction);
@@ -320,8 +301,8 @@ router.put('/plannedaction/:plannedaction_id', function (req, res) {
 
 router.get('/plannedaction/user/:user_id', function (req, res) {
 	var _user_id = req.params.user_id;
-	console.log("oK");
 
+	// Return all planned actions of a user
 	PlannedAction.find({ author: _user_id }, function (err, plannedactions) {
 		if (err) return res.send(err);
 
@@ -330,13 +311,14 @@ router.get('/plannedaction/user/:user_id', function (req, res) {
 });
 
 router.post('/plannedaction', function (req, res) {
+	// Insert new planned action in DB
 	var _plannedaction = req.body;
 
 	var _has_USD_field = _plannedaction.hasOwnProperty('USD');
 	var _has_BTC_field = _plannedaction.hasOwnProperty('BTC');
 	var _has_ETH_field = _plannedaction.hasOwnProperty('ETH');
 
-	// XOR operand
+	// XOR operand. Planned action can contain (USD and BTC) XOR (USD and ETH)
 	if (_has_USD_field && ((_has_BTC_field && !_has_ETH_field) || (!_has_BTC_field && _has_ETH_field))) {
 		PlannedAction.create(_plannedaction, function (err, plannedaction) {
 			if (err) return res.send(err);
@@ -347,13 +329,14 @@ router.post('/plannedaction', function (req, res) {
 	}
 	else {
 		console.log("Error! Wrong data");
-		res.send("Error! The body request should contain either the fields USD and BTC or ETH (exclusively)");
+		res.json({ message: "Error! The body request should contain either the fields USD and BTC or ETH (exclusively)" });
 	}
 });
 
 router.delete('/plannedaction/:plannedaction_id', function (req, res) {
 	var _plannedaction_id = req.params.plannedaction_id;
 
+	// The planned action is not actually deleted but its state set to CANCELED
 	PlannedAction.findByIdAndUpdate(_plannedaction_id, { $set: { state: 'CANCELED' } }, { new: true },
 		function (err, plannedaction) {
 			if (err) res.send(plannedaction);

@@ -7,6 +7,7 @@ const axios = require('axios')
 // User
 router.get('/user/:user_id', async function (req, res) {
     var _user_id = req.params.user_id;
+    
     console.log("Received request for user", _user_id)
 
     var user = (await axios.get(app_domain + '/user/' + _user_id)).data;
@@ -67,4 +68,4 @@ router.get('/plannedaction/user/:user_id', async function (req, res) {
 
 
 // EXPORT
-module.exports.router = router;
+module.exports = router;

@@ -3,8 +3,7 @@ router = express.Router();
 
 const axios = require('axios')
 
-
-//PROCESS ROUTES /////////////////////////////////////////////////////
+// MESSAGES ///////////////////////////////////////////////////////////
 var err_user_session = 'User session variable not set'
 var err_user_update = 'There was an error with the user update'
 var err_transaction = 'There was an error with the transaction'
@@ -15,8 +14,11 @@ var success_plannedaction = 'Planned action successfully inserted'
 var err_negative_amount = 'The amount must be positive'
 
 
+// PROCESS ROUTES /////////////////////////////////////////////////////
+
 // Buy / Sell
 router.post('/buy', async function (req, res) {
+    // Get user from session
     var _user = req.session.user
 
     var response = {}
@@ -24,19 +26,24 @@ router.post('/buy', async function (req, res) {
     // Check if user is logged
     if (_user != null) {
         var _user_id = _user._id;
+        // Get POST params
         var _currency = req.body.currency;
         var _amount = parseFloat(req.body.amount);
 
+        // If the amount of BTC/ETH is positive, proceed. Otherwise, return error.
         if (_amount > 0) {
             try {
                 // Check if user has enough money
                 var user_USD_balance = (await axios.get(app_domain + '/user/' + _user_id)).data.USD
                 var current_price = (await axios.get(app_domain + '/price')).data
 
+                // Compute the total USD required for the transaction
                 var _USD_total = _amount * parseFloat(current_price[_currency][_currency + 'USD'])
 
+                // If user has more money than needed
                 if (user_USD_balance >= _USD_total) {
 
+                    // Create the new objects to be inserted in DB
                     var new_transaction = {
                         author: _user_id,
                         action: 'BUY',
@@ -44,6 +51,7 @@ router.post('/buy', async function (req, res) {
                     }
                     var new_balance = { USD: - _USD_total }
 
+                    // Set the right attributes depending on the currency (BTC or ETH)
                     new_transaction[_currency] = _amount
                     new_balance[_currency] = _amount
 
@@ -91,29 +99,36 @@ router.post('/buy', async function (req, res) {
         response.message = err_user_session
     }
 
+    // Return data to client
     res.json(response);
 });
 
 router.post('/sell', async function (req, res) {
+    // Get user from session
     var _user = req.session.user
 
     var response = {}
 
+    // Check if user is logged
     if (_user != null) {
         var _user_id = _user._id;
+        // Get POST params
         var _currency = req.body.currency;
         var _amount = parseFloat(req.body.amount);
 
+        // If the amount of BTC/ETH is positive, proceed. Otherwise, return error.
         if (_amount > 0) {
             try {
                 // Check if user has enough BTC/ETH to sell
                 var _user_amount = (await axios.get(app_domain + '/user/' + _user_id)).data[_currency]
 
+                // If user has more money than needed
                 if (_user_amount >= _amount) {
 
                     // Get current price
                     var current_price = (await axios.get(app_domain + '/price')).data
 
+                    // Create the new objects to be inserted in DB
                     var new_transaction = {
                         author: _user_id,
                         action: 'SELL'
@@ -169,17 +184,23 @@ router.post('/sell', async function (req, res) {
         response.message = err_user_session
     }
 
+    // Return data to client
     res.json(response);
 });
 
 router.post('/edit_money', async function (req, res) {
+    // Get user from session
     var _user = req.session.user
 
     var response = {}
+
+    // Check if user is logged
     if (_user != null) {
         var _user_id = _user._id;
+        // Get POST params
         var _amount = parseFloat(req.body.amount);
 
+        // Check whether amount is positive OR the user has more money than the amount to withdraw
         if (_amount >= 0 || ((await axios.get(app_domain + '/user/' + _user_id)).data.USD + _amount) > 0) {
             try {
                 var new_balance = {
@@ -218,29 +239,36 @@ router.post('/edit_money', async function (req, res) {
         response.message = err_user_session
     }
 
+    // Return data to client
     res.json(response);
 });
 
 // Plannedaction Buy / Sell / Cancel
 router.post('/plannedaction/buy', async function (req, res) {
+    // Get user from session
     var _user = req.session.user
 
     var response = {}
 
+    // Check if user is logged
     if (_user != null) {
         var _user_id = _user._id;
+        // Get POST params
         var _currency = req.body.currency;
         var _amount = parseFloat(req.body.amount);
         var _USD = parseFloat(req.body.USD);
 
+        // If the amount of BTC/ETH is positive, proceed. Otherwise, return error.
         if (_amount > 0) {
             try {
                 // Check if user has enough money
                 var user_USD_balance = (await axios.get(app_domain + '/user/' + _user_id)).data.USD
                 var _USD_total = _amount * _USD
 
+                // If user has more money than needed
                 if (user_USD_balance >= _USD_total) {
 
+                    // Create the new objects to be inserted in DB
                     var new_plannedaction = {
                         author: _user_id,
                         action: 'BUY',
@@ -293,27 +321,33 @@ router.post('/plannedaction/buy', async function (req, res) {
         response.message = err_user_session
     }
 
+    // Return data to client
     res.json(response);
 });
 
 router.post('/plannedaction/sell', async function (req, res) {
+    // Get user from session
     var _user = req.session.user
 
     var response = {}
 
+    // Check if user is logged
     if (_user != null) {
         var _user_id = _user._id;
+        // Get POST params
         var _currency = req.body.currency;
         var _amount = parseFloat(req.body.amount);
         var _USD = parseFloat(req.body.USD);
 
+        // If the amount of BTC/ETH is positive, proceed. Otherwise, return error.
         if (_amount > 0) {
             try {
                 // Check if user has enough BTC/ETH to sell
                 var _user_amount = (await axios.get(app_domain + '/user/' + _user_id)).data[_currency]
 
+                // If user has more money than needed
                 if (_user_amount >= _amount) {
-
+                    // Create the new objects to be inserted in DB
                     var new_plannedaction = {
                         author: _user_id,
                         action: 'SELL',
@@ -367,68 +401,74 @@ router.post('/plannedaction/sell', async function (req, res) {
         response.message = err_user_session
     }
 
+    // Return data to client
     res.json(response);
 });
 
 router.delete('/plannedaction/:action_id', async function (req, res) {
-    try {
-        var response = {}
+    // Get user from session
+    var _user = req.session.user
 
-        // Set the action as canceled
-        var plannedaction = (await axios.delete(app_domain + '/plannedaction/' + req.params.action_id)).data;
+    var response = {}
 
-        if (plannedaction.hasOwnProperty('_id')) {
-            // Give back user money
-            var new_balance = {}
+    // Check if user is logged
+    if (_user != null) {
+        try {
+            // Set the action as canceled
+            var plannedaction = (await axios.delete(app_domain + '/plannedaction/' + req.params.action_id)).data;
+            if (plannedaction.hasOwnProperty('_id')) {
+                // Give back user money
+                var new_balance = {}
 
-            if (plannedaction.action == 'BUY') {
-                // Give back USD
-                if (plannedaction.hasOwnProperty('BTC')) {
-                    new_balance.USD = plannedaction.USD * plannedaction.BTC
+                // Depending in the action (Buy or Sell), give back USD or BTC/ETH
+                if (plannedaction.action == 'BUY') {
+                    // Give back USD
+                    if (plannedaction.hasOwnProperty('BTC')) {
+                        new_balance.USD = plannedaction.USD * plannedaction.BTC
+                    }
+                    else if (plannedaction.hasOwnProperty('ETH')) {
+                        new_balance.USD = plannedaction.USD * plannedaction.ETH
+                    }
                 }
-                else if (plannedaction.hasOwnProperty('ETH')) {
-                    new_balance.USD = plannedaction.USD * plannedaction.ETH
+                else if (plannedaction.action == 'SELL') {
+                    // Give back BTC / ETH
+                    if (plannedaction.hasOwnProperty('BTC')) {
+                        new_balance.BTC = plannedaction.BTC
+                    }
+                    else if (plannedaction.hasOwnProperty('ETH')) {
+                        new_balance.ETH = plannedaction.ETH
+                    }
                 }
-            }
-            else if (plannedaction.action == 'SELL') {
-                // Give back BTC / ETH
-                if (plannedaction.hasOwnProperty('BTC')) {
-                    new_balance.BTC = plannedaction.BTC
+
+                // Update user's balance
+                var new_user = (await axios.put(app_domain + '/user/' + plannedaction.author + '/balance', new_balance)).data
+                if (new_user.hasOwnProperty('_id')) {
+                    response.successful = true
+                    response.message = 'Planned action successfully canceled'
                 }
-                else if (plannedaction.hasOwnProperty('ETH')) {
-                    new_balance.ETH = plannedaction.ETH
+                else {
+                    response.successful = false;
+                    response.message = 'Error during balance update'
                 }
-            }
-
-            console.log('NEW BALANCE', JSON.stringify(new_balance))
-
-            // Update user's balance
-            var new_user = (await axios.put(app_domain + '/user/' + plannedaction.author + '/balance', new_balance)).data
-
-            if (new_user.hasOwnProperty('_id')) {
-                // Update session's variable
-                req.session.user = new_user
-
-                response.successful = true
-                response.message = 'Planned action successfully canceled'
             }
             else {
                 response.successful = false;
-                response.message = 'Error during balance update'
+                response.message = 'Error during plannedaction update'
             }
         }
-        else {
-            response.successful = false;
-            response.message = 'Error during plannedaction update'
+        catch (err) {
+            console.log(err)
         }
     }
-    catch (err) {
-        console.log(err)
+    else {
+        response.successful = false
+        response.message = err_user_session
     }
 
-    res.json(response)
+    // Return data to client
+    res.json(response);
 })
 
 
 // EXPORT
-module.exports.router = router;
+module.exports = router;

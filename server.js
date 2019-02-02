@@ -1,7 +1,6 @@
 // INCLUDES
 var express = require('express');
 var app = express();                                    // create our app w/ express
-var router = express.Router();
 var session = require('express-session');
 
 var bodyParser = require('body-parser');                // pull information from HTML POST (express4)
@@ -16,8 +15,6 @@ app.use(express.static(path.join(__dirname, 'public')));        // set the stati
 app.use(morgan('dev'));                                         // log every request to the console
 app.use(bodyParser.urlencoded({ extended: true }));             // parse application/x-www-form-urlencoded
 app.use(bodyParser.json());                                     // parse application/json
-//app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
-//app.use(methodOverride());
 
 // Choose what port to use. If deployed on heroku process.env.PORT will be set and therefore used
 const PORT = process.env.PORT || 8080
@@ -51,15 +48,15 @@ app.use('/interface', interface_module.router);
 
 // Include REDIRECT routes
 var redirect_module = require('./services/redirect/redirect_routes.js');
-app.use('/redirect', redirect_module.router);
+app.use('/redirect', redirect_module);
 
 // Include ACTION routes
 var action_module = require('./services/action/action_routes.js');
-app.use('/action', action_module.router);
+app.use('/action', action_module);
 
 // Include ACCOUNT routes
 var account_module = require('./services/account/account_routes.js');
-app.use('/account', account_module.router);
+app.use('/account', account_module);
 
 // Include USER routes
 var user_routes = require('./services/user/user_routes.js');
@@ -77,8 +74,7 @@ app.use('/price', price_routes);
 var transaction_routes = require('./services/transaction/transaction_routes.js');
 app.use('/transaction', transaction_routes);
 
-// register main router
-app.use('/', router);
+
 
 // listen (start app with node server.js) ======================================
 app.listen(PORT, function () {

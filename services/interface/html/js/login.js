@@ -6,10 +6,10 @@ var url_register_mail = '/account/mailRegister'
 
 function onGoogleSignIn(googleUser) {
     var profile = googleUser.getBasicProfile();
-    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+    console.log('ID: ' + profile.getId());
     console.log('Name: ' + profile.getName());
     console.log('Image URL: ' + profile.getImageUrl());
-    console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+    console.log('Email: ' + profile.getEmail());
 
     var user_obj = {
         id_google: profile.getId(),
@@ -18,9 +18,7 @@ function onGoogleSignIn(googleUser) {
         email: profile.getEmail()
     }
 
-    //console.log(profile.getEmail());
-
-    //SEND TOKEN TO BACKEND
+    // Send token to backend
     var id_token = googleUser.getAuthResponse().id_token;
 
     execute_post(url_google, { tokenid: id_token, user: user_obj }, (() => { $('#error_msg').show(); }));
@@ -30,7 +28,7 @@ function onFacebookSignIn(facebookData) {
     var id_token = facebookData.authResponse.accessToken;
 
     FB.api('/me?fields=name,email', function (response) {
-        console.log(response);  //response is the basic user object
+        console.log(response);  // Response is the basic user object
         var userData = response;
 
         var user_obj = {
@@ -67,7 +65,7 @@ function onMailRegister() {
 
 
 function execute_post(url, params, err_callback) {
-    // Send it to /interface
+    // Perform login / register by calling /account
     $.ajax({
         url: url,
         data: params,
@@ -77,10 +75,10 @@ function execute_post(url, params, err_callback) {
         .then(res => {
             console.log(res)
             if (res.success) {
-                console.log('Signed in as');
                 window.location.href = "/interface";
             }
             else {
+                // If there was an error call the callback function provided in the params
                 err_callback()
             }
         })

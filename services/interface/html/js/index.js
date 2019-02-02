@@ -18,8 +18,10 @@ var currency = 'BTC'
 function buy() {
     var _amount = $('#buy-amount').val();
 
+    // Reset input values
     clearBuySellPanel()
 
+    // Call /action to perform a Buy
     $.ajax({
         url: buy_post_path,
         data: { currency: currency, amount: _amount },
@@ -29,6 +31,7 @@ function buy() {
             if (res.successful) {
                 alert(res.message)
 
+                // Update panels
                 updateTransactionList()
                 updateUserInfo()
             }
@@ -101,6 +104,7 @@ function editMoney(_amount) {
 
 // CHART PANEL ///////////////////////////////////////////////////////////
 function getPriceHistory() {
+    // This function gets the prices to be displayed in the chart
     $.ajax({
         url: price_history_get_path + currency + 'USD',
         data: { elem_number: nElemHistory },
