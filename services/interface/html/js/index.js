@@ -130,7 +130,7 @@ function updateTransactionList() {
         type: 'GET'
     })
         .then(res => {
-            console.log(res);
+            //console.log(res);
 
             html = createHTMLlist(res, 'transaction')
 
@@ -149,7 +149,7 @@ function updatePlannedactionList() {
         type: 'GET'
     })
         .then(res => {
-            console.log(res);
+            //console.log(res);
 
             html = createHTMLlist(res, 'plannedaction')
 

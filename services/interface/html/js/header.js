@@ -49,7 +49,7 @@ function updateUserInfo() {
                 $('#user-BTC').html(res.BTC ? res.BTC.toFixed(2) : 0)
                 $('#user-ETH').html(res.ETH ? res.ETH.toFixed(2) : 0)
 
-                console.log('User info updated', res)
+                //console.log('User info updated', res)
             })
             .catch(err => {
                 // If the promise resolves with an error, log it in console
@@ -71,6 +71,9 @@ function timerStep() {
 
     if (typeof updatePlannedactionList === "function")
         updatePlannedactionList()
+
+    if (typeof updateTransactionList === "function")
+        updateTransactionList()
 }
 
 // Update every 10 seconds
