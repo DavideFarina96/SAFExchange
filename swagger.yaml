@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: '2.1.0'
+  version: '2.2.0'
   title: "SAFExchange"
   x-summary: Collection of API provided by the web service PRICE
   description: This is the API documentation for the project SAFExchange.
@@ -19,7 +19,7 @@ produces:
 - application/json
 paths:
 
-###################### ACCOUNT # DA TESTARE 
+###################### ACCOUNT # COMPLETED 
   /account/googleSignIn:
     post:
       summary: POST for Google Sign In
@@ -35,7 +35,9 @@ paths:
             $ref: '#/definitions/Google'  
       responses:
         200:
-          description: Success
+          description: |
+            Success
+            __IMPORTANT:__ tokenId may be espired.
           examples:
             application/json:
               iss: 'accounts.google.com'
@@ -71,7 +73,9 @@ paths:
             $ref: '#/definitions/Facebook'  
       responses:
         200:
-          description: Success
+          description: |
+            Success
+            __IMPORTANT:__ tokenId may be espired.
           schema:
             type: object
             properties:
@@ -319,7 +323,7 @@ paths:
           description: ID of the plannedaction
           required: true
           type: string
-      
+          default: '5c4c31814296b5001795b40b'
       responses: 
         200:
           description: Success
@@ -332,110 +336,13 @@ paths:
                   type: string
                   
 ###################### DATABASE # COMPLETED
-  /database/user/id_google:
-    put:
-      summary: POST edit the Google ID of the user
-      description: |
-        This API is used to update the Google ID of the user. If the value is not set jet, it will write the received data in the database.
-        
-        ____IMPORTANT____: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
-      tags:
-        - database
-      parameters:
-        - name: req
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/GoogleUser'  
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: '#/definitions/GoogleUser'
-  
-  /database/user/id_facebook:
-    put:
-      summary: POST edit the Facebook ID of the user
-      description: |
-        This API is used to update the Facebook ID of the user. If the value is not set jet, it will write the received data in the database.
-        
-        ____IMPORTANT____: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
-      tags:
-        - database
-      parameters:
-        - name: req
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/FacebookUser'  
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: '#/definitions/FacebookUser'
-  
-  /database/user/mail: 
-    post:
-      summary: POST insert the informations of the mail of the user in the database
-      description: |
-        This API inserts the informations of the mail of the user in the database.
-        
-        __IMPORTANT__: You MUST specify Email and Password value or the server will generate and error. The Name is optional.
-      tags:
-        - database
-      parameters:
-        - name: req
-          in: body
-          description: User informations
-          required: true
-          schema:
-            $ref: '#/definitions/MailRequest'
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: '#/definitions/MailResponse'
-  
-  /database/user/mail/{mail}:
+  /database/plannedaction/user/{user_id}:
     get:
-      summary: GET details of the user that has registered with mail method.
+      summary: GET the list of all planned action of the specified user
       description: |
-        This API retreive all the informations about the user that has registered to the site through Mail.
+        This API allows to retreive the list of all planned action of the specified user transaction.
         
-        __IMPORTANT:__ Response will be 'null' if no user has registered with the specified mail.
-      tags:
-        - database
-      parameters:
-        - name: mail
-          in: path
-          description: mail of the user
-          required: true
-          type: string
-          
-      responses:
-        200:
-          description: Success
-          schema:
-              $ref: '#/definitions/MailResponse'
-          examples:
-            application/json:
-              _id: '5c5406b4eb968f0017bcf388'
-              email: 'francesco.bruschetti@yahoo.it'
-              name: 'Francesco'
-              image_url: 'https://www.iconspng.com/images/-abstract-user-icon-1/-abstract-user-icon-1.jpg'
-              password: 'Password'
-              ETH: 0
-              BTC: 0
-              USD: 0
-              __v: 0
-
-  /database/user/{user_id}:
-    get:
-      summary: GET user informations
-      description: |
-        This API provide all the informations and data of the specified user.
-        
-        __IMPORTANT__: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        __IMPORTANT__: if one of the ID of the user is invalid or it doesn't belong to any user, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
       tags:
         - database
       parameters:
@@ -444,117 +351,102 @@ paths:
           description: ID of the user
           required: true
           type: string
+          default: '5c49e7f329202200177264e7'
           
       responses:
         200:
           description: Success
           schema:
-              $ref: '#/definitions/UserProfile'
-          examples:
-            application/json:
-              _id: '5c49e7f329202200177264e7'
-              id_google: '101790666037013555749'
-              name: 'Francesco Bruschetti'
-              image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg'
-              email: 'francesco.bruschetti@studenti.unitn.it'
-              __v: 0
-              ETH: 117.1
-              BTC: 2.5999999999999996
-              USD: 583.2955000000002
+            type: array
+            items:
+              $ref: '#/definitions/PlannedactionSchema'
 
-  /database/user/{user_id}/balance:
-    put:
-      summary: PUT update the balance of the user
+  /database/plannedaction/{plannedaction_id}:  
+    get:
+      summary: GET the details of the planned action with the specified ID
       description: |
-        This API allows to initiate and update the balance of the user due to transactions or when it deposits money on its wallet.
-        
-        __IMPORTANT__: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        __IMPORTANT__: if one of the ID of the plannedaction is invalid or it doesn't belong to any user, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
       tags:
         - database
       parameters:
-        - name: user_id
+        - name: plannedaction_id
+          in: path
+          description: ID of the transaction
+          required: true
+          type: string
+          default: '5c4c31814296b5001795b40b'
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/PlannedactionSchema'
+
+    delete:
+      summary: DELETE planned action
+      description: |
+        This API delete the planned action with the specified ID. A deleted planned action won't be triggered when the price of the market will be equal to the one set in the action.
+        __IMPORTANT__: if one of the ID of the action is invalid or it doesn't belong to any user, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+      parameters:
+        - name: plannedaction_id
           in: path
           description: ID of the user
           required: true
           type: string
-
+          default: '5c4c31814296b5001795b40b'
+      
       responses:
         200:
           description: Success
           schema:
-              $ref: '#/definitions/UserBalance'
-          examples:
-            application/json:
-              _id: '5c49e7f329202200177264e7'
-              id_google: '101790666037013555749'
-              name: 'Francesco Bruschetti'
-              image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg'
-              email: 'francesco.bruschetti@studenti.unitn.it'
-              __v: 0
-              ETH: 117.1
-              BTC: 2.5999999999999996
-              USD: 583.2955000000002
-  
-  /database/user/{user_id}/{currency}:
-    get:
-      summary: GET user currency amount
+              $ref: '#/definitions/PlannedactionSchema'
+
+    put:
+      summary: PUT modify the details of the specified transaction
       description: |
-        This API gets the amount of a single currency for a certain user.
-        
-        __IMPORTANT__: Currency can only be BTC or ETH or USD or atherwise the server won't answer.
-      tags:
-        - database
+        This API allows to modify the details of the specified transaction.
+        __IMPORTANT__: if one of the ID of the action is invalid or if the data of the body is invalid, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
       parameters:
         - in: path
-          name: user_id
-          description: ID of the user
+          name: plannedaction_id
+          description: ID of the action
           required: true
           type: string
-        - in: path
-          name: currency
-          description: Currency [BTC or ETH or USD]
+          default: '5c4c31814296b5001795b40b'
+        - in: body
+          name: req
+          description: "New data for the transaction. __IMPORTANT__: state can only be 'IDLE', 'PROCESSING', 'COMPLETED', 'CANCELED'."
           required: true
-          type: string
+          schema: 
+            $ref: '#/definitions/PlannedactionPUTRequest'
           
       responses:
         200:
           description: Success
           schema:
-            type: string
+              $ref: '#/definitions/PlannedactionSchema'
 
-  # da testare è un casino... devo sapere o id_face or id_google
-  /database/user:
-    post:
-      summary: POST allows userto store user information in the database.
+  /database/plannedaction/:
+    post: 
+      summary: POST allows user to set a planned action
       description: |
-        This API aallows userto store user information in the database.
+        This API allows user to set a planned action.
         
-        __IMPORTANT__: id_google and id_facebook MUST be set mutually exclusive.
+        __IMPORTANT__: You MUST specify one among BTC and ETH.
+            In case of error "impossible to fetch", check that the last value in the json does not terminate with a ","
       tags:
         - database
       parameters:
-        - name: req
-          in: body
+        - in: body
+          name: state
+          description: New state of the transaction
           required: true
-          schema:
-            $ref: '#/definitions/UserProfile'
-
+          schema: 
+            $ref: '#/definitions/PlannedactionRequest'
       responses:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/UserProfile'
-          examples:
-            application/json:
-              _id: 'unique_user_id'
-              id_google: 'id_google_value'
-              name: 'Francesco Bruschetti'
-              image_url: 'url_of_profile_image'
-              email: 'email'
-              __v: 0
-              ETH: 0
-              BTC: 0
-              USD: 0
+            $ref: '#/definitions/PlannedactionSchema'
 
   /database/price:
     get:
@@ -680,6 +572,7 @@ paths:
           description: ID of the the transaction
           required: true
           type: string
+          default: '5c4de5cbf31add5f84e4375f'
           
       responses:
         200:
@@ -707,10 +600,11 @@ paths:
           description: ID of the user
           required: true
           type: string
+          default: '5c49e7f329202200177264e7'
       
       responses:
         200:
-          description: "Success"
+          description: Success
           schema:
               $ref: '#/definitions/TransactionUser'
           examples:
@@ -758,13 +652,111 @@ paths:
                 BTC: 3601.00
                 USD: 1
 
-  /database/plannedaction/user/{user_id}:
-    get:
-      summary: GET the list of all planned action of the specified user
+  /database/user/id_google:
+    put:
+      summary: POST edit the Google ID of the user
       description: |
-        This API allows to retreive the list of all planned action of the specified user transaction.
+        This API is used to update the Google ID of the user. If the value is not set jet, it will write the received data in the database.
         
-        __IMPORTANT__: if one of the ID of the user is invalid or it doesn't belong to any user, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        ____IMPORTANT____: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+      tags:
+        - database
+      parameters:
+        - name: req
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/GoogleUser'  
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/GoogleUser'
+  
+  /database/user/id_facebook:
+    put:
+      summary: POST edit the Facebook ID of the user
+      description: |
+        This API is used to update the Facebook ID of the user. If the value is not set jet, it will write the received data in the database.
+        
+        ____IMPORTANT____: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+      tags:
+        - database
+      parameters:
+        - name: req
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/FacebookUser'  
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/FacebookUser'
+  
+  /database/user/mail: 
+    post:
+      summary: POST insert the informations of the mail of the user in the database
+      description: |
+        This API inserts the informations of the mail of the user in the database.
+        
+        __IMPORTANT__: You MUST specify Email and Password value or the server will generate and error. The Name is optional.
+      tags:
+        - database
+      parameters:
+        - name: req
+          in: body
+          description: User informations
+          required: true
+          schema:
+            $ref: '#/definitions/MailRequest'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/MailResponse'
+  
+  /database/user/mail/{mail}:
+    get:
+      summary: GET details of the user that has registered with mail method.
+      description: |
+        This API retreive all the informations about the user that has registered to the site through Mail.
+        
+        __IMPORTANT:__ Response will be 'null' if no user has registered with the specified mail.
+      tags:
+        - database
+      parameters:
+        - name: mail
+          in: path
+          description: mail of the user
+          required: true
+          type: string
+          default: 'francesco.bruschetti@yahoo.it'
+          
+      responses:
+        200:
+          description: Success
+          schema:
+              $ref: '#/definitions/MailResponse'
+          examples:
+            application/json:
+              _id: '5c5406b4eb968f0017bcf388'
+              email: 'francesco.bruschetti@yahoo.it'
+              name: 'Francesco'
+              image_url: 'https://www.iconspng.com/images/-abstract-user-icon-1/-abstract-user-icon-1.jpg'
+              password: 'Password'
+              ETH: 0
+              BTC: 0
+              USD: 0
+              __v: 0
+
+  /database/user/{user_id}:
+    get:
+      summary: GET user informations
+      description: |
+        This API provide all the informations and data of the specified user.
+        
+        __IMPORTANT__: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
       tags:
         - database
       parameters:
@@ -773,98 +765,121 @@ paths:
           description: ID of the user
           required: true
           type: string
+          default: '5c49e7f329202200177264e7'
           
       responses:
         200:
           description: Success
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/PlannedactionSchema'
+              $ref: '#/definitions/UserProfile'
+          examples:
+            application/json:
+              _id: '5c49e7f329202200177264e7'
+              id_google: '101790666037013555749'
+              name: 'Francesco Bruschetti'
+              image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg'
+              email: 'francesco.bruschetti@studenti.unitn.it'
+              __v: 0
+              ETH: 117.1
+              BTC: 2.5999999999999996
+              USD: 583.2955000000002
 
-  /database/plannedaction/{plannedaction_id}:  
-    get:
-      summary: GET the details of the planned action with the specified ID
+  /database/user/{user_id}/balance:
+    put:
+      summary: PUT update the balance of the user
       description: |
-        __IMPORTANT__: if one of the ID of the plannedaction is invalid or it doesn't belong to any user, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        This API allows to initiate and update the balance of the user due to transactions or when it deposits money on its wallet.
+        
+        __IMPORTANT__: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
       tags:
         - database
       parameters:
-        - name: plannedaction_id
-          in: path
-          description: ID of the transaction
-          required: true
-          type: string
-      responses:
-        200:
-          description: Success
-          schema:
-              $ref: '#/definitions/PlannedactionSchema'
-
-    delete:
-      summary: DELETE planned action
-      description: |
-        This API delete the planned action with the specified ID. A deleted planned action won't be triggered when the price of the market will be equal to the one set in the action.
-        __IMPORTANT__: if one of the ID of the action is invalid or it doesn't belong to any user, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
-      parameters:
-        - name: plannedaction_id
+        - name: user_id
           in: path
           description: ID of the user
           required: true
           type: string
-      
+          default: '5c49e7f329202200177264e7'
+
       responses:
         200:
           description: Success
           schema:
-              $ref: '#/definitions/PlannedactionSchema'
-
-    put:
-      summary: PUT modify the details of the specified transaction
+              $ref: '#/definitions/UserBalance'
+          examples:
+            application/json:
+              _id: '5c49e7f329202200177264e7'
+              id_google: '101790666037013555749'
+              name: 'Francesco Bruschetti'
+              image_url: 'https://lh4.googleusercontent.com/-LBYekgpU62I/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQMqqlNHg_c3VJJ8GcpmRWxhCUiSTQ/s96-c/photo.jpg'
+              email: 'francesco.bruschetti@studenti.unitn.it'
+              __v: 0
+              ETH: 117.1
+              BTC: 2.5999999999999996
+              USD: 583.2955000000002
+  
+  /database/user/{user_id}/{currency}:
+    get:
+      summary: GET user currency amount
       description: |
-        This API allows to modify the details of the specified transaction.
-        __IMPORTANT__: if one of the ID of the action is invalid or if the data of the body is invalid, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        This API gets the amount of a single currency for a certain user.
+        
+        __IMPORTANT__: Currency can only be BTC or ETH or USD or atherwise the server won't answer.
+      tags:
+        - database
       parameters:
         - in: path
-          name: plannedaction_id
-          description: ID of the action
+          name: user_id
+          description: ID of the user
           required: true
           type: string
-        - in: body
-          name: req
-          description: "New data for the transaction. __IMPORTANT__: state can only be 'IDLE', 'PROCESSING', 'COMPLETED', 'CANCELED'."
+          default: '5c49e7f329202200177264e7'
+        - in: path
+          name: currency
+          description: Currency [BTC or ETH or USD]
           required: true
-          schema: 
-            $ref: '#/definitions/PlannedactionPUTRequest'
+          type: string
+          default: 'USD'
           
       responses:
         200:
           description: Success
           schema:
-              $ref: '#/definitions/PlannedactionSchema'
+            type: string
 
-  /database/plannedaction/:
-    post: 
-      summary: POST allows user to set a planned action
+  # da testare è un casino... devo sapere o id_face or id_google
+  /database/user:
+    post:
+      summary: POST allows userto store user information in the database.
       description: |
-        This API allows user to set a planned action.
+        This API aallows userto store user information in the database.
         
-        __IMPORTANT__: You MUST specify one among BTC and ETH.
-            In case of error "impossible to fetch", check that the last value in the json does not terminate with a ","
+        __IMPORTANT__: id_google and id_facebook MUST be set mutually exclusive.
       tags:
         - database
       parameters:
-        - in: body
-          name: state
-          description: New state of the transaction
+        - name: req
+          in: body
           required: true
-          schema: 
-            $ref: '#/definitions/PlannedactionRequest'
+          schema:
+            $ref: '#/definitions/UserProfile'
+
       responses:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/PlannedactionSchema'
+            $ref: '#/definitions/UserProfile'
+          examples:
+            application/json:
+              _id: 'unique_user_id'
+              id_google: 'id_google_value'
+              name: 'Francesco Bruschetti'
+              image_url: 'url_of_profile_image'
+              email: 'email'
+              __v: 0
+              ETH: 0
+              BTC: 0
+              USD: 0
 
 ###################### PLANNED_ACTION # COMPLETED
   /plannedaction/user/{user_id}:
@@ -882,6 +897,7 @@ paths:
           description: ID of the user
           required: true
           type: string
+          default: '5c49e7f329202200177264e7'
       responses: 
         200:
           description: Success
@@ -903,6 +919,7 @@ paths:
           description: ID of the user
           required: true
           type: string
+          default: '5c4c31814296b5001795b40b'
       responses: 
         200:
           description: Success
@@ -1096,7 +1113,8 @@ paths:
           description: ID of the user
           required: true
           type: string
-      responses: # "
+          default: '5c49e7f329202200177264e7'
+      responses: 
         200:
           description: Success
           schema:
@@ -1217,7 +1235,7 @@ paths:
           description: ID of the user
           required: true
           type: string
-      
+          default: '5c49e7f329202200177264e7'
       responses:
         200:
           description: Success
@@ -1253,6 +1271,7 @@ paths:
           description: ID of the user
           required: true
           type: string
+          default: '5c49e7f329202200177264e7'
           
       responses:
         200:
@@ -1292,6 +1311,7 @@ paths:
           description: ID of the user
           required: true
           type: string
+          default: '5c49e7f329202200177264e7'
       responses:
         200:
           description: Success
@@ -1355,6 +1375,7 @@ paths:
           description: ID of the user
           required: true
           type: string
+          default: '5c49e7f329202200177264e7'
       responses:
         200:
           description: Success
@@ -1386,6 +1407,7 @@ paths:
           required: true
           type: string
           description: User ID
+          default: '5c49e7f329202200177264e7'
         - in: body
           name: balance
           required: true
@@ -1479,7 +1501,7 @@ paths:
 
   /user/mail/{mail}: 
     get:
-      summary: GET details of the user that has registered with mail.
+      summary: GET details of the user that has registered with Mail
       description: |
         This API retreive all the informations about the user that has registered with the specified mail.
         
@@ -1492,6 +1514,7 @@ paths:
           description: Mail of the user
           required: true
           type: string
+          default: 'francesco.bruschetti@yahoo.it'
       responses: 
         200:
           description: Success
