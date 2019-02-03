@@ -1,9 +1,9 @@
 swagger: '2.0'
 info:
-  version: '1.0'
+  version: '2.1.0'
   title: "SAFExchange"
   x-summary: Collection of API provided by the web service PRICE
-  description: API description for the project SAFExchange of the course Introduction to Service Design and Engineering.
+  description: This is the API documentation for the project SAFExchange.
   contact:
     name: Francesco Bruschetti, Filippo Nardin, Davide Farina
   license:
@@ -20,12 +20,13 @@ produces:
 paths:
 
 ###################### ACCOUNT # DA TESTARE 
-  # da testare
   /account/googleSignIn:
     post:
       summary: POST for Google Sign In
       description: |
         This API is used when the user wants to Sign In using Google.
+      tags:
+        - account
       parameters:
         - name: req
           in: body
@@ -35,22 +36,33 @@ paths:
       responses:
         200:
           description: Success
-          schema:
-            type: object
-            properties:
-              Success:
-                type: boolean
-                
           examples:
             application/json:
-              Success: true
+              iss: 'accounts.google.com'
+              azp: '533024552572-ltbl4ks1kib5qod9cgihc2ppjhcdem2l.apps.googleusercontent.com'
+              aud: '533024552572-ltbl4ks1kib5qod9cgihc2ppjhcdem2l.apps.googleusercontent.com'
+              sub: '107360525933532801390'
+              hd: 'studenti.unitn.it'
+              email: 'francesco.bruschetti@studenti.unitn.it'
+              email_verified: true
+              at_hash: 'TiKlw3sUgYoK_nxMShS-LQ'
+              name: 'Francesco Bruschetti'
+              picture: 'https://lh4.googleusercontent.com/-V5mZEUxEFqY/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQN20FvlQfrTxYzNOACE9CklD3uvBQ/s96-c/photo.jpg'
+              given_name: 'Francesco'
+              family_name: 'Bruschetti'
+              locale: 'it'
+              iat: 1549191087
+              exp: 1549194687
+              jti: c35a6f3f064f095c1131d0dc79c539dc21e556f9'
+              success: true
 
-  # da testare
   /account/facebookSignIn:
     post:
       summary: POST for Facebook Sign In
       description: |
         This API is used when the user wants to Sign In using Facebook.
+      tags:
+        - account
       parameters:
         - name: req
           in: body
@@ -65,41 +77,50 @@ paths:
             properties:
               Success:
                 type: boolean
-                
           examples:
             application/json:
               Success: true 
 
-  # da testare
   /account/mailRegister: 
     post:
       summary: POST allows the user to Register with email
-      description: |
-        __HOW TO TEST:__ paste this code in the field "Body" of the Console
+      tags:
+        - account
       parameters:
         - name: req
           in: body
           required: true
           schema:
-            $ref: '#/definitions/MailRequest'  
+            properties:
+              name:
+                type: string
+                example: 'Test Name'
+              image_url:
+                type: string
+                example: 'https://www.iconspng.com/images/-abstract-user-icon-1/-abstract-user-icon-1.jpg'
+              email:
+                type: string
+                example: 'test@email.it'
+              password:
+                type: string
+                example: 'Password1' 
       responses:
         200:
           description: Success
           schema:
-              $ref: '#/definitions/MailResponse'
+              properties:
+                success:
+                  type: boolean
           examples: # 
             application/json:
-              email: 'mail@test.it'
-              name: 'UsernameTest'
-              image_url: 'https://www.iconspng.com/images/-abstract-user-icon-1/-abstract-user-icon-1.jpg'
-              password: 'Password'
+              success: 'false'
+              message: 'Mail already taken'
 
-  # da testare
   /account/mailSignIn: 
     post:
-      summary: POST allows the user to Register with email
-      description: |
-        __HOW TO TEST:__ paste this code in the field "Body" of the Console
+      summary: POST allows the user to Login with email
+      tags:
+        - account
       parameters:
         - name: req
           in: body
@@ -108,6 +129,10 @@ paths:
             properties:
               email:
                 type: string
+                example: 'test@email.it'
+              password:
+                type: string
+                example: 'Password1'
         
       responses:
         200:
@@ -125,13 +150,15 @@ paths:
     post:
       summary: POST action BUY
       description: |
-        __HOW TO TEST:__ In order to work, the following API need a session to be stored on the client. The schema of the session is:
+        __HOW TO TEST:__ In order to work, the following API need a __session__ to be stored on the client. The schema of the session is:
           {
             _id: _user._id,
             name: _user.name,
             email: _user.email,
             image_url: _user.image_url
           }
+      tags:
+        - action
       parameters:
         - name: req
           in: body
@@ -153,13 +180,15 @@ paths:
     post:
       summary: POST action SELL
       description: |
-        __HOW TO TEST:__ In order to work, the following API need a session to be stored on the client. The schema of the session is:
+        __HOW TO TEST:__ In order to work, the following API need a __session__ to be stored on the client. The schema of the session is:
           {
             _id: _user._id,
             name: _user.name,
             email: _user.email,
             image_url: _user.image_url
           }
+      tags:
+        - action
       parameters:
         - name: req
           in: body
@@ -181,13 +210,15 @@ paths:
     post:
       summary: POST action edit user money
       description: |
-        __HOW TO TEST:__ In order to work, the following API need a session to be stored on the client. The schema of the session is:
+        __HOW TO TEST:__ In order to work, the following API need a __session__ to be stored on the client. The schema of the session is:
           {
             _id: _user._id,
             name: _user.name,
             email: _user.email,
             image_url: _user.image_url
           }
+      tags:
+        - action
       parameters:
         - name: req
           in: body
@@ -212,13 +243,15 @@ paths:
     post:
       summary: POST planned action BUY event
       description: |
-        __HOW TO TEST:__ In order to work, the following API need a session to be stored on the client. The schema of the session is:
+        __HOW TO TEST:__ In order to work, the following API need a __session__ to be stored on the client. The schema of the session is:
           {
             _id: _user._id,
             name: _user.name,
             email: _user.email,
             image_url: _user.image_url
           }
+      tags:
+        - action
       parameters:
         - name: req
           in: body
@@ -240,13 +273,15 @@ paths:
     post:
       summary: POST planned action SELL event
       description: |
-        __HOW TO TEST:__ In order to work, the following API need a session to be stored on the client. The schema of the session is:
+        __HOW TO TEST:__ In order to work, the following API need a __session__ to be stored on the client. The schema of the session is:
           {
             _id: _user._id,
             name: _user.name,
             email: _user.email,
             image_url: _user.image_url
           }
+      tags:
+        - action
       parameters:
         - name: req
           in: body
@@ -268,7 +303,7 @@ paths:
     delete:
       summary: DELETE planned action
       description: |
-        __HOW TO TEST:__ In order to work, the following API need a session to be stored on the client. The schema of the session is:
+        __HOW TO TEST:__ In order to work, the following API need a __session__ to be stored on the client. The schema of the session is:
           {
             _id: _user._id,
             name: _user.name,
@@ -276,6 +311,8 @@ paths:
             image_url: _user.image_url
           }
         __IMPORTANT:__  if the action_id doesn't exists, schema will contain a field "message" : "Description of the error"
+      tags:
+        - action
       parameters:
         - name: action_id
           in: path
@@ -302,6 +339,8 @@ paths:
         This API is used to update the Google ID of the user. If the value is not set jet, it will write the received data in the database.
         
         ____IMPORTANT____: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+      tags:
+        - database
       parameters:
         - name: req
           in: body
@@ -321,6 +360,8 @@ paths:
         This API is used to update the Facebook ID of the user. If the value is not set jet, it will write the received data in the database.
         
         ____IMPORTANT____: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+      tags:
+        - database
       parameters:
         - name: req
           in: body
@@ -340,6 +381,8 @@ paths:
         This API inserts the informations of the mail of the user in the database.
         
         __IMPORTANT__: You MUST specify Email and Password value or the server will generate and error. The Name is optional.
+      tags:
+        - database
       parameters:
         - name: req
           in: body
@@ -360,6 +403,8 @@ paths:
         This API retreive all the informations about the user that has registered to the site through Mail.
         
         __IMPORTANT:__ Response will be 'null' if no user has registered with the specified mail.
+      tags:
+        - database
       parameters:
         - name: mail
           in: path
@@ -391,6 +436,8 @@ paths:
         This API provide all the informations and data of the specified user.
         
         __IMPORTANT__: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+      tags:
+        - database
       parameters:
         - name: user_id
           in: path
@@ -422,6 +469,8 @@ paths:
         This API allows to initiate and update the balance of the user due to transactions or when it deposits money on its wallet.
         
         __IMPORTANT__: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+      tags:
+        - database
       parameters:
         - name: user_id
           in: path
@@ -453,6 +502,8 @@ paths:
         This API gets the amount of a single currency for a certain user.
         
         __IMPORTANT__: Currency can only be BTC or ETH or USD or atherwise the server won't answer.
+      tags:
+        - database
       parameters:
         - in: path
           name: user_id
@@ -474,11 +525,13 @@ paths:
   # da testare è un casino... devo sapere o id_face or id_google
   /database/user:
     post:
-      summary: POST allows userto store user information in the database
+      summary: POST allows userto store user information in the database.
       description: |
         This API aallows userto store user information in the database.
         
         __IMPORTANT__: id_google and id_facebook MUST be set mutually exclusive.
+      tags:
+        - database
       parameters:
         - name: req
           in: body
@@ -508,6 +561,8 @@ paths:
       summary: GET Bitcoin and Ethereum value
       description: |
         This API provides updated values of both Bitcoin and Ethereum from our exchange.
+      tags:
+        - database
       responses:
         200:
           description: Success
@@ -551,6 +606,8 @@ paths:
         This API returns the value of Bitcoin from our exchange.
         Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Bitcoin.
         __Example:__ /BTCUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
+      tags:
+        - database
       parameters:
         - name: elem_number
           in: query
@@ -582,6 +639,8 @@ paths:
         This API returns the value of Ethereum on our exchange.
         Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Ethereum.
         __Example:__ /ETHUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
+      tags:
+        - database
       parameters:
         - name: elem_number
           in: query
@@ -613,6 +672,8 @@ paths:
         This API provide all the informations about the specified transaction.
         
         __IMPORTANT__: if one of the parameter 'transaction_id' is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+      tags:
+        - database
       parameters:
         - name: transaction_id
           in: path
@@ -638,6 +699,8 @@ paths:
       summary: GET user transaction history
       description: |
         This API provide the full history of transaction performed by the specified user, both for selling and buying.
+      tags:
+        - database
       parameters:
         - name: user_id
           in: path
@@ -665,11 +728,13 @@ paths:
                 ETH: 0.1
                 _v: 0
 
-  /database/transaction/: #da testare 
+  /database/transaction/:
     post:
       summary: POST allows user to buy/sell
       description: |
         This API allows the user to buy or sell either Bitcoin or Ethereum at the current price.
+      tags:
+        - database
       parameters:
         - name: req
           description: |
@@ -700,6 +765,8 @@ paths:
         This API allows to retreive the list of all planned action of the specified user transaction.
         
         __IMPORTANT__: if one of the ID of the user is invalid or it doesn't belong to any user, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+      tags:
+        - database
       parameters:
         - name: user_id
           in: path
@@ -720,6 +787,8 @@ paths:
       summary: GET the details of the planned action with the specified ID
       description: |
         __IMPORTANT__: if one of the ID of the plannedaction is invalid or it doesn't belong to any user, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+      tags:
+        - database
       parameters:
         - name: plannedaction_id
           in: path
@@ -782,6 +851,8 @@ paths:
         
         __IMPORTANT__: You MUST specify one among BTC and ETH.
             In case of error "impossible to fetch", check that the last value in the json does not terminate with a ","
+      tags:
+        - database
       parameters:
         - in: body
           name: state
@@ -803,6 +874,8 @@ paths:
         This API allows to get the details of every planned actions the user has scheduled.
         
         __IMPORTANT__: if the user_id doesn't exists, response will contain a field 'message' : 'Description of the error'.
+      tags:
+        - plannedaction
       parameters:
         - name: user_id
           in: path
@@ -822,6 +895,8 @@ paths:
         This API returns all the informations about the planned action that has ID equal to the value of the "action_id" parameter value.
         
         __IMPORTANT__: if the user_id doesn't exists, response will be 'null'.
+      tags:
+        - plannedaction
       parameters:
         - name: action_id
           in: path
@@ -867,6 +942,8 @@ paths:
         This API allows the user to schedule an action for the future. It'll be triggered when the price on the server will be equal to the one of the action.
         
         __IMPORTANT__: in case of missing fields, the schema will contain the message 'Error! The body request should contain either the fields USD and BTC or ETH (exclusively)'.
+      tags:
+        - plannedaction
       parameters:
         - name: req
           in: body
@@ -885,6 +962,8 @@ paths:
       summary: POST check if there are planned actions to trigger
       description: |
         This API check if the actual price is equal to the one of the planned actions scheduled by the users. if yes, it'll trigger that planned action.
+      tags:
+        - plannedaction
       parameters:
         - name: req
           in: body
@@ -901,6 +980,8 @@ paths:
   /price/API:
     get:
       summary: GET the list of available actions
+      tags:
+        - price
       responses:
         200:
           description: List of all actions 
@@ -919,6 +1000,8 @@ paths:
       summary: GET both Bitcoin and Ethereum value
       description: |
         This API provides updated values of both Bitcoin and Ethereum from our exchange.
+      tags:
+        - price
       responses:
         200:
           description: Success
@@ -940,6 +1023,8 @@ paths:
         This API returns the value of Bitcoin from our exchange.
         Specifying a value for the parameter "elem_number", the user can retrieve the latest N stored values of Bitcoin.
         __Example:__ /BTCUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
+      tags:
+        - price
       parameters:
         - name: elem_number
           in: query
@@ -970,6 +1055,8 @@ paths:
         This API returns the value of Ethereum from our exchange.
         Specifying a value for the parameter "elem_number", the user can retrieve the latest N stored values of Ethereum.
         __Example:__ /ETHUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
+      tags:
+        - price
       parameters:
         - name: elem_number
           in: query
@@ -1001,6 +1088,8 @@ paths:
         This API provide all the informations and data of the specified user.
         
         __IMPORTANT__: if the user_id doesn't exists, schema will contain a field 'message' : 'Description of the error'.
+      tags:
+        - redirect
       parameters:
         - name: user_id
           in: path
@@ -1029,6 +1118,8 @@ paths:
       summary: GET Bitcoin and Ethereum value
       description: |
         This API provides updated values of both Bitcoin and Ethereum from our exchange.
+      tags:
+        - redirect
       responses:
         200:
           description: Success
@@ -1050,6 +1141,8 @@ paths:
         This API returns the value of Bitcoin from our exchange.
         Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Bitcoin.
         __Example:__ /BTCUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
+      tags:
+        - redirect
       parameters:
         - name: elem_number
           in: query
@@ -1082,6 +1175,8 @@ paths:
         This API returns the value of Ethereum on our exchange.
         Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Ethereum.
         __Example:__ /ETHUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
+      tags:
+        - redirect
       parameters:
         - name: elem_number
           in: query
@@ -1114,6 +1209,8 @@ paths:
         This API provide the full history of transaction performed by the specified user.
         
         __IMPORTANT__: if the user_id doesn't exists, schema will contain a field 'message' : 'Description of the error'.
+      tags:
+        - redirect
       parameters:
         - name: user_id
           in: path
@@ -1148,6 +1245,8 @@ paths:
         This API allows to get the details of every planned actions the the user has scheduled.
         
         __IMPORTANT__: if the user_id doesn't exists, schema will contain a field 'message' : 'Description of the error'.
+      tags:
+        - redirect
       parameters:
         - name: user_id
           in: path
@@ -1185,6 +1284,8 @@ paths:
         This API provides the full history of transactions performed by the specified user.
        
         __IMPORTANT__: if the user_id doesn't exists, schema will contain a field 'message' : 'Description of the error'.
+      tags:
+        - transaction
       parameters:
         - name: user_id
           in: path
@@ -1217,6 +1318,8 @@ paths:
       description: |
         This API allows the user to buy or sell either Bitcoin or Ethereum at the price if the server.
         __IMPORTANT__: ONLY ONE among BTC and ETH must be specified. Be careful not to leave ',' after the last value of the json object, or an error will occur.
+      tags:
+        - transaction
       parameters:
         - name: req
           in: body
@@ -1244,6 +1347,8 @@ paths:
         This API provide all the informations and data of the specified user.
         
         __IMPORTANT__: if the user_id doesn't exists, schema will contain a field 'message' : 'Description of the error'.
+      tags:
+        - user
       parameters:
         - name: user_id
           in: path
@@ -1273,6 +1378,8 @@ paths:
       description: |
         This API allows to initiate and update the balance of the user due to transactions or when it deposits money on its wallet.
         The specified value of BTC, ETH and USD will be summed up to the one already stored in the database.
+      tags:
+        - user
       parameters:
         - in: path
           name: user_id
@@ -1308,6 +1415,8 @@ paths:
         This API allows to  update the information of the user that has Sign In with Google.
         
         __IMPORTANT__: the ID_GOOGLE MUST BE specified or an error will occour.
+      tags:
+        - user
       parameters:
         - name: req
           in: body
@@ -1327,6 +1436,8 @@ paths:
         This API allows to update the Facebook date of the user.
         
         __IMPORTANT__: the ID_FACEBOOK MUST BE specified or an error will occour.
+      tags:
+        - user
       parameters:
         - name: req
           in: body
@@ -1346,6 +1457,8 @@ paths:
         This API allows the user to sign up in the site.
         
         __HOW TO TEST__: paste this code in the field "Body" of the Console
+      tags:
+        - user
       parameters:
         - name: req
           in: body
@@ -1371,6 +1484,8 @@ paths:
         This API retreive all the informations about the user that has registered with the specified mail.
         
         __IMPORTANT__: response will be 'null' if there isn't a user with the specified __{mail}__ that has registered by __Mail__ and not using Facebook or Google.
+      tags:
+        - user
       parameters:
         - name: mail
           in: path
@@ -1408,16 +1523,44 @@ definitions:
     properties:
       tokenid:
         type: string
+        example: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjZmYjA1Zjc0MjM2NmVlNGNmNGJjZjQ5Zjk4NGM0ODdlNDVjOGM4M2QiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiNTMzMDI0NTUyNTcyLWx0Ymw0a3Mxa2liNXFvZDljZ2loYzJwcGpoY2RlbTJsLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiNTMzMDI0NTUyNTcyLWx0Ymw0a3Mxa2liNXFvZDljZ2loYzJwcGpoY2RlbTJsLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTA3MzYwNTI1OTMzNTMyODAxMzkwIiwiaGQiOiJzdHVkZW50aS51bml0bi5pdCIsImVtYWlsIjoiZnJhbmNlc2NvLmJydXNjaGV0dGlAc3R1ZGVudGkudW5pdG4uaXQiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXRfaGFzaCI6IlRpS2x3M3NVZ1lvS19ueE1TaFMtTFEiLCJuYW1lIjoiRnJhbmNlc2NvIEJydXNjaGV0dGkiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDQuZ29vZ2xldXNlcmNvbnRlbnQuY29tLy1WNW1aRVV4RUZxWS9BQUFBQUFBQUFBSS9BQUFBQUFBQUFBQS9BQ2V2b1FOMjBGdmxRZnJUeFl6Tk9BQ0U5Q2tsRDN1dkJRL3M5Ni1jL3Bob3RvLmpwZyIsImdpdmVuX25hbWUiOiJGcmFuY2VzY28iLCJmYW1pbHlfbmFtZSI6IkJydXNjaGV0dGkiLCJsb2NhbGUiOiJpdCIsImlhdCI6MTU0OTE5MTA4NywiZXhwIjoxNTQ5MTk0Njg3LCJqdGkiOiJjMzVhNmYzZjA2NGYwOTVjMTEzMWQwZGM3OWM1MzlkYzIxZTU1NmY5In0.wuIN-cCRapuiaTTx64rFhtmnJNHEUCKPiDGSQQ8slsbtBl7ArDqHlwt6rel1uB1MTEBX6Hn6VHIhXv8KB1Gz4p2gK0jHA0Ms006K8Y6dMXje8RvkOu_GjF6JdV2SbnhbASsHdI4671rxklygICoCntBVbJYQWS7E7ijHISLbW_uPf2744iIH1BdSuQQaE9TGuab81-vUUeL05qjZBKsIUF9ERg1il4PZ1bwHXbG1xAdk-ey3qi_QGj1ZAR_Ii7v6laJan-ACVOEwiSwvrbVdBxqbzhO7wJEN0h9idZ1ZWNLZy_rcATrnNAkvKehgXEMRSqW53ulxoJOMBFxDiNxhtA'
       user:
-        $ref: '#/definitions/GoogleUser'
+        type: object
+        properties:
+          id_google:
+            type: string
+            example: '107360525933532801390'
+          name:
+            type: string
+            example: 'Francesco Bruschetti'
+          image_url:
+            type: string
+            example: 'https://lh4.googleusercontent.com/-V5mZEUxEFqY/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQN20FvlQfrTxYzNOACE9CklD3uvBQ/s96-c/photo.jpg'
+          email:
+            type: string
+            example: 'francesco.bruschetti@studenti.unitn.it'
 
   Facebook:
     type: object
     properties:
       tokenid:
         type: string
+        example: 'EAAe9iyaWCEoBANk6BcMda3yEZCfoTukaIZBECbOvaTyZBZCOCJNSv6WrZCpTye9nSTEN9Dije4MXfVsLFGJKLeZBn5TtafQrCaHRDZAHDgX9wWjfWoHkaZBfbpBZCMkc26BwWCNZBpaObqFXf7rwlj2gRa7u2eHYJ5puZCNk5qfsy4bSdLe9uJrJAud5lN3725C1DoCGY3eZBnY4DwZDZD'
       user:
-        $ref: '#/definitions/FacebookUser'
+        type: object
+        properties:
+          id_google:
+            type: string
+            example: '2146357875458989'
+          name:
+            type: string
+            example: 'Francesco Bruschetti'
+          image_url:
+            type: string
+            example: 'http://graph.facebook.com/2146357875458989/picture?type=square'
+          email:
+            type: string
+            example: 'francesco.bruschetti@tiscali.it'
 
 ######################ACTION
   ActionBuy:
@@ -1455,7 +1598,6 @@ definitions:
         type: integer
       USD:
         type: number
-
 
 ###################### PLANNEDACTION
   
@@ -1714,10 +1856,10 @@ definitions:
     properties:
       name:
         type: string
-        example: 'Francesco'
+        example: 'Test Name'
       email:
         type: string
-        example: 'francesco.bruschetti@yahoo.it'
+        example: 'test@email.it'
       password:
         type: string
         example: 'Password'
@@ -1751,3 +1893,21 @@ definitions:
       USD:
         type: number
         example: 0
+
+tags:
+  - name: account
+    description: List of available API for the ws *Account*.
+  - name: action
+    description: List of available API for the ws *Action*.
+  - name: database
+    description: List of available API for the ws *Database*.
+  - name: plannedaction
+    description: List of available API for the ws *Plannedaction*.
+  - name: price
+    description: List of available API for the ws *Price*.
+  - name: redirect
+    description: List of available API for the ws *Redirect*.
+  - name: transaction
+    description: List of available API for the ws *Transaction*.
+  - name: user
+    description: List of available API for the ws *User*.
