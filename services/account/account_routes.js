@@ -24,6 +24,9 @@ function setSession(req, _user, _logged_with) {
 router.post('/googleSignIn', function (req, res) {
     // Get token from page
     var token = req.body.tokenid;
+    console.log("GOOGLE*-*-*-*-*-*-*-*-*-*-*-*-*");
+    console.log(req.body);
+    console.log("GOOGLE*-*-*-*-*-*-*-*-*-*-*-*-*");
 
     // ID of this application to be authenticated on Google's servers
     var clientId = "533024552572-ltbl4ks1kib5qod9cgihc2ppjhcdem2l.apps.googleusercontent.com";
@@ -48,6 +51,9 @@ router.post('/googleSignIn', function (req, res) {
             // Set session variable
             setSession(req, user, 'GOOGLE')
 
+            console.log("GOOGLE|*|*|*|*|*|*|*|*|*|*|*|*|*|*|");
+            console.log(tokenInfo);
+            console.log("GOOGLE|*|*|*|*|*|*|*|*|*|*|*|*|*|*|");
             // Send data to page
             res.json(tokenInfo);
         }
@@ -62,6 +68,9 @@ router.post('/googleSignIn', function (req, res) {
 router.post('/facebookSignIn', async function (req, res) {
     // Get token from page
     var token = req.body.tokenid;
+    console.log("FACEBOOK*-*-*-*-*-*-*-*-*-*-*-*-*");
+    console.log(req.body);
+    console.log("FACEBOOK*-*-*-*-*-*-*-*-*-*-*-*-*");
 
     // Get app token
     var app_token = (await axios.get("https://graph.facebook.com/oauth/access_token?client_id=2178730182445130&client_secret=ea1da7f5d63016176122012d80b2be4c&grant_type=client_credentials")).data.access_token;
@@ -89,6 +98,9 @@ router.post('/facebookSignIn', async function (req, res) {
         // Set session variables
         setSession(req, user, 'FACEBOOK')
 
+        console.log("FACEBOOK|*|*|*|*|*|*|*|*|*|*|*|*|*|*|");
+        console.log(tokenInfo);
+        console.log("FACEBOOK|*|*|*|*|*|*|*|*|*|*|*|*|*|*|");
         // Return data to client
         res.json(token_validity);
     }
@@ -101,6 +113,9 @@ router.post('/facebookSignIn', async function (req, res) {
 router.post('/mailRegister', async function (req, res) {
     // Get user params
     var userData = req.body;
+    console.log("MAILREG*-*-*-*-*-*-*-*-*-*-*-*-*");
+    console.log(req.body);
+    console.log("MAILREG*-*-*-*-*-*-*-*-*-*-*-*-*");
 
     // Check if the mail is already present
     try {
@@ -129,6 +144,9 @@ router.post('/mailRegister', async function (req, res) {
 router.post('/mailSignIn', async function (req, res) {
     // Get user params
     var userData = req.body;
+    console.log("MAILSIGNIN*-*-*-*-*-*-*-*-*-*-*-*-*");
+    console.log(req.body);
+    console.log("MAILSIGNIN*-*-*-*-*-*-*-*-*-*-*-*-*");
 
     // Check if the user exists
     try {
