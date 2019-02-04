@@ -1,9 +1,9 @@
 swagger: '2.0'
 info:
-  version: '2.2.0'
+  version: '2.2.1'
   title: "SAFExchange"
   x-summary: Collection of API provided by the web service PRICE
-  description: This is the API documentation for the project SAFExchange.
+  description: This is the API documentation for the __*SAFExchange*__ project.
   contact:
     name: Francesco Bruschetti, Filippo Nardin, Davide Farina
   license:
@@ -35,9 +35,7 @@ paths:
             $ref: '#/definitions/Google'  
       responses:
         200:
-          description: |
-            Success
-            __IMPORTANT:__ tokenId may be espired.
+          description: Success
           examples:
             application/json:
               iss: 'accounts.google.com'
@@ -73,9 +71,7 @@ paths:
             $ref: '#/definitions/Facebook'  
       responses:
         200:
-          description: |
-            Success
-            __IMPORTANT:__ tokenId may be espired.
+          description: Success
           schema:
             type: object
             properties:
@@ -314,7 +310,8 @@ paths:
             email: _user.email,
             image_url: _user.image_url
           }
-        __IMPORTANT:__  if the action_id doesn't exists, schema will contain a field "message" : "Description of the error"
+          
+        __IMPORTANT:__  if the __{action_id}__ doesn't exists, schema will contain a field "message" : "Description of the error"
       tags:
         - action
       parameters:
@@ -340,9 +337,9 @@ paths:
     get:
       summary: GET the list of all planned action of the specified user
       description: |
-        This API allows to retreive the list of all planned action of the specified user transaction.
+        This API allows to retrieve the list of all planned action of the specified user.
         
-        __IMPORTANT__: if one of the ID of the user is invalid or it doesn't belong to any user, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        __IMPORTANT__: if the ID of the user is invalid or it doesn't belong to any user, the response schema will contain a field "message" : "Description of the error". If everything is correctly set, the response will contain the required data.
       tags:
         - database
       parameters:
@@ -365,7 +362,7 @@ paths:
     get:
       summary: GET the details of the planned action with the specified ID
       description: |
-        __IMPORTANT__: if one of the ID of the plannedaction is invalid or it doesn't belong to any user, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        __IMPORTANT__: if the ID of the plannedaction is invalid or it doesn't belong to any user, the response schema will contain a field "message" : "Description of the error". If everything is correctly set, the response will contain the required data.
       tags:
         - database
       parameters:
@@ -385,7 +382,8 @@ paths:
       summary: DELETE planned action
       description: |
         This API delete the planned action with the specified ID. A deleted planned action won't be triggered when the price of the market will be equal to the one set in the action.
-        __IMPORTANT__: if one of the ID of the action is invalid or it doesn't belong to any user, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        
+        __IMPORTANT__: if one of the ID of the action is invalid or it doesn't belong to any user, the response schema will contain a field "message" : "Description of the error". If everything is correctly set, the response will contain the required data.
       parameters:
         - name: plannedaction_id
           in: path
@@ -404,7 +402,8 @@ paths:
       summary: PUT modify the details of the specified transaction
       description: |
         This API allows to modify the details of the specified transaction.
-        __IMPORTANT__: if one of the ID of the action is invalid or if the data of the body is invalid, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        
+        __IMPORTANT__: if one of the ID of the action is invalid or if the data of the body is invalid, the response schema will contain a field "message" : "Description of the error". If everything is correctly set, the response will contain the required data.
       parameters:
         - in: path
           name: plannedaction_id
@@ -432,7 +431,8 @@ paths:
         This API allows user to set a planned action.
         
         __IMPORTANT__: You MUST specify one among BTC and ETH.
-            In case of error "impossible to fetch", check that the last value in the json does not terminate with a ","
+        
+        In case of error *"impossible to fetch"*, check that the last value in the json does not terminate with a *","*.
       tags:
         - database
       parameters:
@@ -496,7 +496,7 @@ paths:
       summary: GET the value of Bitcoin
       description: |
         This API returns the value of Bitcoin from our exchange.
-        Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Bitcoin.
+        Specifing a value for the parameter *"elem_number"*, the user can retrieve the lastest N stored values of Bitcoin.
         __Example:__ /BTCUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
       tags:
         - database
@@ -529,7 +529,7 @@ paths:
       summary: GET the value of Ethereum
       description: |
         This API returns the value of Ethereum on our exchange.
-        Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Ethereum.
+        Specifing a value for the parameter *"elem_number"*, the user can retrieve the lastest N stored values of Ethereum.
         __Example:__ /ETHUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
       tags:
         - database
@@ -563,7 +563,8 @@ paths:
       description: |
         This API provide all the informations about the specified transaction.
         
-        __IMPORTANT__: if one of the parameter 'transaction_id' is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        __IMPORTANT__: if the parameter *"transaction_id"* is not defined or if the IDs are incorrect, the response schema will contain a field "message" : "Description of the error".
+        If everything is correctly set, the response will contain the required data.
       tags:
         - database
       parameters:
@@ -591,7 +592,7 @@ paths:
     get:
       summary: GET user transaction history
       description: |
-        This API provide the full history of transaction performed by the specified user, both for selling and buying.
+        This API provide the full history of transactions performed by the specified user, both for selling and buying.
       tags:
         - database
       parameters:
@@ -626,7 +627,7 @@ paths:
     post:
       summary: POST allows user to buy/sell
       description: |
-        This API allows the user to buy or sell either Bitcoin or Ethereum at the current price.
+        This API allows the user to buy and sell either Bitcoin or Ethereum at the current price.
       tags:
         - database
       parameters:
@@ -658,7 +659,7 @@ paths:
       description: |
         This API is used to update the Google ID of the user. If the value is not set jet, it will write the received data in the database.
         
-        ____IMPORTANT____: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        ____IMPORTANT____: if one of the parameters is not defined or if the IDs are incorrect, the response schema will contain a field "message" : "Description of the error". If everything is correctly set, the response will contain the required data.
       tags:
         - database
       parameters:
@@ -679,7 +680,7 @@ paths:
       description: |
         This API is used to update the Facebook ID of the user. If the value is not set jet, it will write the received data in the database.
         
-        ____IMPORTANT____: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        ____IMPORTANT____: if one of the parameters is not defined or if the IDs are incorrect, the response schema will contain a field "message" : "Description of the error". If everything is correctly set, the response will contain the required data.
       tags:
         - database
       parameters:
@@ -700,7 +701,7 @@ paths:
       description: |
         This API inserts the informations of the mail of the user in the database.
         
-        __IMPORTANT__: You MUST specify Email and Password value or the server will generate and error. The Name is optional.
+        __IMPORTANT__: You MUST specify Email and Password value or the server will generate and error. Name is optional.
       tags:
         - database
       parameters:
@@ -720,9 +721,9 @@ paths:
     get:
       summary: GET details of the user that has registered with mail method.
       description: |
-        This API retreive all the informations about the user that has registered to the site through Mail.
+        This API retrieve all the informations about the user that has registered to the site through Mail.
         
-        __IMPORTANT:__ Response will be 'null' if no user has registered with the specified mail.
+        __IMPORTANT:__ Response will be __null__ if no user has registered with the specified mail.
       tags:
         - database
       parameters:
@@ -756,7 +757,7 @@ paths:
       description: |
         This API provide all the informations and data of the specified user.
         
-        __IMPORTANT__: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        __IMPORTANT__: if one of the parameters is not defined or if the IDs are incorrect, the response schema will contain a field "message" : "Description of the error". If everything is correctly set, the response will contain the required data.
       tags:
         - database
       parameters:
@@ -790,7 +791,7 @@ paths:
       description: |
         This API allows to initiate and update the balance of the user due to transactions or when it deposits money on its wallet.
         
-        __IMPORTANT__: if one of the parameter is not defined or if the IDs are incorrect, the response schema will contain a field 'message': 'Description of the error'. If everything is correctly set, the response will contain the required data.
+        __IMPORTANT__: if one of the parameters is not defined or if the IDs are incorrect, the response schema will contain a field "message" : "Description of the error". If everything is correctly set, the response will contain the required data.
       tags:
         - database
       parameters:
@@ -888,7 +889,7 @@ paths:
       description: |
         This API allows to get the details of every planned actions the user has scheduled.
         
-        __IMPORTANT__: if the user_id doesn't exists, response will contain a field 'message' : 'Description of the error'.
+        __IMPORTANT__: if the __{user_id}__ doesn't exists, response will contain a field "message" : "Description of the error".
       tags:
         - plannedaction
       parameters:
@@ -908,9 +909,9 @@ paths:
     get:
       summary: GET all the details of the specified planned action
       description: |
-        This API returns all the informations about the planned action that has ID equal to the value of the "action_id" parameter value.
+        This API returns all the informations about the planned action that has ID equal to the value of the __{action_id}__ parameter value.
         
-        __IMPORTANT__: if the user_id doesn't exists, response will be 'null'.
+        __IMPORTANT__: if the __{action_id}__ doesn't exists, response will be __null__.
       tags:
         - plannedaction
       parameters:
@@ -939,7 +940,8 @@ paths:
       summary: DELETE planned action
       description: |
         This API allows to delete planned action before they're triggered.
-        __IMPORTANT__: in case of missing fields, the schema will contain a field 'message' : 'Description of the error'.
+        
+        __IMPORTANT__: in case of missing fields, the schema will contain a field "message" : "Description of the error".
       parameters:
         - name: action_id
           in: path
@@ -978,7 +980,7 @@ paths:
     post:
       summary: POST check if there are planned actions to trigger
       description: |
-        This API check if the actual price is equal to the one of the planned actions scheduled by the users. if yes, it'll trigger that planned action.
+        This API check if the actual price is equal to the one of the planned actions scheduled by the users. If yes, it'll trigger them.
       tags:
         - plannedaction
       parameters:
@@ -1038,7 +1040,8 @@ paths:
       summary: GET the value of Bitcoin
       description: |
         This API returns the value of Bitcoin from our exchange.
-        Specifying a value for the parameter "elem_number", the user can retrieve the latest N stored values of Bitcoin.
+        Specifying a value for the parameter *"elem_number"*, the user can retrieve the latest N stored values of Bitcoin.
+        
         __Example:__ /BTCUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
       tags:
         - price
@@ -1070,7 +1073,8 @@ paths:
       summary: GET the value of Ethereum
       description: |
         This API returns the value of Ethereum from our exchange.
-        Specifying a value for the parameter "elem_number", the user can retrieve the latest N stored values of Ethereum.
+        Specifying a value for the parameter *"elem_number"*, the user can retrieve the latest N stored values of Ethereum.
+       
         __Example:__ /ETHUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
       tags:
         - price
@@ -1104,7 +1108,7 @@ paths:
       description: |
         This API provide all the informations and data of the specified user.
         
-        __IMPORTANT__: if the user_id doesn't exists, schema will contain a field 'message' : 'Description of the error'.
+        __IMPORTANT__: if the __{user_id}__ doesn't exists, schema will contain a field "message" : "Description of the error".
       tags:
         - redirect
       parameters:
@@ -1157,7 +1161,8 @@ paths:
       summary: GET the value of Bitcoin
       description: |
         This API returns the value of Bitcoin from our exchange.
-        Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Bitcoin.
+        Specifing a valure for the parameter *"elem_number"*, the user can retrieve the lastest N stored values of Bitcoin.
+        
         __Example:__ /BTCUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
       tags:
         - redirect
@@ -1191,7 +1196,8 @@ paths:
       summary: GET the value of Ethereum
       description: |
         This API returns the value of Ethereum on our exchange.
-        Specifing a valure for the parameter "elem_number", the user can retreive the lastest N stored values of Ethereum.
+        Specifing a valure for the parameter *"elem_number"*, the user can retrieve the lastest N stored values of Ethereum.
+        
         __Example:__ /ETHUSD?elem_number=4 will return the latest 4 values of Bitcoin on our exchange.
       tags:
         - redirect
@@ -1226,7 +1232,7 @@ paths:
       description: |
         This API provide the full history of transaction performed by the specified user.
         
-        __IMPORTANT__: if the user_id doesn't exists, schema will contain a field 'message' : 'Description of the error'.
+        __IMPORTANT__: if the __{user_id}__ doesn't exists, schema will contain a field "message" : "Description of the error".
       tags:
         - redirect
       parameters:
@@ -1262,7 +1268,7 @@ paths:
       description: |
         This API allows to get the details of every planned actions the the user has scheduled.
         
-        __IMPORTANT__: if the user_id doesn't exists, schema will contain a field 'message' : 'Description of the error'.
+        __IMPORTANT__: if the __{user_id}__ doesn't exists, schema will contain a field "message" : "Description of the error".
       tags:
         - redirect
       parameters:
@@ -1302,7 +1308,7 @@ paths:
       description: |
         This API provides the full history of transactions performed by the specified user.
        
-        __IMPORTANT__: if the user_id doesn't exists, schema will contain a field 'message' : 'Description of the error'.
+        __IMPORTANT__: if the __{user_id}__ doesn't exists, schema will contain a field "message" : "Description of the error".
       tags:
         - transaction
       parameters:
@@ -1337,6 +1343,7 @@ paths:
       summary: POST allows user to buy and sell
       description: |
         This API allows the user to buy or sell either Bitcoin or Ethereum at the price if the server.
+        
         __IMPORTANT__: ONLY ONE among BTC and ETH must be specified. Be careful not to leave ',' after the last value of the json object, or an error will occur.
       tags:
         - transaction
@@ -1366,7 +1373,7 @@ paths:
       description: |
         This API provide all the informations and data of the specified user.
         
-        __IMPORTANT__: if the user_id doesn't exists, schema will contain a field 'message' : 'Description of the error'.
+        __IMPORTANT__: if the __{user_id}__ doesn't exists, schema will contain a field "message" : "Description of the error".
       tags:
         - user
       parameters:
@@ -1436,7 +1443,7 @@ paths:
       description: |
         This API allows to  update the information of the user that has Sign In with Google.
         
-        __IMPORTANT__: the ID_GOOGLE MUST BE specified or an error will occour.
+        __IMPORTANT__: the *id_google* MUST BE specified or an error will occour.
       tags:
         - user
       parameters:
@@ -1457,7 +1464,7 @@ paths:
       description: |
         This API allows to update the Facebook date of the user.
         
-        __IMPORTANT__: the ID_FACEBOOK MUST BE specified or an error will occour.
+        __IMPORTANT__: the *id_facebook* MUST BE specified or an error will occour.
       tags:
         - user
       parameters:
@@ -1477,8 +1484,6 @@ paths:
       summary: POST insert the data of the new user
       description: |
         This API allows the user to sign up in the site.
-        
-        __HOW TO TEST__: paste this code in the field "Body" of the Console
       tags:
         - user
       parameters:
@@ -1503,9 +1508,9 @@ paths:
     get:
       summary: GET details of the user that has registered with Mail
       description: |
-        This API retreive all the informations about the user that has registered with the specified mail.
+        This API retrieve all the informations about the user that has registered with the specified mail.
         
-        __IMPORTANT__: response will be 'null' if there isn't a user with the specified __{mail}__ that has registered by __Mail__ and not using Facebook or Google.
+        __IMPORTANT__: response will be __null__ if there isn't a user with the specified __{mail}__ that has registered by __Mail__ and not using Facebook or Google.
       tags:
         - user
       parameters:
@@ -1546,6 +1551,7 @@ definitions:
     properties:
       tokenid:
         type: string
+        description: 'The value is just an example, it may be espired.'
         example: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjZmYjA1Zjc0MjM2NmVlNGNmNGJjZjQ5Zjk4NGM0ODdlNDVjOGM4M2QiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiNTMzMDI0NTUyNTcyLWx0Ymw0a3Mxa2liNXFvZDljZ2loYzJwcGpoY2RlbTJsLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiNTMzMDI0NTUyNTcyLWx0Ymw0a3Mxa2liNXFvZDljZ2loYzJwcGpoY2RlbTJsLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTA3MzYwNTI1OTMzNTMyODAxMzkwIiwiaGQiOiJzdHVkZW50aS51bml0bi5pdCIsImVtYWlsIjoiZnJhbmNlc2NvLmJydXNjaGV0dGlAc3R1ZGVudGkudW5pdG4uaXQiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXRfaGFzaCI6IlRpS2x3M3NVZ1lvS19ueE1TaFMtTFEiLCJuYW1lIjoiRnJhbmNlc2NvIEJydXNjaGV0dGkiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDQuZ29vZ2xldXNlcmNvbnRlbnQuY29tLy1WNW1aRVV4RUZxWS9BQUFBQUFBQUFBSS9BQUFBQUFBQUFBQS9BQ2V2b1FOMjBGdmxRZnJUeFl6Tk9BQ0U5Q2tsRDN1dkJRL3M5Ni1jL3Bob3RvLmpwZyIsImdpdmVuX25hbWUiOiJGcmFuY2VzY28iLCJmYW1pbHlfbmFtZSI6IkJydXNjaGV0dGkiLCJsb2NhbGUiOiJpdCIsImlhdCI6MTU0OTE5MTA4NywiZXhwIjoxNTQ5MTk0Njg3LCJqdGkiOiJjMzVhNmYzZjA2NGYwOTVjMTEzMWQwZGM3OWM1MzlkYzIxZTU1NmY5In0.wuIN-cCRapuiaTTx64rFhtmnJNHEUCKPiDGSQQ8slsbtBl7ArDqHlwt6rel1uB1MTEBX6Hn6VHIhXv8KB1Gz4p2gK0jHA0Ms006K8Y6dMXje8RvkOu_GjF6JdV2SbnhbASsHdI4671rxklygICoCntBVbJYQWS7E7ijHISLbW_uPf2744iIH1BdSuQQaE9TGuab81-vUUeL05qjZBKsIUF9ERg1il4PZ1bwHXbG1xAdk-ey3qi_QGj1ZAR_Ii7v6laJan-ACVOEwiSwvrbVdBxqbzhO7wJEN0h9idZ1ZWNLZy_rcATrnNAkvKehgXEMRSqW53ulxoJOMBFxDiNxhtA'
       user:
         type: object
@@ -1568,6 +1574,7 @@ definitions:
     properties:
       tokenid:
         type: string
+        description: 'The value is just an example, it may be espired.'
         example: 'EAAe9iyaWCEoBANk6BcMda3yEZCfoTukaIZBECbOvaTyZBZCOCJNSv6WrZCpTye9nSTEN9Dije4MXfVsLFGJKLeZBn5TtafQrCaHRDZAHDgX9wWjfWoHkaZBfbpBZCMkc26BwWCNZBpaObqFXf7rwlj2gRa7u2eHYJ5puZCNk5qfsy4bSdLe9uJrJAud5lN3725C1DoCGY3eZBnY4DwZDZD'
       user:
         type: object
