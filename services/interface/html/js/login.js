@@ -52,7 +52,7 @@ function onMailLogin() {
 function onMailRegister() {
     var email = $('#ma-box-email').val()
     var username = $('#ma-box-username').val()
-    var image_url = 'https://www.iconspng.com/images/-abstract-user-icon-1/-abstract-user-icon-1.jpg'
+    var image_url = '/images/user-icon.jpg'
     var psw = $('#ma-box-password').val()
     var re_psw = $('#ma-box-repeat-password').val()
 
